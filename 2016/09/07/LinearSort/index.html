@@ -1,0 +1,840 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="数据结构与算法," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一期一会" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="在计算机科学中，排序是一个非常基础的算法。不同的排序算法有不同的时间和空间开销。在这么多的排序算法中，根据在排序的最终结果中，各元素的次序是否依赖于它们之间的比较，可以将排序算法分为两大类：基于比较的排序和非基于比较的排序。">
+<meta name="keywords" content="数据结构与算法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="线性排序算法：计数排序、基数排序和桶排序">
+<meta property="og:url" content="http://blog.jonnydu.me/2016/09/07/LinearSort/index.html">
+<meta property="og:site_name" content="一期一会">
+<meta property="og:description" content="在计算机科学中，排序是一个非常基础的算法。不同的排序算法有不同的时间和空间开销。在这么多的排序算法中，根据在排序的最终结果中，各元素的次序是否依赖于它们之间的比较，可以将排序算法分为两大类：基于比较的排序和非基于比较的排序。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://i.imgur.com/pgoZnNn.png">
+<meta property="og:image" content="http://i.imgur.com/Yz80C5w.png">
+<meta property="og:image" content="http://i.imgur.com/hvHJ4Lx.png">
+<meta property="og:image" content="http://i.imgur.com/eOVN7vZ.png">
+<meta property="og:image" content="http://i.imgur.com/sLQPdaX.png">
+<meta property="og:updated_time" content="2016-09-16T11:48:06.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="线性排序算法：计数排序、基数排序和桶排序">
+<meta name="twitter:description" content="在计算机科学中，排序是一个非常基础的算法。不同的排序算法有不同的时间和空间开销。在这么多的排序算法中，根据在排序的最终结果中，各元素的次序是否依赖于它们之间的比较，可以将排序算法分为两大类：基于比较的排序和非基于比较的排序。">
+<meta name="twitter:image" content="http://i.imgur.com/pgoZnNn.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '一期一会'
+    }
+  };
+</script>
+
+  <title> 线性排序算法：计数排序、基数排序和桶排序 | 一期一会 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">一期一会</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CFymCPjb2LHwhFXVjxQk','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                线性排序算法：计数排序、基数排序和桶排序
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-09-07T20:43:51+08:00" content="2016-09-07">
+              2016-09-07
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/09/07/LinearSort/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/07/LinearSort/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在计算机科学中，排序是一个非常基础的算法。不同的排序算法有不同的时间和空间开销。在这么多的排序算法中，根据在排序的最终结果中，各元素的次序是否依赖于它们之间的比较，可以将排序算法分为两大类：基于比较的排序和非基于比较的排序。<br><a id="more"></a><br>基于比较的排序需要对序列中的数据进行比较，如我们最常用的快速排序、堆排序和归并排序。根据决策树模型可以证明：基于比较的排序算法的时间复杂度是不能突破O(NlogN)的。（《算法导论》8.1）<br>而非基于比较的排序，如本文将要介绍的计数排序、基数排序和桶排序，则可以突破O(NlogN)的时间下限。当然，这样的非比较的排序的使用会有一些条件的限制，比如元素的大小，所以，在一般在特定场合下，非基于比较的排序算法能够巧妙地解决一些问题。     </p>
+<h3 id="计数排序"><a href="#计数排序" class="headerlink" title="计数排序"></a>计数排序</h3><p>首先介绍计数排序。<br>计数排序假设n个输入元素的每一个都是在0到K区间内的一个整数，其中K为某个正整数。计数排序的基本思想是，对每一个输入元素x，确定小于x的元素个数。利用这一信息，就可以直接把x放到它在输出数组的位置上了。比如，如果有17个元素小于x，则x就应该放在第18（或17，看数组a[0]怎么处理）个输出位置上。<br>按照这个思想，可以写出计数排序的伪代码：    </p>
+<pre><code>COUNTING-SORT(A,B,k)
+    let C[0,k] be a new array
+    for i=0 to k
+        C[i]=0
+    for j=0 to A.length-1
+        C[A[j]]=C[A[j]]+1
+    for i=1 to k
+        C[i]=C[i]+C[i-1]
+    for j=A.length-1 to 0
+        B[C[A[j]]-1]=A[j]
+        C[A[j]]=C[A[J]]-1
+</code></pre><p>说明一下，《算法导论》中的伪代码采用的是输入数组为A[1..n],输出数组为B[1..n]。这里没有这样做，而是采用传统的0~n-1的数组下标作为输入输出，本质是一样的。     </p>
+<p>下面以数据2 5 3 0 2 3 0 3为例说明计数排序的执行过程。<br><img src="http://i.imgur.com/pgoZnNn.png" alt=""><br><img src="http://i.imgur.com/Yz80C5w.png" alt=""><br><img src="http://i.imgur.com/hvHJ4Lx.png" alt=""><br>容易看出，第一个for循环所花时间为Θ(k)，第二个for循环所花时间为Θ(n)，第三个for循环所花时间为Θ(k)，最后一个循环所花时间为Θ(n)。这样，总的时间代价就是Θ(n+k)。所以，当k=O(n)时，一般可以采用计数排序，这时运行时间为Θ(n)。          </p>
+<h3 id="桶排序"><a href="#桶排序" class="headerlink" title="桶排序"></a>桶排序</h3><p>桶排序假设输入数据服从均匀分布，平均情况下它的时间代价为O(n)。与计数排序类似，因为对输入数据做了某种假设，桶排序的速度也很快。具体来说，计数排序假设输入数据都属于一个小区间内的整数，而桶排序则假设输入是由一个随机过程产生，该过程将元素均匀、独立地分布在[0,1)区间上。我们把区间[0,1)划分成n个相同大小的子区间，称为桶。将n个记录分布到各个桶中去。如果有多于一个记录分到同一个桶中，需要进行桶内排序。<br>在桶排序的代码中，假设输入是一个包含n个元素的数组A，且每个元素A[i]满足0&lt;=A[i]&lt;1。此外，算法还需要一个临时数组B[0..n-1]来存放链表（即桶），并假设存在一种用于维护这些链表的机制。在分完桶后，对每个桶进行排序，然后合并最后的结果。<br>桶排序用伪代码表示如下：</p>
+<pre><code>BUCKET-SORT(A)
+    n=A.length
+    let B[0..n-1] to be a new array
+    for i=0 to n-1
+        make B[i] an empty list
+    for i=1 to n
+        insert A[i] to list B[nA[i]]
+    for i=0 to n-1
+        sort list B[i] with insertion sort
+    concatenate the list B[0],B[1],...,B[n-1] together in order
+</code></pre><p>例如，要对大小为[1..1000]范围内的n个整数A[1,n]排序，可以把桶设为大小为10的范围，具体而言，设集合B[0]存储[1..10)的整数，集合B[2]存储(10,20]的整数…依次，总共有100个桶。然后对A[1,n]从头到尾扫描一遍，把每个A[i]放入对应的桶B[j]中。然后再对这100个桶中每个桶里的数字进行排序。最后依次输出每个桶里面的数字，这样得到的就是排好序的序列了。<br>桶排序的平均时间复杂度为线性的O(N+C)，其中C为桶内快排的时间复杂度，如果对于同样的N，桶数量M越大，其效率越大，最好的时间复杂度达到O(N)。但是，桶排序的空间复杂度为O(N+M)，如果输入数据很庞大，而桶的数量也非常多，则空间代价是昂贵的。 </p>
+<h3 id="基数排序"><a href="#基数排序" class="headerlink" title="基数排序"></a>基数排序</h3><p>另外一种线性排序方式是基数排序。下面通过一个例子来说明基数排序的思想。<br>假设有待排序的数据序列如下：<br>73 22 93 43 55 14 28 65 39 81<br>首先根据个位数的数值，在遍历数据时将它们各自分到编号为0-9的桶中，分配的结果如下图所示：<br> <img src="http://i.imgur.com/eOVN7vZ.png" alt=""><br>分配结束后，接下来将所有桶中所盛数据按照桶号由小到大依次重新收集起来，得到下列仍然无序的数据序列：<br>81 22 73 93 43 14 55 65 28 39<br>接着，再进行一次分配，这次根据十位数值来分配（原理同上），分配结构如下所示。<br><img src="http://i.imgur.com/sLQPdaX.png" alt=""><br>这样，原来无序的数据序列已经排序完毕。如果排序的位数大于2，则重复以上动作至最后一位。<br>当然，上面的排序过程中有一个还需探究的问题，即在原来的序列中的73 93 43（个位数相同）三个数的顺序，在经过第一次分配之后，在桶中的顺序由底至上应该为73 93 43（即装的迟的在最上面），但是在3号桶中刚好相反。这正是基数排序稳定的原因，分配时是从预排数据序列的末尾开始进行，逐次分配至首位。<br>所以，不难看出，基数排序原理类似于桶排序，只是这里总是需要十个桶，多次使用。     </p>
+<pre><code>/*
+ * getdigit(arr[i],k)用于获得arr[i]第k位上的数字
+ */
+
+void lsdRadixSort(int arr[], int begin, int end, int d)
+{
+    const int radix = 10;
+    int count[radix];
+    int i,j;
+
+    int *bucket = (int*)malloc((end-start+1)*sizeof(int));
+    for(int k=1;k&lt;=d;k++)
+    {
+        for(i=0;i&lt;radix;i++)
+        {
+            count[i]=0;
+        }
+        for(i=begin;i&lt;=end;i++)
+        {
+            count[getdigit(arr[i], k)]++;    
+        }    
+        for(i=1;i&lt;radix;i++)
+        {
+            count[i] = count[i] + count[i-1];
+        }
+        for(i=end;i&gt;=end;--i)
+        {
+            j = getdigit(arr[i], k);
+            bucket[count[j]-1] = arr[i];
+            --count[j];
+        }
+        for(i=begin,j=0;i&lt;=end;++i,++j)
+        {
+            arr[i] = bucket[j];
+        }
+    }
+    free(bucket);    
+}            
+</code></pre><p>所以，给定n个d位数，其中每一个数位有k个可能的取值，所以，每一轮排序耗时Θ(n+k)，那么整个基数排序的总时间为Θ(d(n+k))，当d为常数且k=O(n)时，基数排序具有线性的时间代价。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>以上三种线性时间排序方法突破了基于比较排序的O(NlogN)的时间下界，这样的非比较排序的方法会有一些使用场景的限制，比如元素的大小，所以，在特定的条件下，会体现出较好的性能。<br>本质上，都体现了用空间换时间的理念。        </p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/数据结构与算法/" rel="tag">#数据结构与算法</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/08/26/muduo-7/" rel="next" title="从BlockingQueue再探线程同步">
+                <i class="fa fa-chevron-left"></i> 从BlockingQueue再探线程同步
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/09/14/cplusplusReference/" rel="prev" title="C++引用剖析">
+                C++引用剖析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/09/07/LinearSort/"
+           data-title="线性排序算法：计数排序、基数排序和桶排序" data-url="http://blog.jonnydu.me/2016/09/07/LinearSort/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="jonnydu" />
+          <p class="site-author-name" itemprop="name">jonnydu</p>
+          <p class="site-description motion-element" itemprop="description">jonnydu.uestc@gmail.com</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">63</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jiongdu" target="_blank">
+                  
+                    <i class="fa fa-https://github.com/jiongdu"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/3309795495" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 微博
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#计数排序"><span class="nav-number">1.</span> <span class="nav-text">计数排序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#桶排序"><span class="nav-number">2.</span> <span class="nav-text">桶排序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基数排序"><span class="nav-number">3.</span> <span class="nav-text">基数排序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">jonnydu</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+  
+  
+<script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = NexT.utils.escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    NexT.motion.middleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+
+      if (CONFIG.sidebar.display === 'post' || CONFIG.sidebar.display === 'always') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          NexT.utils.displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"jonnydu"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+  
+
+
+
+
+
+  
+  
+  
+
+  
+
+
+</body>
+</html>

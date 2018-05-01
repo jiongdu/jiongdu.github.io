@@ -1,0 +1,777 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="NVMe over RDMA," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一期一会" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="海量数据的迸发和传统存储技术所面临的性能瓶颈，促进了新型存储技术和系统架构的高速发展。">
+<meta name="keywords" content="NVMe over RDMA">
+<meta property="og:type" content="article">
+<meta property="og:title" content="存储的那些词儿">
+<meta property="og:url" content="http://blog.jonnydu.me/2017/02/13/storage/index.html">
+<meta property="og:site_name" content="一期一会">
+<meta property="og:description" content="海量数据的迸发和传统存储技术所面临的性能瓶颈，促进了新型存储技术和系统架构的高速发展。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://i.imgur.com/4uOqsG8.png">
+<meta property="og:image" content="http://i.imgur.com/J22ZZLp.png">
+<meta property="og:updated_time" content="2017-05-05T12:08:18.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="存储的那些词儿">
+<meta name="twitter:description" content="海量数据的迸发和传统存储技术所面临的性能瓶颈，促进了新型存储技术和系统架构的高速发展。">
+<meta name="twitter:image" content="http://i.imgur.com/4uOqsG8.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '一期一会'
+    }
+  };
+</script>
+
+  <title> 存储的那些词儿 | 一期一会 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">一期一会</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CFymCPjb2LHwhFXVjxQk','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                存储的那些词儿
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-02-13T15:06:23+08:00" content="2017-02-13">
+              2017-02-13
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/02/13/storage/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/13/storage/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>海量数据的迸发和传统存储技术所面临的性能瓶颈，促进了新型存储技术和系统架构的高速发展。<br><a id="more"></a></p>
+<h3 id="存储的那些词儿"><a href="#存储的那些词儿" class="headerlink" title="存储的那些词儿"></a>存储的那些词儿</h3><p>本文简单介绍下在存储领域出现频率最高的几个词语:SATA、PCIe、AHCI和NVMe（Non-Volatile Memory Express，非易失性存储器标准）。</p>
+<h4 id="SATA和PCIe"><a href="#SATA和PCIe" class="headerlink" title="SATA和PCIe"></a>SATA和PCIe</h4><p>SATA和PCIe大家应该比较熟悉，这两个都是总线标准。<br>SATA由IDE/ATA标准发展而来，主要用途是把存储设备连接到主板。SATA的发展主要经历了以下版本：<br>SATA revision 1.0 (1.5 Gbit/s, 150 MB/s)<br>SATA revision 2.0 (3 Gbit/s, 300 MB/s)<br>SATA revision 3.0 (6 Gbit/s, 600 MB/s)<br>SATA revision 3.1<br>SATA revision 3.2 (16 Gbit/s, 1969 MB/s)<br>SATA在发展过程中，考虑了向下兼容的问题，比如主板上SATA-3的接口，可以连接SATA-2的硬盘。但同时，向下兼容也造成了其发展缓慢。<br>出于向下兼容的考虑，SATA可以工作在两种模式：传统模式和AHCI模式。传统模式是为了兼容以前的 IDE/ATA。AHCI模式则比较新，支持SATA独有的功能，如热插拔、原生命令队列（NCQ）等。      </p>
+<p>PCIe是另一种总线标准，由AGP、PCI、PCI-x发展而来，而这些总线的发展，主要的动力是显卡的发展。AGP就是Accelerated Graphics Port（加速图像端口）的缩写。由于显卡需要很大的带宽和速度，PCI总线标准就不断升级来满足要求。当然，除了显卡外，PCI总线还用于其他的扩展卡，如网卡（包括有线网卡、无线网卡、3G/4G卡等）。  </p>
+<h4 id="AHCI和NVMe"><a href="#AHCI和NVMe" class="headerlink" title="AHCI和NVMe"></a>AHCI和NVMe</h4><p>AHCI和NVMe是逻辑（或者说软件、驱动程序）上的标准。<br>从上面 SATA的不同版本可以看到，提速是一个主要任务（当然也有其他的改进）。但进入SSD时代后，SATA的改版速度（由于要考虑向下兼容），已经跟不上传输速度的要求了。这时候，业界就考虑采用PCIe来连接存贮设备。但在驱动程序层面，仍然采用AHCI。这是因为AHCI已经非常成熟，广泛被各种操作系统（如Windows、Linux）所采用。<br>AHCI是为了发挥SATA的潜能而设计的，当时算是“高大上”了。但当时仍然是机械硬盘统治市场，因此AHCI的设计是基于机械硬盘的特性（旋转式磁性盘片）。虽然AHCI也可以用于SSD，但却不能发挥极致。因为SSD更像内存，而不像“盘片”。譬如说，机械硬盘，如果磁头错过了一个扇区，那就得等盘片转一圈回来才能访问。SSD就不存在这个问题。因此，业界重新设计一个新的NVMe协议，希望发挥 SSD的潜能。下面是AHCI和NVMe的对比：<br><img src="http://i.imgur.com/4uOqsG8.png" alt="">   </p>
+<h4 id="物理接口"><a href="#物理接口" class="headerlink" title="物理接口"></a>物理接口</h4><p>说完了总线和协议，下面说说物理接口。无论采用什么总线和协议，主板总得连接到存储设备上。这里所说的物理接口，指是是物理尺寸和形状，电气特征不作讨论。接口分为主机端和设备端，种类繁多，这里挑几个常见的。<br>1.SATA接口。采用这种接口的，只能使用SATA总线，不能使用PCIe总线。大部分2.5”SSD就是这种接口。<br>2.M.2接口。采用这种接口的SSD，可以使用SATA或者PCIe总线（取决于主板和SSD）。如果采用PCIe总线，又分为AHCI和NVMe两种协议。<br>3.SATA Express接口。SATA Express使用的是PCIe总线，向下兼容SATA总线。</p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>不同存储总线标准/协议之间的组合如下图所示。<br><img src="http://i.imgur.com/J22ZZLp.png" alt=""><br>可以看出，AHCI和NVMe是驱动程序层面的。NVMe只适用于SSD（SSD和主板也要支持NVMe才行）。AHCI则适用于机械硬盘和SSD。<br>在主板芯片层面，有AHCI控制器和PCIe控制器。有趣的是AHCI驱动程序“居然”可以使用PCIe控制器（中间那条橙色的线）。这个其实是个过渡方案，目的是在利用PCIe高带宽的同时，保持对上层软件的兼容性。<br>绿色那个框是主板上的物理接口。注意即使是同样的物理接口，也可以选择不同的总线和协议（如果主机和设备支持的话）。<br>右下角的PCIe SSD设备则可以有两种不同的控制器（最下面的两个框）：AHCI和NVMe。因此，同样是PCIe的SSD，也可以有不同的传输效能。<br>说了这么多，相信大家已经晕了。下面按传输效率做个排序。<br>1.PCIe NVMe<br>这个是最高大上的。在笔记本市场，根据效能，可以再细分为两个等级：<br>（1）M.2尺寸的NVMe（如三星 950 PRO）。可以有四条PCIe通道，速度最快。但由于电路板面积限制，容量和发热都是个问题。<br>（2）2.5″尺寸的NVMe（如东芝XG3），采用SATA Express接口，可以有两条PCIe通道，传输速率较低。此外，由于2.5″体积较大，容量和发热比 M.2 要好。<br>2.PCIe AHCI<br>效能比1稍低，是由于AHCI协议的滞后性决定的。笔记本上只有M.2外形，没有2.5″外形。<br>3.SATA AHCI<br>效能最低，但兼容性最好，根据外形可分为两类。这两类的传输效能是一样的，无分高低。<br>（1）M.2外形的设备，如三星850EVO的M.2盘。<br>（2）2.5″外形的设备，如目前广泛使用的机械硬盘，固态硬盘等。</p>
+<h3 id="附"><a href="#附" class="headerlink" title="附"></a>附</h3><p>接下来将详细分析NVMe的设计及其带来的性能提升。   </p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/NVMe-over-RDMA/" rel="tag">#NVMe over RDMA</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/01/20/Distribute-Sort/" rel="next" title="分配排序（桶排序和基数排序）总结">
+                <i class="fa fa-chevron-left"></i> 分配排序（桶排序和基数排序）总结
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/17/NVMe/" rel="prev" title="NVMe技术浅析">
+                NVMe技术浅析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/02/13/storage/"
+           data-title="存储的那些词儿" data-url="http://blog.jonnydu.me/2017/02/13/storage/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="jonnydu" />
+          <p class="site-author-name" itemprop="name">jonnydu</p>
+          <p class="site-description motion-element" itemprop="description">jonnydu.uestc@gmail.com</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">63</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jiongdu" target="_blank">
+                  
+                    <i class="fa fa-https://github.com/jiongdu"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/3309795495" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 微博
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#存储的那些词儿"><span class="nav-number">1.</span> <span class="nav-text">存储的那些词儿</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#SATA和PCIe"><span class="nav-number">1.1.</span> <span class="nav-text">SATA和PCIe</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AHCI和NVMe"><span class="nav-number">1.2.</span> <span class="nav-text">AHCI和NVMe</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#物理接口"><span class="nav-number">1.3.</span> <span class="nav-text">物理接口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总结"><span class="nav-number">1.4.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#附"><span class="nav-number">2.</span> <span class="nav-text">附</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">jonnydu</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+  
+  
+<script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = NexT.utils.escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    NexT.motion.middleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+
+      if (CONFIG.sidebar.display === 'post' || CONFIG.sidebar.display === 'always') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          NexT.utils.displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"jonnydu"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+  
+
+
+
+
+
+  
+  
+  
+
+  
+
+
+</body>
+</html>

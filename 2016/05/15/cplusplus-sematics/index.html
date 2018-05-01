@@ -1,0 +1,879 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="C++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一期一会" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="值语义和对象语义值语义(value sematics)指的是对象的拷贝与原对象无关，拷贝之后就与原对象脱离关系。C++的内置类型都是值语义，如bool/int/double等，标准库里的pair&amp;lt;&amp;gt;,vector&amp;lt;&amp;gt;,map&amp;lt;&amp;gt;，string等类型也都是值语义。Java语言的primitive types(原生数据类型)也是值语义。与值语义(object sem">
+<meta name="keywords" content="C++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="浅谈C++值语义和对象语义">
+<meta property="og:url" content="http://blog.jonnydu.me/2016/05/15/cplusplus-sematics/index.html">
+<meta property="og:site_name" content="一期一会">
+<meta property="og:description" content="值语义和对象语义值语义(value sematics)指的是对象的拷贝与原对象无关，拷贝之后就与原对象脱离关系。C++的内置类型都是值语义，如bool/int/double等，标准库里的pair&amp;lt;&amp;gt;,vector&amp;lt;&amp;gt;,map&amp;lt;&amp;gt;，string等类型也都是值语义。Java语言的primitive types(原生数据类型)也是值语义。与值语义(object sem">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://i.imgur.com/xN0fihh.png">
+<meta property="og:image" content="http://i.imgur.com/ptaBium.png">
+<meta property="og:updated_time" content="2016-08-02T06:05:28.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="浅谈C++值语义和对象语义">
+<meta name="twitter:description" content="值语义和对象语义值语义(value sematics)指的是对象的拷贝与原对象无关，拷贝之后就与原对象脱离关系。C++的内置类型都是值语义，如bool/int/double等，标准库里的pair&amp;lt;&amp;gt;,vector&amp;lt;&amp;gt;,map&amp;lt;&amp;gt;，string等类型也都是值语义。Java语言的primitive types(原生数据类型)也是值语义。与值语义(object sem">
+<meta name="twitter:image" content="http://i.imgur.com/xN0fihh.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '一期一会'
+    }
+  };
+</script>
+
+  <title> 浅谈C++值语义和对象语义 | 一期一会 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">一期一会</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CFymCPjb2LHwhFXVjxQk','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                浅谈C++值语义和对象语义
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-05-15T19:29:20+08:00" content="2016-05-15">
+              2016-05-15
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/05/15/cplusplus-sematics/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/15/cplusplus-sematics/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="值语义和对象语义"><a href="#值语义和对象语义" class="headerlink" title="值语义和对象语义"></a>值语义和对象语义</h3><p>值语义(value sematics)指的是对象的拷贝与原对象无关，拷贝之后就与原对象脱离关系。C++的内置类型都是值语义，如bool/int/double等，标准库里的pair&lt;&gt;,vector&lt;&gt;,map&lt;&gt;，string等类型也都是值语义。Java语言的primitive types(原生数据类型)也是值语义。<br>与值语义(object sematics)对应的是”对象语义”，或者也叫做”引用语义”。对象语义指的是面向对象意义下的对象，对象是禁止拷贝的或拷贝后与原来的对象存在关联。比如，拷贝一个Employee对象是没有意义的，一个雇员不会变成两个雇员。同样，muduo库中的TcpConnection，显然也是不可复制的，因为牵涉到系统的资源。Java里面的class对象都是对象语义/引用语义。<br><a id="more"></a><br>下面举Java和C++几个简单的例子看值语义和对象语义:</p>
+<h4 id="Java"><a href="#Java" class="headerlink" title="Java"></a>Java</h4><pre><code>int a = 8;
+int b = a;
+</code></pre><p>这里的a，b都是int， 属于Java中原生数据类型，他们的特点是复制后二者再无关联。它们表现出来是两个value。<br>与他们形成对比的是用户自定义的class，如下:</p>
+<pre><code>Student a1 = new Student(&quot;dujiong&quot;, 23);
+Student a2 = a1;
+a2.setAge(25);    
+System.out.println(a1.getAge());
+</code></pre><p>代码输出为25，因为第二行语句，导致a和b指向的是同一个对象，修改a2也会影响a1，所以表现的行为是一种reference。</p>
+<h4 id="C"><a href="#C" class="headerlink" title="C++"></a>C++</h4><p>如前所述，C++的内置类型、标准库容器如vector&lt;&gt;，map&lt;&gt;等都是值语义，C++要求凡是可以放入容器的元素都必须具备值语义，即必须具备拷贝的能力，放入标准容器的元素和之前的元素没有任何的关联。<br>而C++的普通类呢?</p>
+<pre><code>class Book
+{
+    private:
+        string isbn_;
+        double price_;
+        int amount_;
+};
+</code></pre><p>如果以下面的代码:</p>
+<pre><code>Book a1;
+Book a2 = a1;
+</code></pre><p>那么a1和a2复制后将没有任何关联，他们的表现属于值语义。</p>
+<h3 id="值语义与C-语言"><a href="#值语义与C-语言" class="headerlink" title="值语义与C++语言"></a>值语义与C++语言</h3><p>C++的class本质上是值语义的。C++的设计初衷是让用户定义的类型(class)能像内置类型一样工作，具有同等的地位。为此，C++做了妥协:<br>(1) class的layout与C struct一样，没有额外的开销，定义一个”只包含一个int成员的class”的对象开销和一个int一样。<br>(2) class可以在stack上创建，也可以在heap上创建。。<br>(3) class的data member默认都是uninitialized。<br>(4) class的数组是一个个class对象挨着，没有额外的indirection。<br>(5) 编译器为class默认生成copy constructor和assignment operator。其他语言没有copy constructor，也不允许重载assignment operator。C++的对象默认是可以拷贝的。<br>(6) 当class类型传入函数时，默认是make a copy(除非参数声明为reference)。<br>(7) 当函数返回一个class type时，只能通过make a copy(C++不得不定义RVO来解决性能问题)。<br>(8) 当class type为成员时，数据成员时嵌入的。<br>C++这样的设计带来了性能上的好处。比如在C++里定义复数类(complex<double>class)和其数组(array)、向量(vector)，它们的layout分别是:</double></p>
+<p>   <img src="http://i.imgur.com/xN0fihh.png" alt=""></p>
+<p>而如果在Java中定义同样的结构，就不一样。</p>
+<p><img src="http://i.imgur.com/ptaBium.png" alt=""></p>
+<p>Java中每个object都有header。对比Java，C++的对象模型更紧凑。</p>
+<h3 id="值语义与生命期"><a href="#值语义与生命期" class="headerlink" title="值语义与生命期"></a>值语义与生命期</h3><p>值语义的一个巨大好处是生命期管理很简单，就像你不需要操心基本数据类型的生命期一样。值语义的对象要么是栈上对象，要么作为其他对象的成员(一个成员函数使用自己的数据成员对象)。而，对象语义由于不能拷贝，只能通过指针或引用来使用它。而一旦使用指针或引用来操作对象，那么就要担心所指的对象是否已被释放，而这也是C++ bug的主要来源。此外，C++只能通过指针或引用来获得多态，所以，在C++中进行继承和多态的面向对象编程中，资源管理成为了一大难题。            </p>
+<h4 id="模型1"><a href="#模型1" class="headerlink" title="模型1"></a>模型1</h4><p>模型1: a Parent has a Child, a Child knows his/her Parent<br>Java中很好些，不用担心内存泄露，也不用担心空悬指针。    </p>
+<pre><code>public class Parent{
+    private Child myChild;    
+}
+public class Child{
+    private Parent myParent;    
+}
+</code></pre><p>只要正确初始化myChild和myParent即可。<br>而在C++里就要为资源管理费一番脑筋:Parent 和 Child 都代表的是真人，肯定是不能拷贝的，因此具有对象语义。Parent 是直接持有 Child 吗？抑或 Parent 和 Child 通过指针互指？Child 的生命期由 Parent 控制吗？<br>直接但是易错的写法:</p>
+<pre><code>class Child;
+class Parent : boost::noncopyable
+{
+    private:
+        Child* myChild;
+};
+
+class Child : boodt::noncopyable
+{
+    private:
+        Parent* myParent;
+};
+</code></pre><p>那么，直接使用指针作为成员，那么如何确保指针的有效性？如何防止出现空悬指针？Child 和 Parent 由谁负责释放？在释放某个 Parent 对象的时候，如何确保程序中没有指向它的指针？在释放某个 Child 对象的时候，如何确保程序中没有指向它的指针？<br>这一系列问题都是C++面向对象编程令人头疼的问题。现在可以使用boost智能指针解决(C++11引入,用栈上对象管理堆上对象的生命期），借助于智能指针把对象语义转换为值语义，从而解决对象生命期问题：让Parent持有Child的智能指针，同时让Child持有Parent的智能指针，这样始终引用对方的时候就不用担心出现空悬指针。当然，其中一个智能应该是weak reference，否则会出现循环引用，导致内存泄露。<br>所以，如果Parent拥有Child，Child的生命期由其Parent控制，Child的生命期小于Parent，那么代码：     </p>
+<pre><code>class Parent;
+class Child : boost::noncopyable
+{
+    public:
+        explicit Child(Parent* myParent) : myParent_(myParent)
+        { }
+    private:
+        Parent* myParent_;
+};
+class Parent : boost::noncopyable
+{
+    public:
+        Parent() : myChild(new Child(this))
+        { }
+    private:
+        boost::scoped_ptr&lt;Child&gt; myChild;
+}; 
+</code></pre><h4 id="模型2"><a href="#模型2" class="headerlink" title="模型2"></a>模型2</h4><p>模型2: a Child has parents:mom and dad; a Parent has one or more Child; a Parent knows his/her spouser<br>Java描述还是很简单，垃圾收集会搞定对象生命期。</p>
+<pre><code>public class Parent{
+    private Parent mySpouser;
+    private ArrayList&lt;Child&gt; myChildren;    
+}
+public class Child{
+    private Parent myMom;
+    private Parent myDad;
+}
+</code></pre><p>而如果用C++实现，还是需要借助于智能指针将裸指针转化为值语义。</p>
+<pre><code>class Parent;
+typedef boost::shared_ptr&lt;Parent&gt; ParentPtr;
+
+class Child : boost::noncopyable
+{
+    public:
+        explicit Child(const ParentPtr&amp; myMom, const ParentPtr&amp; myDad)
+        : myMom_(myMom), myDad_(myDad)
+        { }
+    private:
+        boost::weak_ptr&lt;Parent&gt; myMom_;
+        boost::weak_ptr&lt;Parent&gt; myDad_;
+};
+
+typedef boost::shared_ptr&lt;Child&gt; ChildPtr;
+
+class Parent :　boost::noncopyable
+{
+    public:
+        Parent(){}
+        void setSpouser(const ParentPtr&amp; spouser)
+        {
+            mySpouser_ = spouser;
+        }
+        void addChild(const ChildPtr&amp; child)
+        {
+            myChildren_.push_back(child);    
+        }
+    private:
+        boost::weak_ptr&lt;Parent&gt; mySpouser_;
+        std::vector&lt;ChildPtr&gt; myChildren_;
+}
+</code></pre><p>可以看出，如果不使用智能指针，使用C++面向对象编程，有效的资源管理将会很困难。</p>
+<h3 id="待续"><a href="#待续" class="headerlink" title="待续"></a>待续</h3><p>对于智能指针，这里只是有一些简单的介绍，后面还将深入研究。</p>
+<p>参考: <a href="http://www.cnblogs.com/Solstice/archive/2011/08/16/2141515.html" target="_blank" rel="noopener">http://www.cnblogs.com/Solstice/archive/2011/08/16/2141515.html</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag">#C++</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/05/06/muduo-4/" rel="next" title="muduo源码阅读之Channel与Poller">
+                <i class="fa fa-chevron-left"></i> muduo源码阅读之Channel与Poller
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/05/28/concurrent-server-conclusion/" rel="prev" title="常见并发网络服务程序设计方案">
+                常见并发网络服务程序设计方案 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/05/15/cplusplus-sematics/"
+           data-title="浅谈C++值语义和对象语义" data-url="http://blog.jonnydu.me/2016/05/15/cplusplus-sematics/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="jonnydu" />
+          <p class="site-author-name" itemprop="name">jonnydu</p>
+          <p class="site-description motion-element" itemprop="description">jonnydu.uestc@gmail.com</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">63</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jiongdu" target="_blank">
+                  
+                    <i class="fa fa-https://github.com/jiongdu"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/3309795495" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 微博
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#值语义和对象语义"><span class="nav-number">1.</span> <span class="nav-text">值语义和对象语义</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Java"><span class="nav-number">1.1.</span> <span class="nav-text">Java</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#C"><span class="nav-number">1.2.</span> <span class="nav-text">C++</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#值语义与C-语言"><span class="nav-number">2.</span> <span class="nav-text">值语义与C++语言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#值语义与生命期"><span class="nav-number">3.</span> <span class="nav-text">值语义与生命期</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#模型1"><span class="nav-number">3.1.</span> <span class="nav-text">模型1</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#模型2"><span class="nav-number">3.2.</span> <span class="nav-text">模型2</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#待续"><span class="nav-number">4.</span> <span class="nav-text">待续</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">jonnydu</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+  
+  
+<script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = NexT.utils.escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    NexT.motion.middleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+
+      if (CONFIG.sidebar.display === 'post' || CONFIG.sidebar.display === 'always') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          NexT.utils.displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"jonnydu"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+  
+
+
+
+
+
+  
+  
+  
+
+  
+
+
+</body>
+</html>

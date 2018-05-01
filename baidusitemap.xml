@@ -1,0 +1,1082 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2017/05/05/Linux-Block-IO/</loc>
+    <lastmod>2017-05-31T02:45:42.000Z</lastmod>
+    <data>
+        <display>
+        <title>Linux块IO浅析</title>
+        <pubTime>2017-05-05T12:08:25.000Z</pubTime>
+        
+        <tag>network/linux</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2017/04/27/NVMe-IO-Request/</loc>
+    <lastmod>2017-05-23T14:19:14.000Z</lastmod>
+    <data>
+        <display>
+        <title>NVMe驱动之I/O请求</title>
+        <pubTime>2017-04-27T12:31:41.000Z</pubTime>
+        
+        <tag>NVMe over RDMA</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2017/04/21/trace-linux-network-stack/</loc>
+    <lastmod>2017-05-17T13:41:04.000Z</lastmod>
+    <data>
+        <display>
+        <title>理解TCP/IP网络栈</title>
+        <pubTime>2017-04-21T08:45:24.000Z</pubTime>
+        
+        <tag>network/linux</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2017/04/13/trace-linux-networking-stack-receiving-data/</loc>
+    <lastmod>2017-05-16T11:45:10.000Z</lastmod>
+    <data>
+        <display>
+        <title>Linux网络协议栈数据处理流程---收包</title>
+        <pubTime>2017-04-13T06:15:59.000Z</pubTime>
+        
+        <tag>network/linux</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2017/03/20/config-two-network-interfaces/</loc>
+    <lastmod>2017-05-09T04:52:30.000Z</lastmod>
+    <data>
+        <display>
+        <title>CentOS配置双网卡（Mellanox和传统以太网卡）</title>
+        <pubTime>2017-03-20T09:57:25.000Z</pubTime>
+        
+        <tag>network/linux</tag>
+         
+        <tag>NVMe over RDMA</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2017/03/27/leveldb/</loc>
+    <lastmod>2017-05-06T10:52:52.000Z</lastmod>
+    <data>
+        <display>
+        <title>LevelDB原理剖析</title>
+        <pubTime>2017-03-27T08:49:41.000Z</pubTime>
+        
+        <tag>LevelDB</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2017/04/05/NVMe-over-RDMA/</loc>
+    <lastmod>2017-05-06T08:50:14.000Z</lastmod>
+    <data>
+        <display>
+        <title>NVMe over RDMA浅析</title>
+        <pubTime>2017-04-05T12:49:59.000Z</pubTime>
+        
+        <tag>NVMe over RDMA</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2017/02/17/NVMe/</loc>
+    <lastmod>2017-05-06T06:39:04.000Z</lastmod>
+    <data>
+        <display>
+        <title>NVMe技术浅析</title>
+        <pubTime>2017-02-17T12:09:40.000Z</pubTime>
+        
+        <tag>NVMe over RDMA</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2017/02/27/RDMA/</loc>
+    <lastmod>2017-05-05T12:11:22.000Z</lastmod>
+    <data>
+        <display>
+        <title>RDMA技术浅析</title>
+        <pubTime>2017-02-27T02:22:39.000Z</pubTime>
+        
+        <tag>NVMe over RDMA</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2017/02/13/storage/</loc>
+    <lastmod>2017-05-05T12:08:18.000Z</lastmod>
+    <data>
+        <display>
+        <title>存储的那些词儿</title>
+        <pubTime>2017-02-13T07:06:23.000Z</pubTime>
+        
+        <tag>NVMe over RDMA</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2017/01/20/Distribute-Sort/</loc>
+    <lastmod>2017-04-24T13:52:38.000Z</lastmod>
+    <data>
+        <display>
+        <title>分配排序（桶排序和基数排序）总结</title>
+        <pubTime>2017-01-20T11:51:47.000Z</pubTime>
+        
+        <tag>数据结构与算法</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2017/01/15/Redis-Cluster/</loc>
+    <lastmod>2017-03-29T13:53:04.000Z</lastmod>
+    <data>
+        <display>
+        <title>搭建Redis集群</title>
+        <pubTime>2017-01-15T07:08:05.000Z</pubTime>
+        
+        <tag>Redis</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2017/01/11/Redis-sentinel/</loc>
+    <lastmod>2017-03-29T13:53:04.000Z</lastmod>
+    <data>
+        <display>
+        <title>Redis Sentinel原理及实践</title>
+        <pubTime>2017-01-11T07:21:58.000Z</pubTime>
+        
+        <tag>Redis</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2017/01/05/Redis-transaction/</loc>
+    <lastmod>2017-03-29T13:53:02.000Z</lastmod>
+    <data>
+        <display>
+        <title>Redis事务</title>
+        <pubTime>2017-01-05T12:25:52.000Z</pubTime>
+        
+        <tag>Redis</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/11/25/Redis-replicate/</loc>
+    <lastmod>2017-03-28T07:14:38.000Z</lastmod>
+    <data>
+        <display>
+        <title>Redis之复制</title>
+        <pubTime>2016-11-25T07:04:22.000Z</pubTime>
+        
+        <tag>Redis</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/11/17/Redis-db/</loc>
+    <lastmod>2017-03-28T07:14:36.000Z</lastmod>
+    <data>
+        <display>
+        <title>Redis之数据库的实现</title>
+        <pubTime>2016-11-17T11:46:03.000Z</pubTime>
+        
+        <tag>Redis</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/11/27/Redis-RDB/</loc>
+    <lastmod>2017-03-27T07:06:52.000Z</lastmod>
+    <data>
+        <display>
+        <title>Redis之RDB持久化</title>
+        <pubTime>2016-11-27T06:22:16.000Z</pubTime>
+        
+        <tag>Redis</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/11/30/Redis-AOF/</loc>
+    <lastmod>2017-03-27T07:06:50.000Z</lastmod>
+    <data>
+        <display>
+        <title>Redis之AOF持久化</title>
+        <pubTime>2016-11-30T12:17:07.000Z</pubTime>
+        
+        <tag>Redis</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/12/03/Redis-RDB-AOF/</loc>
+    <lastmod>2017-03-27T07:02:30.000Z</lastmod>
+    <data>
+        <display>
+        <title>Redis两种持久化方式比较</title>
+        <pubTime>2016-12-03T09:14:03.000Z</pubTime>
+        
+        <tag>Redis</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/12/23/Coroutine/</loc>
+    <lastmod>2017-01-19T08:53:28.000Z</lastmod>
+    <data>
+        <display>
+        <title>协程</title>
+        <pubTime>2016-12-23T10:41:42.000Z</pubTime>
+        
+        <tag>进程/线程/并发</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/12/30/Effective-STL-3/</loc>
+    <lastmod>2017-01-19T07:13:30.000Z</lastmod>
+    <data>
+        <display>
+        <title>更好地使用STL关联容器</title>
+        <pubTime>2016-12-30T02:13:50.000Z</pubTime>
+        
+        <tag>C++</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/12/11/Effective-STL-1/</loc>
+    <lastmod>2017-01-03T02:05:32.000Z</lastmod>
+    <data>
+        <display>
+        <title>使用vector和string时需注意的问题</title>
+        <pubTime>2016-12-11T09:39:38.000Z</pubTime>
+        
+        <tag>C++</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/12/19/Effective-STL-2/</loc>
+    <lastmod>2016-12-29T13:46:38.000Z</lastmod>
+    <data>
+        <display>
+        <title>使用STL算法时需注意的问题</title>
+        <pubTime>2016-12-19T12:21:14.000Z</pubTime>
+        
+        <tag>C++</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/12/08/String/</loc>
+    <lastmod>2016-12-07T08:33:14.000Z</lastmod>
+    <data>
+        <display>
+        <title>《C++编程思想》之字符串学习笔记</title>
+        <pubTime>2016-12-08T13:10:07.000Z</pubTime>
+        
+        <tag>C++</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/10/23/permutation/</loc>
+    <lastmod>2016-12-02T02:55:06.000Z</lastmod>
+    <data>
+        <display>
+        <title>字符串的排列与组合</title>
+        <pubTime>2016-10-23T11:09:33.000Z</pubTime>
+        
+        <tag>数据结构与算法</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/08/26/muduo-7/</loc>
+    <lastmod>2016-11-30T10:40:34.000Z</lastmod>
+    <data>
+        <display>
+        <title>从BlockingQueue再探线程同步</title>
+        <pubTime>2016-08-26T05:18:11.000Z</pubTime>
+        
+        <tag>进程/线程/并发</tag>
+         
+        <tag>muduo</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/09/18/spinlock-vs-mutex/</loc>
+    <lastmod>2016-11-30T10:38:16.000Z</lastmod>
+    <data>
+        <display>
+        <title>Spin lock与Mutex</title>
+        <pubTime>2016-09-18T13:34:32.000Z</pubTime>
+        
+        <tag>进程/线程/并发</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/11/20/shortest-path/</loc>
+    <lastmod>2016-11-25T01:45:34.000Z</lastmod>
+    <data>
+        <display>
+        <title>最短路问题</title>
+        <pubTime>2016-11-20T12:03:09.000Z</pubTime>
+        
+        <tag>数据结构与算法</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/11/13/Redis-pubsub/</loc>
+    <lastmod>2016-11-23T12:03:20.000Z</lastmod>
+    <data>
+        <display>
+        <title>Redis之发布与订阅</title>
+        <pubTime>2016-11-13T10:13:33.000Z</pubTime>
+        
+        <tag>Redis</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/11/10/Redis-start/</loc>
+    <lastmod>2016-11-23T08:24:58.000Z</lastmod>
+    <data>
+        <display>
+        <title>Redis之启动过程分析</title>
+        <pubTime>2016-11-10T01:49:28.000Z</pubTime>
+        
+        <tag>Redis</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/11/05/Redis-event/</loc>
+    <lastmod>2016-11-15T05:52:32.000Z</lastmod>
+    <data>
+        <display>
+        <title>Redis之事件驱动</title>
+        <pubTime>2016-11-05T04:03:53.000Z</pubTime>
+        
+        <tag>Redis</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/10/31/STL-deque/</loc>
+    <lastmod>2016-10-31T11:48:50.000Z</lastmod>
+    <data>
+        <display>
+        <title>C++ STL之deque</title>
+        <pubTime>2016-10-31T09:49:42.000Z</pubTime>
+        
+        <tag>C++</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/10/28/STL-list/</loc>
+    <lastmod>2016-10-31T03:26:02.000Z</lastmod>
+    <data>
+        <display>
+        <title>C++ STL之list</title>
+        <pubTime>2016-10-28T11:33:14.000Z</pubTime>
+        
+        <tag>C++</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/10/25/STL-vector/</loc>
+    <lastmod>2016-10-25T07:29:32.000Z</lastmod>
+    <data>
+        <display>
+        <title>C++ STL之vector</title>
+        <pubTime>2016-10-25T10:42:24.000Z</pubTime>
+        
+        <tag>C++</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/04/20/wifi-data-get/</loc>
+    <lastmod>2016-10-25T03:29:28.000Z</lastmod>
+    <data>
+        <display>
+        <title>wifi关键数据提取</title>
+        <pubTime>2016-04-20T01:56:09.000Z</pubTime>
+        
+        <tag>openwrt/wifi</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/10/21/STL-functor/</loc>
+    <lastmod>2016-10-18T12:10:56.000Z</lastmod>
+    <data>
+        <display>
+        <title>C++ STL仿函数</title>
+        <pubTime>2016-10-21T12:10:17.000Z</pubTime>
+        
+        <tag>C++</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/10/18/DataCenterBridging/</loc>
+    <lastmod>2016-10-18T07:14:36.000Z</lastmod>
+    <data>
+        <display>
+        <title>Data Center Bridging</title>
+        <pubTime>2016-10-18T04:34:17.000Z</pubTime>
+        
+        <tag>network/linux</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/10/14/STL-iterator/</loc>
+    <lastmod>2016-10-17T13:31:22.000Z</lastmod>
+    <data>
+        <display>
+        <title>C++ STL迭代器</title>
+        <pubTime>2016-10-14T09:49:12.000Z</pubTime>
+        
+        <tag>C++</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/10/09/STL-allocator/</loc>
+    <lastmod>2016-10-13T11:18:10.000Z</lastmod>
+    <data>
+        <display>
+        <title>C++ STL空间配置器</title>
+        <pubTime>2016-10-09T05:54:15.000Z</pubTime>
+        
+        <tag>C++</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/09/28/tcp-backlog/</loc>
+    <lastmod>2016-09-20T15:49:46.000Z</lastmod>
+    <data>
+        <display>
+        <title>浅谈tcp backlog</title>
+        <pubTime>2016-09-28T13:42:51.000Z</pubTime>
+        
+        <tag>network/linux</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/06/13/tcp-1/</loc>
+    <lastmod>2016-09-20T13:41:38.000Z</lastmod>
+    <data>
+        <display>
+        <title>TCP协议总结（一）</title>
+        <pubTime>2016-06-13T05:07:19.000Z</pubTime>
+        
+        <tag>network/linux</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/07/21/internetcompany/</loc>
+    <lastmod>2016-09-19T15:38:38.000Z</lastmod>
+    <data>
+        <display>
+        <title>2015-2016年互联网公司校招编程题汇总</title>
+        <pubTime>2016-07-21T12:16:02.000Z</pubTime>
+        
+        <tag>数据结构与算法</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/09/23/SegmentTree/</loc>
+    <lastmod>2016-09-17T02:46:30.000Z</lastmod>
+    <data>
+        <display>
+        <title>数据结构之线段树</title>
+        <pubTime>2016-09-23T13:28:16.000Z</pubTime>
+        
+        <tag>数据结构与算法</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/09/07/LinearSort/</loc>
+    <lastmod>2016-09-16T11:48:06.000Z</lastmod>
+    <data>
+        <display>
+        <title>线性排序算法：计数排序、基数排序和桶排序</title>
+        <pubTime>2016-09-07T12:43:51.000Z</pubTime>
+        
+        <tag>数据结构与算法</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/03/25/Seq&Substring/</loc>
+    <lastmod>2016-09-16T11:47:58.000Z</lastmod>
+    <data>
+        <display>
+        <title>动态规划之最长公共子序列，最长公共子串，最长递增子序列，最长子序列和等</title>
+        <pubTime>2016-03-25T07:05:10.000Z</pubTime>
+        
+        <tag>数据结构与算法</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/09/14/cplusplusReference/</loc>
+    <lastmod>2016-09-14T15:17:58.000Z</lastmod>
+    <data>
+        <display>
+        <title>C++引用剖析</title>
+        <pubTime>2016-09-14T11:58:41.000Z</pubTime>
+        
+        <tag>C++</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/07/17/muduo-6/</loc>
+    <lastmod>2016-08-30T12:14:06.000Z</lastmod>
+    <data>
+        <display>
+        <title>muduo源码阅读之Thread和ThreadPool</title>
+        <pubTime>2016-07-17T11:14:12.000Z</pubTime>
+        
+        <tag>muduo</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/07/08/muduo-5/</loc>
+    <lastmod>2016-08-30T07:14:42.000Z</lastmod>
+    <data>
+        <display>
+        <title>muduo源码阅读之线程同步</title>
+        <pubTime>2016-07-08T07:07:13.000Z</pubTime>
+        
+        <tag>muduo</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/08/08/shared-ptr/</loc>
+    <lastmod>2016-08-27T13:24:50.000Z</lastmod>
+    <data>
+        <display>
+        <title>shared_ptr的注意事项</title>
+        <pubTime>2016-08-08T13:38:44.000Z</pubTime>
+        
+        <tag>C++</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/08/21/Singleton/</loc>
+    <lastmod>2016-08-26T08:23:06.000Z</lastmod>
+    <data>
+        <display>
+        <title>单例模式</title>
+        <pubTime>2016-08-21T13:57:13.000Z</pubTime>
+        
+        <tag>设计模式</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/07/29/epoll/</loc>
+    <lastmod>2016-08-08T12:29:48.000Z</lastmod>
+    <data>
+        <display>
+        <title>epoll总结</title>
+        <pubTime>2016-07-29T11:03:21.000Z</pubTime>
+        
+        <tag>network/linux</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/06/25/tcp-2/</loc>
+    <lastmod>2016-08-07T13:00:44.000Z</lastmod>
+    <data>
+        <display>
+        <title>TCP协议总结（二）</title>
+        <pubTime>2016-06-25T12:06:14.000Z</pubTime>
+        
+        <tag>network/linux</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/06/05/cpp-constructor/</loc>
+    <lastmod>2016-08-06T12:49:28.000Z</lastmod>
+    <data>
+        <display>
+        <title>C++构造函数一些常见问题分析</title>
+        <pubTime>2016-06-05T08:58:57.000Z</pubTime>
+        
+        <tag>C++</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/05/28/concurrent-server-conclusion/</loc>
+    <lastmod>2016-08-06T07:52:12.000Z</lastmod>
+    <data>
+        <display>
+        <title>常见并发网络服务程序设计方案</title>
+        <pubTime>2016-05-28T02:14:00.000Z</pubTime>
+        
+        <tag>network/linux</tag>
+         
+        <tag>muduo</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/05/15/cplusplus-sematics/</loc>
+    <lastmod>2016-08-02T06:05:28.000Z</lastmod>
+    <data>
+        <display>
+        <title>浅谈C++值语义和对象语义</title>
+        <pubTime>2016-05-15T11:29:20.000Z</pubTime>
+        
+        <tag>C++</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/05/06/muduo-4/</loc>
+    <lastmod>2016-07-21T12:50:08.000Z</lastmod>
+    <data>
+        <display>
+        <title>muduo源码阅读之Channel与Poller</title>
+        <pubTime>2016-05-06T10:39:19.000Z</pubTime>
+        
+        <tag>muduo</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2018/05/01/dumbap/</loc>
+    <lastmod>2016-07-21T08:44:06.000Z</lastmod>
+    <data>
+        <display>
+        <title>配置OpenWrt路由器为Dumb AP</title>
+        <pubTime>2018-05-01T13:39:00.580Z</pubTime>
+        
+        <tag>openwrt/wifi</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/03/18/startAP/</loc>
+    <lastmod>2016-07-21T08:44:06.000Z</lastmod>
+    <data>
+        <display>
+        <title>OpenWrt设置程序开机自启动</title>
+        <pubTime>2016-03-18T09:05:23.000Z</pubTime>
+        
+        <tag>openwrt/wifi</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/05/03/muduo-3/</loc>
+    <lastmod>2016-07-16T07:38:56.000Z</lastmod>
+    <data>
+        <display>
+        <title>muduo源码阅读之EventLoop类</title>
+        <pubTime>2016-05-03T13:13:47.000Z</pubTime>
+        
+        <tag>muduo</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/04/13/cplusplusMem/</loc>
+    <lastmod>2016-07-05T12:56:04.000Z</lastmod>
+    <data>
+        <display>
+        <title>C++内存管理--部分总结</title>
+        <pubTime>2016-04-13T11:11:16.000Z</pubTime>
+        
+        <tag>C++</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/04/28/muduo-2/</loc>
+    <lastmod>2016-06-28T13:55:58.000Z</lastmod>
+    <data>
+        <display>
+        <title>muduo源码阅读之muduo的回调函数机制</title>
+        <pubTime>2016-04-28T11:18:24.000Z</pubTime>
+        
+        <tag>muduo</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/04/25/muduo-1/</loc>
+    <lastmod>2016-06-28T12:17:56.000Z</lastmod>
+    <data>
+        <display>
+        <title>muduo源码阅读之Reactor模式和muduo</title>
+        <pubTime>2016-04-25T10:56:03.000Z</pubTime>
+        
+        <tag>muduo</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2018/05/01/welcome/</loc>
+    <lastmod>2016-03-18T08:24:04.000Z</lastmod>
+    <data>
+        <display>
+        <title>Welcome to My Blog</title>
+        <pubTime>2018-05-01T13:39:00.756Z</pubTime>
+        
+         
+           
+        </display>
+    </data>
+    </url>
+
+</urlset>

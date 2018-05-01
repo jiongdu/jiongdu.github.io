@@ -1,0 +1,854 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="NVMe over RDMA," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一期一会" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="NVMe SSD具有极高的I/O读写性能，不存在传统磁盘所具有的访问寻道、抖动问题。为了发挥NVMe SSD的性能，无论在软件还是在硬件上都需要采用多队列技术，通过多队列方式充分发挥NVMe SSD的性能。">
+<meta name="keywords" content="NVMe over RDMA">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NVMe驱动之I&#x2F;O请求">
+<meta property="og:url" content="http://blog.jonnydu.me/2017/04/27/NVMe-IO-Request/index.html">
+<meta property="og:site_name" content="一期一会">
+<meta property="og:description" content="NVMe SSD具有极高的I/O读写性能，不存在传统磁盘所具有的访问寻道、抖动问题。为了发挥NVMe SSD的性能，无论在软件还是在硬件上都需要采用多队列技术，通过多队列方式充分发挥NVMe SSD的性能。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://i.imgur.com/sIdEXDh.gif">
+<meta property="og:image" content="http://i.imgur.com/bsa3KFs.png">
+<meta property="og:updated_time" content="2017-05-23T14:19:14.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="NVMe驱动之I&#x2F;O请求">
+<meta name="twitter:description" content="NVMe SSD具有极高的I/O读写性能，不存在传统磁盘所具有的访问寻道、抖动问题。为了发挥NVMe SSD的性能，无论在软件还是在硬件上都需要采用多队列技术，通过多队列方式充分发挥NVMe SSD的性能。">
+<meta name="twitter:image" content="http://i.imgur.com/sIdEXDh.gif">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '一期一会'
+    }
+  };
+</script>
+
+  <title> NVMe驱动之I/O请求 | 一期一会 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">一期一会</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CFymCPjb2LHwhFXVjxQk','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                NVMe驱动之I/O请求
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-04-27T20:31:41+08:00" content="2017-04-27">
+              2017-04-27
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/04/27/NVMe-IO-Request/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/04/27/NVMe-IO-Request/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>NVMe SSD具有极高的I/O读写性能，不存在传统磁盘所具有的访问寻道、抖动问题。为了发挥NVMe SSD的性能，无论在软件还是在硬件上都需要采用多队列技术，通过多队列方式充分发挥NVMe SSD的性能。<br><a id="more"></a><br>Linux的NVMe驱动采用一个Core独占一个Queue（包含一个Completion Queue和至少一个Submission Queue）的方式来充分发挥NVMe SSD的性能，这样可以避免一个队列被多个Core竞争访问（引起的锁竞争等问题），各CPU使用自己的Queue，互不影响。 </p>
+<p><img src="http://i.imgur.com/sIdEXDh.gif" alt="">   </p>
+<p>NVMe响应I/O的过程已经在<a href="http://blog.dujiong.net/2017/02/17/NVMe/" target="_blank" rel="noopener">NVMe技术浅析</a>一文中详细描述，这里将结合部分源码做进一步说明。    </p>
+<h3 id="创建NVMe-Queue"><a href="#创建NVMe-Queue" class="headerlink" title="创建NVMe Queue"></a>创建NVMe Queue</h3><pre><code>/*
+ * pci.c
+ */
+static int nvme_setup_io_queues(struct nvme_dev* dev){
+    struct nvme_queue* adminq = dev-&gt;queues[0];
+    struct pci_dev* pdev = to_pci_dev(dev-&gt;dev);
+    int result, nr_io_queues, size;
+
+    nr_io_queues = num_online_cpus();
+    result = nvme_set_queue_count(&amp;dev-&gt;ctrl, &amp;nr_io_queues);
+    ...
+
+    result = queue_request_irq(adminq);
+    if(result){
+        admin-&gt;cq_vector = -1;
+        return result;
+    }
+    return nvme_create_io_queues(dev);
+}
+</code></pre><p>驱动程序在创建队列之前首先通过内核函数num_online_cpus获取当前系统中运行的CPU数量m，然后通过nvme_set_queue_count得到SSD的队列数量限制n，选择二者较小值作为所创建的队列数。<br>此外，关于Queue还有一个重要的概念，那就是队列深度，简单来说就是这个Queue能够放多少个成员（比如NVMe Command）。在NVMe中，这个队列深度是由NVMe SSD决定的，存储在NVMe设备的BAR空间里。另外，NVMe驱动没有区分Namespace，也就是一个设备上的多个Namespace共享这些队列资源。<br>因此，它们之间的关系是：队列用来存放NVMe Command，NVMe Command是Host与SSD Controller交流的基本单元，应用的I/O请求也要转化成NVMe Command。</p>
+<h3 id="提交I-O请求"><a href="#提交I-O请求" class="headerlink" title="提交I/O请求"></a>提交I/O请求</h3><p>Block层下发的IO请求以BIO表示，我们需要通过DMA发送这些数据，Command使用dma_alloc_coherent分配DMA地址，但是BIO是存放在普通的内核线程空间的（线程的虚拟空间不能直接作为DMA地址），使用dma_alloc_coherent分配再将BIO中的数据拷贝显然不是有效的方法。这里linux提供了另一个函数dma_map_single，这个函数能够将虚拟空间地址（BIO数据存放地址）转换成DMA可用地址，并且多个IO请求的DMA地址可以通过scatterlist来表示。有了DMA地址就可以把BIO封装成NVMe Command发送出去。从BIO到NVMe Command有可能会经过拆分，放入等待队列等。我们知道，驱动会给每个CPU分配一个Queue，那么I/O请求到来时，该由哪个Queue来存放这个Command呢？你可能已经想到，应该由当前线程运行的CPU所属的Queue，这样才能保证Queue不被其他Core抢占，驱动使用get_cpu()获得当前处理I/O请求的CPU号来索引对应的Queue。 </p>
+<pre><code>/*
+ * pci.c
+ */
+static void __nvme_submit_cmd(struct nvme_queue* nvmeq, struct nvme_command* cmd){
+    u16 tail = nvmeq-&gt;sq_tail;
+    if(nvmeq-&gt;sq_cmds_io){
+        memcpy_toio(&amp;nvmeq-&gt;sq_cmds_io[tail], cmd, sizeof(*cmd));
+    }else{
+        memcpy(&amp;nvmeq-&gt;sq_cmds[tail], cmd, sizeof(*cmd));
+    }
+
+    if(++tail == nvmeq-&gt;q_depth)
+        tail = 0;
+    writel(tail, nvmeq-&gt;q_db);
+    nvmeq-&gt;sq_tail = tail;
+}
+</code></pre><p>BIO封装成的Command会顺序存入Submission Queue中。对于Submission Queue来说，使用Tail表示最后操作的Command Index（nvmeq-&gt;sq_tail）。每存入一个Command，Host就会更新Queue对应的Doorbell寄存器中的Tail值。Doorbell定义在BAR空间，通过QID可以索引到。NVMe没有规定Command存入队列的执行顺序，Controller可以一次取出多个Command进行批量处理，所以一个队列中的Command执行顺序是不固定的（可能导致先提交的请求后处理）。</p>
+<h3 id="获得处理结果"><a href="#获得处理结果" class="headerlink" title="获得处理结果"></a>获得处理结果</h3><p>SSD Controller根据Doorbell的值，获取NVMe Command和对应数据，待处理完成后将结果存入Completion Queue中。Controller通过中断的方式通知Host，驱动为每一个Queue分配一个MSI/MSI-X中断。<br>驱动使用request_irq将中断注册到kernel，并且绑定中断处理函数nvme_irq。此中断处理函数调用__nvme_process_cq，先将Completion Command从Completion Queue中取出，然后把队列的head增加1，并调用上层的callback函数，完成IO处理。由于NVMe Command可以批量处理，这里使用while循环取出所有新的Completion Command。     </p>
+<pre><code>/*
+ * pci.c
+ */
+static void __nvme_process_cq(struct nvme_queue *nvmeq, unsigned int *tag){
+    u16 head, phase;
+
+    head = nvmeq-&gt;cq_head;
+    phase = nvmeq-&gt;cq_phase;
+
+    while(nvme_cqe_valid(nvmeq, head, phase)){
+        struct nvme_completion cqe = nvmeq-&gt;cqes[head];
+        struct request *req;
+
+        if(++head == nvmeq-&gt;q_depth){
+            head = 0;
+            phase = !phase;
+        }
+        ...
+        if (unlikely(nvmeq-&gt;qid == 0 &amp;&amp;
+            cqe.command_id &gt;= NVME_AQ_BLKMQ_DEPTH)) {
+                nvme_complete_async_event(&amp;nvmeq-&gt;dev-&gt;ctrl,
+                                        cqe.status, &amp;cqe.result);
+                continue;
+        }
+        req = blk_mq_tag_to_rq(*nvmeq-&gt;tags, cqe.command_id);
+        nvme_req(req)-&gt;result = cqe.result;
+        blk_mq_complete_request(req, le16_to_cpu(cqe.status) &gt;&gt; 1);    
+    }
+    if (head == nvmeq-&gt;cq_head &amp;&amp; phase == nvmeq-&gt;cq_phase)
+        return;
+
+    if (likely(nvmeq-&gt;cq_vector &gt;= 0))
+        writel(head, nvmeq-&gt;q_db + nvmeq-&gt;dev-&gt;db_stride);
+    nvmeq-&gt;cq_head = head;
+    nvmeq-&gt;cq_phase = phase;
+
+    nvmeq-&gt;cqe_seen = 1;
+}
+</code></pre><p>处理完Command后，往Completion Queue的Doorbell写入Head值，通知NVMe Controller操作完成。中断处理结束。</p>
+<h3 id="Head-Tail机制"><a href="#Head-Tail机制" class="headerlink" title="Head/Tail机制"></a>Head/Tail机制</h3><p>我们知道，SQ和CQ都是队列，队列的头尾很重要，头决定谁会最先被服务，尾决定新到来命令的位置，所以，我们需要记录SQ和CQ的头尾位置。  </p>
+<p><img src="http://i.imgur.com/bsa3KFs.png" alt=""></p>
+<p>对一个SQ来说，它的生产者是Host，因为它往SQ的Tail位置写入命令；消费者是SSD，它从SQ的Head取出指令执行。CQ则刚刚相反，生产者是SSD，消费者是Host。     </p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>本文简单介绍了NVMe I/O请求的处理过程，其核心是多队列，Submission Queue/Completion Queue、Doorbell寄存器和Head/Tail机制。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/NVMe-over-RDMA/" rel="tag">#NVMe over RDMA</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/21/trace-linux-network-stack/" rel="next" title="理解TCP/IP网络栈">
+                <i class="fa fa-chevron-left"></i> 理解TCP/IP网络栈
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/05/Linux-Block-IO/" rel="prev" title="Linux块IO浅析">
+                Linux块IO浅析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/04/27/NVMe-IO-Request/"
+           data-title="NVMe驱动之I/O请求" data-url="http://blog.jonnydu.me/2017/04/27/NVMe-IO-Request/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="jonnydu" />
+          <p class="site-author-name" itemprop="name">jonnydu</p>
+          <p class="site-description motion-element" itemprop="description">jonnydu.uestc@gmail.com</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">63</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jiongdu" target="_blank">
+                  
+                    <i class="fa fa-https://github.com/jiongdu"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/3309795495" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 微博
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建NVMe-Queue"><span class="nav-number">1.</span> <span class="nav-text">创建NVMe Queue</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#提交I-O请求"><span class="nav-number">2.</span> <span class="nav-text">提交I/O请求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获得处理结果"><span class="nav-number">3.</span> <span class="nav-text">获得处理结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Head-Tail机制"><span class="nav-number">4.</span> <span class="nav-text">Head/Tail机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">jonnydu</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+  
+  
+<script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = NexT.utils.escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    NexT.motion.middleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+
+      if (CONFIG.sidebar.display === 'post' || CONFIG.sidebar.display === 'always') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          NexT.utils.displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"jonnydu"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+  
+
+
+
+
+
+  
+  
+  
+
+  
+
+
+</body>
+</html>

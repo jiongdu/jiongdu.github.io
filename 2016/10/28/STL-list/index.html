@@ -1,0 +1,915 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="C++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一期一会" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="上一篇文章总结了vector的结构和实现原理，今天来看看STL中另一个重要的容器：list。">
+<meta name="keywords" content="C++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++ STL之list">
+<meta property="og:url" content="http://blog.jonnydu.me/2016/10/28/STL-list/index.html">
+<meta property="og:site_name" content="一期一会">
+<meta property="og:description" content="上一篇文章总结了vector的结构和实现原理，今天来看看STL中另一个重要的容器：list。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://i.imgur.com/rClntKM.png">
+<meta property="og:image" content="http://i.imgur.com/nq2Qm5c.png">
+<meta property="og:updated_time" content="2016-10-31T03:26:02.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="C++ STL之list">
+<meta name="twitter:description" content="上一篇文章总结了vector的结构和实现原理，今天来看看STL中另一个重要的容器：list。">
+<meta name="twitter:image" content="http://i.imgur.com/rClntKM.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '一期一会'
+    }
+  };
+</script>
+
+  <title> C++ STL之list | 一期一会 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">一期一会</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CFymCPjb2LHwhFXVjxQk','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                C++ STL之list
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-10-28T19:33:14+08:00" content="2016-10-28">
+              2016-10-28
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/10/28/STL-list/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/28/STL-list/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>上一篇文章总结了vector的结构和实现原理，今天来看看STL中另一个重要的容器：list。<br><a id="more"></a><br>相比于vector的连续线性空间，list显得复杂得多，它的好处是每次插入或删除一个元素，就配置或释放一个元素空间。因此，list对于空间的运用有绝对的精准，一点都不浪费。    </p>
+<h3 id="list的节点"><a href="#list的节点" class="headerlink" title="list的节点"></a>list的节点</h3><p>我们知道，list本身和list的节点是不同的结构，需分开设计。以下是STL list的节点结构：    </p>
+<pre><code>template &lt;class T&gt;
+struct __list_node {
+    typedef void* void_pointer;
+    void_pointer prev;
+    void_pointer next;
+    T data;    
+};
+</code></pre><p>可以看出，STL list是一个双向链表，有两个指针，分别指向前向节点和后向节点。  </p>
+<h3 id="list的迭代器"><a href="#list的迭代器" class="headerlink" title="list的迭代器"></a>list的迭代器</h3><p>list不能够像vector一样以普通指针作为迭代器，因为其节点不保证在存储空间连续存在。并且，由于list提供的是一个双向链表，迭都代器必须具备前移、后移的能力，所以list提供的是Bidirectional Iterators.<br>list有一个重要的性质：插入操作和结合操作都不会造成原有的list迭代器失效。这在vector是不成立的，因为vector的插入操作可能造成记忆体重新配置，导致原有的迭代器全部失效。甚至list的元素删除操作，也只有“指向被删除元素”的那个迭代器失效，其他迭代器不受任何影响。   </p>
+<pre><code>template&lt;class T, class Ref, class Ptr&gt;
+struct __list_iterator {
+    typedef __list_iterator&lt;T, &amp;T, T*&gt; iterator;
+    typedef __list_iterator&lt;T, Ref, Ptr&gt; self;
+
+    typedef __list_node&lt;T&gt;* link_type;
+    link_type node;                        //list的节点:node 
+
+    //迭代器的构造函数
+    __list_iterator(link_type x) : node(x) {}
+      __list_iterator() {}
+      __list_iterator(const iterator&amp; x) : node(x.node) {}    
+
+    reference operator*() const { return (*node).data; }
+    pointer operator-&gt;() const { return &amp;(operator*()); }
+
+    self&amp; operator++() {                    //先加1，再返回，类似++i
+        node = (link_type)((*node).next);
+        return *this;
+    }
+    self operator++(int) {                    //类似于i++
+        self tmp = *this;
+        ++*this;
+        return tmp;
+    }
+    ...
+};
+</code></pre><p>以上是list的迭代器的设计，只实现了迭代器的++，–，取值，成员调用四个基本操作，没有像vector迭代器那样的+n操作，主要是因为地址不连续。       </p>
+<h3 id="list的结构"><a href="#list的结构" class="headerlink" title="list的结构"></a>list的结构</h3><p>list不仅是一个双向链表，而且还是一个环状双向链表。所以，只需要一个指针，便可以完整表现整个链表：   </p>
+<pre><code>template &lt;class T, class Alloc = alloc&gt;
+class list {
+protected:
+    typedef __list_node&lt;T&gt; list_node;
+public:
+    typedef list_node* link_type;
+protected:
+    link_type node;        
+};
+</code></pre><p>如下图所示，如果让指针node指向刻意置于尾端的一个空白节点，node便能符合STL对于“前闭后开”区间的要求，成为last迭代器。<br><img src="http://i.imgur.com/rClntKM.png" alt=""></p>
+<h4 id="list的构造与内存管理"><a href="#list的构造与内存管理" class="headerlink" title="list的构造与内存管理"></a>list的构造与内存管理</h4><p>list提供了多种constructors，主要包括四种：默认构造函数、使用n个值来初始化list、将另一个list的部分数据来初始化以及复制构造函数。<br>以下是默认构造函数，就是创建一个节点，然后前后指向自己。    </p>
+<pre><code>list() { empty_initialize(); }
+void empty_initialize() {
+    node = get_node();
+    node-&gt;next = node;
+    node-&gt;prev = node;
+}
+</code></pre><p>list缺省使用alloc作为空间配置器，并据此另外定义了一个list_node_allocator，方便以节点大小为配置单位。</p>
+<pre><code>typedef simple_alloc&lt;list_node, Alloc&gt; list_node_allocator;
+</code></pre><p>于是，list_node_allocator(n)表示配置n个节点空间，list提供四个函数分别用来配置、释放、构造和销毁一个节点。</p>
+<pre><code>link_type get_node() { return list_node_allocator::allocate(); }
+void put_node(link_type p) { list_node_allocator::deallocate(p); }
+
+link_type create_node(const T&amp; x) {    //配置并构造节点
+    link_type p = get_node;
+    construct(&amp;p-&gt;data, x);
+    return p;
+}  
+void destroy_node(link_type p){        //析构并释放节点
+    destroy(&amp;p-&gt;data);
+    put_node(p);
+}
+</code></pre><p>另外，当我们以push_back()将新元素插入于list尾端时，此函数内部调用insert():</p>
+<pre><code>void push_back(const T&amp; x) { insert(end(), x); }
+</code></pre><p>insert()是一个重载函数，有多种形式，其中最简单的一种如下，符合以上所需： 首先配置并构造一个节点，然后进行适当的指针操作，将新节点插入进去：</p>
+<pre><code>iterator insert(iterator position, const T&amp; x){
+    link_type tmp = create_node(x);
+    tmp-&gt;next = position.node;
+    tmp-&gt;prev = position.node-&gt;prev;
+    (link_type(position.node-&gt;prev))-&gt;next = tmp;
+    position.node-&gt;prev = tmp;
+    return tmp;
+}
+</code></pre><h4 id="list的析构"><a href="#list的析构" class="headerlink" title="list的析构"></a>list的析构</h4><pre><code>~list() {
+    clear();
+    put_node(node);
+}
+</code></pre><p>clear()清空链表所有数据，即只剩下node节点，然后put_node将最后的node节点回收。</p>
+<h3 id="list常用操作函数"><a href="#list常用操作函数" class="headerlink" title="list常用操作函数"></a>list常用操作函数</h3><h4 id="在链表头尾插入节点"><a href="#在链表头尾插入节点" class="headerlink" title="在链表头尾插入节点"></a>在链表头尾插入节点</h4><pre><code>void push_front(const T&amp; x) { insert(begin(), x); }
+void push_back(const T&amp; x) { insert(end(), x); }
+</code></pre><h4 id="erase"><a href="#erase" class="headerlink" title="erase"></a>erase</h4><pre><code>iterator erase(iterator position){
+    link_type next_node = link_type(position.node-&gt;next);
+    link_type prev_node = link_type(position.node-&gt;prev);
+    prev_node-&gt;next = next_node;
+    next_node-&gt;prev = prev_node;
+    destroy_node(position.node);
+    return iterator(next_node);
+}
+</code></pre><p>修改前后节点的指针指向，然后销毁position处的节点。</p>
+<h4 id="remove"><a href="#remove" class="headerlink" title="remove"></a>remove</h4><p>将数值为value的所有元素移除：</p>
+<pre><code>template &lt;class T, class Alloc&gt;
+void list&lt;T, Alloc&gt;::remove(const T&amp; value){
+    iterator first = begin();
+    iterator last = end();
+    while(first != last){
+        iterator next = first;
+        ++next;
+        if(*first == value) erase(first);
+        first = next;
+    }
+}    
+</code></pre><p>这里的remove是真的移除了元素，而不像vector那样。</p>
+<h4 id="transfer"><a href="#transfer" class="headerlink" title="transfer"></a>transfer</h4><p>list内部提供一个迁移操作transfer：将某连续范围的元素迁移到某个特定位置之前。技术上很简单，节点间的指针移动。</p>
+<pre><code>void transfer(iterator position, iterator first, iterator last) {
+      if (position != last) {
+        (*(link_type((*last.node).prev))).next = position.node;    　　　　// (1)
+        (*(link_type((*first.node).prev))).next = last.node;           // (2)
+        (*(link_type((*position.node).prev))).next = first.node;         // (3)
+        link_type tmp = link_type((*position.node).prev);               // (4)
+        (*position.node).prev = (*last.node).prev;                       // (5)
+        (*last.node).prev = (*first.node).prev;                        // (6)
+        (*first.node).prev = tmp;                                       // (7)
+      }
+}
+</code></pre><p>示意图如下所示。<br>    <img src="http://i.imgur.com/nq2Qm5c.png" alt=""><br>transfer并非公开接口。list公开提供的是接合操作splice：将某连续范围的元素从一个list移动到另一个（或同一个）list的某个定点。</p>
+<pre><code>//将x链表的所有元素插入到当前list的position处
+void splice(iterator position, list&amp; x) {
+    if(!x.empty()){
+        transfer(position, x.begin(), x.end());
+    }
+}
+//将i处节点插到position之前，i和position可能来自同一个链表
+void splice(iterator position, list&amp;, iterator i) {
+    iterator j = i;
+    ++j;
+    if(position == i || position == j) return;
+    transfer(position, i, j);
+}
+//将[first, last)内的所有元素结合与position所指位置之前,position不能位于[first,last）之内
+void splice(iterator position, list&amp; iterator first, iterator last) {
+    if(first!=last) {
+        transfer(position, first, last);
+    }
+}
+</code></pre><h4 id="merge-reverse-sort"><a href="#merge-reverse-sort" class="headerlink" title="merge(), reverse(), sort()"></a>merge(), reverse(), sort()</h4><p>基于transfer操作，list提供了三个很有用的函数：<br>merge()：合并两个链表，要求两个链表必须有序，合并之后的链表也是有序的。merge之后，传入的list被清空。<br>reverse()：将链表数据反转。<br>sort()：由于list的迭代器为Bidirectional iterator，而STL的sort算法必须接受RamdonAccessIterator，所以list不能使用STL的sort算法。于是，基于quick sort，list实现了自身的sort。<br>三个函数的具体源码这里就不再详细列出。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>list是一种很常用的数据结构，我们不仅要熟练使用它，还要弄清其中的设计与实现。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag">#C++</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/25/STL-vector/" rel="next" title="C++ STL之vector">
+                <i class="fa fa-chevron-left"></i> C++ STL之vector
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/10/31/STL-deque/" rel="prev" title="C++ STL之deque">
+                C++ STL之deque <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/10/28/STL-list/"
+           data-title="C++ STL之list" data-url="http://blog.jonnydu.me/2016/10/28/STL-list/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="jonnydu" />
+          <p class="site-author-name" itemprop="name">jonnydu</p>
+          <p class="site-description motion-element" itemprop="description">jonnydu.uestc@gmail.com</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">63</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jiongdu" target="_blank">
+                  
+                    <i class="fa fa-https://github.com/jiongdu"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/3309795495" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 微博
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#list的节点"><span class="nav-number">1.</span> <span class="nav-text">list的节点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#list的迭代器"><span class="nav-number">2.</span> <span class="nav-text">list的迭代器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#list的结构"><span class="nav-number">3.</span> <span class="nav-text">list的结构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#list的构造与内存管理"><span class="nav-number">3.1.</span> <span class="nav-text">list的构造与内存管理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#list的析构"><span class="nav-number">3.2.</span> <span class="nav-text">list的析构</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#list常用操作函数"><span class="nav-number">4.</span> <span class="nav-text">list常用操作函数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#在链表头尾插入节点"><span class="nav-number">4.1.</span> <span class="nav-text">在链表头尾插入节点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#erase"><span class="nav-number">4.2.</span> <span class="nav-text">erase</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#remove"><span class="nav-number">4.3.</span> <span class="nav-text">remove</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#transfer"><span class="nav-number">4.4.</span> <span class="nav-text">transfer</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#merge-reverse-sort"><span class="nav-number">4.5.</span> <span class="nav-text">merge(), reverse(), sort()</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">jonnydu</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+  
+  
+<script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = NexT.utils.escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    NexT.motion.middleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+
+      if (CONFIG.sidebar.display === 'post' || CONFIG.sidebar.display === 'always') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          NexT.utils.displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"jonnydu"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+  
+
+
+
+
+
+  
+  
+  
+
+  
+
+
+</body>
+</html>

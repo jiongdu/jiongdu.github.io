@@ -1,0 +1,875 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="C++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一期一会" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="我们知道，STL的中心思想在于：将数据容器和算法分开，彼此独立设计，最后再以一帖胶着剂将他们撮合在一起。容器和算法的泛型化，可分别通过C++的class templates和function templates达成目标，而如何设计出两者之间的良好胶着剂，是一个值得深究的问题。本文所要学习的迭代器（iterator）就是在STL中扮演粘胶的角色。">
+<meta name="keywords" content="C++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++ STL迭代器">
+<meta property="og:url" content="http://blog.jonnydu.me/2016/10/14/STL-iterator/index.html">
+<meta property="og:site_name" content="一期一会">
+<meta property="og:description" content="我们知道，STL的中心思想在于：将数据容器和算法分开，彼此独立设计，最后再以一帖胶着剂将他们撮合在一起。容器和算法的泛型化，可分别通过C++的class templates和function templates达成目标，而如何设计出两者之间的良好胶着剂，是一个值得深究的问题。本文所要学习的迭代器（iterator）就是在STL中扮演粘胶的角色。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://i.imgur.com/WSUJIqE.jpg">
+<meta property="og:updated_time" content="2016-10-17T13:31:22.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="C++ STL迭代器">
+<meta name="twitter:description" content="我们知道，STL的中心思想在于：将数据容器和算法分开，彼此独立设计，最后再以一帖胶着剂将他们撮合在一起。容器和算法的泛型化，可分别通过C++的class templates和function templates达成目标，而如何设计出两者之间的良好胶着剂，是一个值得深究的问题。本文所要学习的迭代器（iterator）就是在STL中扮演粘胶的角色。">
+<meta name="twitter:image" content="http://i.imgur.com/WSUJIqE.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '一期一会'
+    }
+  };
+</script>
+
+  <title> C++ STL迭代器 | 一期一会 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">一期一会</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CFymCPjb2LHwhFXVjxQk','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                C++ STL迭代器
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-10-14T17:49:12+08:00" content="2016-10-14">
+              2016-10-14
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/10/14/STL-iterator/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/14/STL-iterator/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>我们知道，STL的中心思想在于：将数据容器和算法分开，彼此独立设计，最后再以一帖胶着剂将他们撮合在一起。容器和算法的泛型化，可分别通过C++的class templates和function templates达成目标，而如何设计出两者之间的良好胶着剂，是一个值得深究的问题。本文所要学习的迭代器（iterator）就是在STL中扮演粘胶的角色。<br><a id="more"></a></p>
+<h3 id="Traits编程手法"><a href="#Traits编程手法" class="headerlink" title="Traits编程手法"></a>Traits编程手法</h3><p>在迭代器的实现中，经常需要访问迭代器所指对象的类型，称之为该迭代器的value type。利用内嵌类型声明typedef可以轻松实现隐藏所指对象类型。如下迭代器的实现：</p>
+<pre><code>template &lt;class T&gt;
+struct Iterator{
+    typedef T value_type;
+    ...
+};
+</code></pre><p>泛型算法就可以通过typename Iterator::value_type来获得value type。</p>
+<pre><code>template &lt;class Iterator&gt;
+typename Iterator::value_type
+getValue(Iterator iter){
+    return *iter;
+}
+</code></pre><p>这里，关键字typename必不可少，因为T是一个一个template参数，在它被实例化之前，编译器不知道T是一个类型还是一个其他的对象，typename用于告诉编译器这是一个类型，这样才能通过编译。<br>如此，可以解决“函数的template参数推导机制推导的只是参数，无法推导函数的返回值型别“的问题，但是有个问题，并不是所有迭代器都是class type，比如原生指针。如果不是class type，就无法为它定义内嵌型别。但STL（以及整个泛型思维）都必须接受原生指针作为一种迭代器，所以上面这样还不够。<br>所以，这里需要多一层的封装，即萃取编译技术。</p>
+<h4 id="template-partial-specialization"><a href="#template-partial-specialization" class="headerlink" title="template partial specialization"></a>template partial specialization</h4><p>template partial specialization的大致意思是：如果class template拥有一个以上的template参数，我们可以针对其中某个（或数个，但非全部）template参数进行特化工作。换句话说，我们可以在泛化设计中提供一个特化版本。所以，所谓的partial specialization就是“针对（任何）template参数更进一步的条件限制所设计出来的一个特化版本”。<br>比如，面对以下的class template:</p>
+<pre><code>template&lt;typename T&gt;
+class C { ... };
+</code></pre><p>然后，有一个如下形式的partial specialization:</p>
+<pre><code>template&lt;typename T&gt;
+class C&lt;T*&gt; { ... };
+</code></pre><p>这个特化版本仅适用于“T为原生指针”的情况，即“T为原生指针”便是“T为任何型别”的一个更进一步的条件限制。<br>如此，我们便可以使用partial specialization解决“内嵌型别”未能解决的问题。即对“迭代器之template参数为指针”者，设计特定版的迭代器。<br>下面这个class template专门用来“萃取”迭代器的特性，而value_type正是迭代器的特性之一：</p>
+<pre><code>template &lt;class Iterator&gt;
+struct iterator_traits {
+    typedef typename Iterator::value_type value_type;
+};
+</code></pre><p>这里所谓的traits，其意义是，如果Iterator定义有自己的value_type，那么通过这个traits的作用，萃取出来的value_type就是Iterator::value_type。<br>因此，先前的func可以改写成这样：</p>
+<pre><code>template &lt;class T&gt;
+typename iterator_traits&lt;Iterator&gt;::value_type
+getValue(Iterator iter){
+    return *iter;
+}
+</code></pre><p>如此，多了一层间接性，traits便可以拥有特化版本。令iterator_traits拥有一个partial specialization：</p>
+<pre><code>template &lt;class T&gt;
+struct iterator_traits&lt;T*&gt;{      //模板是一个原生指针
+    typedef T value_type;
+}
+</code></pre><p>于是，原生指针虽然不是一种class type，亦可通过traits取其value type。</p>
+<h3 id="STL的五种迭代器"><a href="#STL的五种迭代器" class="headerlink" title="STL的五种迭代器"></a>STL的五种迭代器</h3><p>根据移动特性与施行操作，迭代器被分为五类：<br>（1）Input Iterator:这种迭代器所指的对象，不允许外界改变，客户只可读取它们所指的东西，且只能向前移动，一次一步。C++标准库中的istream_iterator是这一类的代表。<br>（2）Output Iterator：与Input Iterator类似，但一切只为输出，C++标准库中的ostream_iterator是这类的代表。<br>（3）Forward Iterator：这种迭代器可以做前述两种分类所做的每一件事，而且可以读或写所指物一次以上。<br>（4）Bidirectional Iterator：比上一个分类威力更大，它除了可以向前移动，还可以向后移动。STL的list迭代器就属于这一分类，set、multiset、map和multimap的迭代器也都是这一分类。<br>（5）最具威力的当属Random Access Iterator。这种迭代器比上一个分类威力更大的地方在于它可以执行“迭代器算术”，也就是可以在常量时间内向前或向后跳跃任意距离，这样的算术很类似指针算术，因为random access迭代器正是以内置（原始）指针为榜样，而内置指针也可被当做random access迭代器使用。 vector, deque和string提供的迭代器都是这一分类。<br>这些迭代器的分类与从属关系，如下图所示。<br><img src="http://i.imgur.com/WSUJIqE.jpg" alt=""><br>设计算法时，如果可能，我们尽量针对上图中的某种迭代器提供一个明确定义，并针对更强化的某种迭代器提供另一种定义，这样才能在不同情况下提供最大效率。假设有个算法可接受Forward Iterator，而传入Random Access Iterator，它当然也会接受，因为一个Random Access Iterator必然是一个Forward Iterator，但是并不是最佳。<br>以advance()为例说明使用函数重载机制来选择最佳的迭代器版本。advance()函数有两个参数，迭代器p和数值n，函数内部将p累进n次。下面有分别针对Input Iterator、Bidirectional Iterator和Random Access Iterator的三种函数定义版本。</p>
+<pre><code>template &lt;class InputIterator, class Distance&gt;
+void advance_II(InputIterator&amp; i, Distance n){
+    while(n--) ++i;        
+}
+
+template &lt;class InputIterator, class Distance&gt;
+void advance_BI(InputIterator&amp; i, Distance n){
+    if(n&gt;=0)
+        while(n--) ++i;
+    else
+        while(n++) ++i;
+}    
+
+template &lt;class InputIterator, class Distance&gt;
+void advance_RAI(InputIterator&amp; i, Distance n){
+    i+=n;        
+}
+</code></pre><p>现在，当程序调用advance()时，应该选择跟自己最匹配的版本，所以，我们需要将三者合一。首先想到的是运用条件判断。</p>
+<pre><code>template &lt;class InputIterator, class Distance&gt;
+void advance(InputIterator&amp; i, Distance n){
+    if(is_random_access_iterator(i)){
+        advance_RAI(i, n);
+    }else if(is_bidirectional_iterator(i)){
+        advance_BI(i, n);
+    }else{
+        advance_II(i, n);
+    }
+}    
+</code></pre><p>但是像这样在执行时期才决定使用哪一个版本，会影响程序效率。最好能在编译期就选择正确的版本，所以，采用函数重载机制。<br>前面三个advance_xx()都有两个函数参数，型别都未定（都是template参数），为了令其同名，形成重载函数，我们必须加上一个型别已确定的函数参数，使函数重载机制得以有效运作起来。<br>STL设计思想为：如果traits有能力萃取出迭代器的种类，我们便可利用这个“迭代器类型”相应型别作为advanced()的三个参数，这个相应型别一定必须是一个class type，因为编译器需要依赖它（一个型别）来进行重载决议。<br>定义五个class，代表五种迭代器类型：    </p>
+<pre><code>struct input_iterator_tag { };
+struct output_iterator_tag { };
+struct forward_iterator_tag : public input_iterator_tag｛｝；
+...
+</code></pre><p>现在重新设计__advance，并加上第三参数，使它们形成重载:   </p>
+<pre><code>template &lt;class InputIterator, class Distance&gt;
+inline void __advance(InputIterator&amp; i, Distance n,
+                      input_iterator_tag){
+    while(n--) ++i;
+}
+
+template &lt;class BidirectionalIterator, class Distance n&gt;
+inline void __advance(BidirectionalIterator&amp; i, Distance n,
+                      bidirectional_iterator_tag){
+    if(n&gt;=0)
+        while(n--) ++i;
+    else
+        while(n++) --i;
+}
+...
+</code></pre><p>每个__advance()的最后一个参数都只声明型别，并未指定参数名称，因为它纯粹只是用来激活重载机制，函数之中根本不使用该参数。<br>最后，还需要一个对外开放的上层接口，调用上述各个重载的__advance()，这一上层接口只需要两个参数，当它准备将工作转给上述的__advance()时，才自行加上第三参数：迭代器类型。因此，这个上层函数必须有能力从它所能获得的迭代器中推导出其类型（traits机制）。</p>
+<pre><code>template &lt;class InputIterator, class Distance&gt;
+inline void advance(InputIterator&amp; i, Distance n){
+    __advance(i, n, 
+                iterator_traits&lt;InputIterator&gt;::iterator_category());
+}
+</code></pre><p>iterator_traits<inputiterator>::iterator_category())将产生一个暂时对象，其型别应该隶属于前述四个迭代器类型，然后根据这个型别，编译器才决定调用哪一个__advance()重载函数。<br>因此，为了满足上述行为，traits必须再增加一个相应的型别：</inputiterator></p>
+<pre><code>template &lt;class Iterator&gt;
+struct iterator_traits{
+    ...
+    typedef typename Iterator::iterator_category iterator_category;
+};
+
+//针对原生指针
+template &lt;class T&gt;
+struct iterator_traits&lt;T*&gt;{
+    ...
+    typedef typename random_access_iterator_tag iterator_category;
+}
+</code></pre><p>最后一个问题，STL算法的命名规则：以算法所能接收之最低阶迭代器类型，来为其迭代器型别参数命名。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag">#C++</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/09/STL-allocator/" rel="next" title="C++ STL空间配置器">
+                <i class="fa fa-chevron-left"></i> C++ STL空间配置器
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/10/18/DataCenterBridging/" rel="prev" title="Data Center Bridging">
+                Data Center Bridging <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/10/14/STL-iterator/"
+           data-title="C++ STL迭代器" data-url="http://blog.jonnydu.me/2016/10/14/STL-iterator/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="jonnydu" />
+          <p class="site-author-name" itemprop="name">jonnydu</p>
+          <p class="site-description motion-element" itemprop="description">jonnydu.uestc@gmail.com</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">63</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jiongdu" target="_blank">
+                  
+                    <i class="fa fa-https://github.com/jiongdu"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/3309795495" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 微博
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Traits编程手法"><span class="nav-number">1.</span> <span class="nav-text">Traits编程手法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#template-partial-specialization"><span class="nav-number">1.1.</span> <span class="nav-text">template partial specialization</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#STL的五种迭代器"><span class="nav-number">2.</span> <span class="nav-text">STL的五种迭代器</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">jonnydu</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+  
+  
+<script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = NexT.utils.escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    NexT.motion.middleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+
+      if (CONFIG.sidebar.display === 'post' || CONFIG.sidebar.display === 'always') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          NexT.utils.displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"jonnydu"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+  
+
+
+
+
+
+  
+  
+  
+
+  
+
+
+</body>
+</html>
