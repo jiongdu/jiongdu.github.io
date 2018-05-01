@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://blog.jonnydu.me/2017/05/05/Linux-Block-IO/</loc>
+    
+    <lastmod>2018-05-01T14:04:25.284Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://blog.jonnydu.me/2016/03/08/dumbap/</loc>
     
     <lastmod>2018-05-01T13:57:25.054Z</lastmod>
@@ -12,13 +19,6 @@
     <loc>http://blog.jonnydu.me/2016/03/01/welcome/</loc>
     
     <lastmod>2018-05-01T13:56:01.849Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://blog.jonnydu.me/2017/05/05/Linux-Block-IO/</loc>
-    
-    <lastmod>2017-05-31T02:45:42.000Z</lastmod>
     
   </url>
   

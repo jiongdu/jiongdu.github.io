@@ -4,6 +4,23 @@
 
     
   <url>
+    <loc>http://blog.jonnydu.me/2017/05/05/Linux-Block-IO/</loc>
+    <lastmod>2018-05-01T14:04:25.284Z</lastmod>
+    <data>
+        <display>
+        <title>Linux块IO浅析</title>
+        <pubTime>2017-05-05T12:08:28.000Z</pubTime>
+        
+        <tag>network/linux</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>http://blog.jonnydu.me/2016/03/08/dumbap/</loc>
     <lastmod>2018-05-01T13:57:25.054Z</lastmod>
     <data>
@@ -28,23 +45,6 @@
         <title>Welcome to My Blog</title>
         <pubTime>2016-03-01T01:56:09.000Z</pubTime>
         
-         
-           
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>http://blog.jonnydu.me/2017/05/05/Linux-Block-IO/</loc>
-    <lastmod>2017-05-31T02:45:42.000Z</lastmod>
-    <data>
-        <display>
-        <title>Linux块IO浅析</title>
-        <pubTime>2017-05-05T12:08:25.000Z</pubTime>
-        
-        <tag>network/linux</tag>
-         
          
            
         </display>
