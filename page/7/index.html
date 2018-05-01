@@ -249,202 +249,6 @@
             
               
                 
-                <a class="post-title-link" href="/2016/07/17/muduo-6/" itemprop="url">
-                  muduo源码阅读之Thread和ThreadPool
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-07-17T19:14:12+08:00" content="2016-07-17">
-              2016-07-17
-            </time>
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/07/17/muduo-6/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/07/17/muduo-6/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>在muduo的one loop per thread + thread pool模型中，线程和线程池应该是其中最基础也是最重要的两个组件了。所以，本文深入代码，学习Thread和ThreadPool两个类的结构和实现。</p>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/07/17/muduo-6/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/07/08/muduo-5/" itemprop="url">
-                  muduo源码阅读之线程同步
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-07-08T15:07:13+08:00" content="2016-07-08">
-              2016-07-08
-            </time>
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/07/08/muduo-5/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/07/08/muduo-5/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>前面的四篇“muduo源码阅读”文章都是从总体上（Reactor模式）出发把握muduo库的一些设计思想和架构，从这篇开始，将更深入细节、更贴近代码地阅读muduo网络库。<br>首先，是多线程编程中重中之重的线程同步问题。     </p>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/07/08/muduo-5/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
                 <a class="post-title-link" href="/2016/06/25/tcp-2/" itemprop="url">
                   TCP协议总结（二）
                 </a>
@@ -987,6 +791,202 @@
           <p>如前所述，Reactor模式包括四个部分的组件:Handle, Synchronous Event Demultiplexer，Initiation Dispatcher和Event Handler。上一篇已经学习了muduo中的Initiation Dispatcher—EventLoop类，接下来分别讲述Handle—Channel类和Synchronous Event Demultiplexer—Poller类。<br>
           <div class="post-more-link text-center">
             <a class="btn" href="/2016/05/06/muduo-4/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2016/05/03/muduo-3/" itemprop="url">
+                  muduo源码阅读之EventLoop类
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-05-03T21:13:47+08:00" content="2016-05-03">
+              2016-05-03
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/05/03/muduo-3/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/03/muduo-3/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>EventLoop类似于前面所述的Reactor模式中的Initiation Dispatcher，是用于驱动的主模块，完成与其他模块的调用和交互。EventLoop类提供的主要是一个框架，事件的分发由Demultiplexer提供，事件的处理由Event Handler提供，但事件的循环、怎样将事件的分发与调用结合起来则是由EventLoop类决定的。<br>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/05/03/muduo-3/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2016/04/28/muduo-2/" itemprop="url">
+                  muduo源码阅读之muduo的回调函数机制
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-04-28T19:18:24+08:00" content="2016-04-28">
+              2016-04-28
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/04/28/muduo-2/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/28/muduo-2/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>回调是指将一段可执行的代码作为变量传给另外一部分代码，以供同步或异步调用。在Reactor模式中，在事件到来时调用相应的处理函数就是一种异步回调的过程。回调函数的实现可以由各种各样的方式。<br>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/04/28/muduo-2/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>

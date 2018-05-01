@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://blog.jonnydu.me/"/>
-  <updated>2016-03-18T08:24:04.000Z</updated>
+  <updated>2017-05-31T02:45:42.000Z</updated>
   <id>http://blog.jonnydu.me/</id>
   
   <author>
@@ -15,48 +15,6 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
-  
-  <entry>
-    <title>Welcome to My Blog</title>
-    <link href="http://blog.jonnydu.me/2018/05/01/welcome/"/>
-    <id>http://blog.jonnydu.me/2018/05/01/welcome/</id>
-    <published>2018-05-01T13:39:00.756Z</published>
-    <updated>2016-03-18T08:24:04.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>Welcome to <a href="https://blog.dujiong.net/" target="_blank" rel="noopener">My Blog</a>! Happy Everyday！</p><p>This is where i am writing and leaning. Let’s go!</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;Welcome to &lt;a href=&quot;https://blog.dujiong.net/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;My Blog&lt;/a&gt;! Happy Everyday！&lt;/p&gt;
-&lt;p&gt;This is where i am writ
-      
-    
-    </summary>
-    
-    
-  </entry>
-  
-  <entry>
-    <title>配置OpenWrt路由器为Dumb AP</title>
-    <link href="http://blog.jonnydu.me/2018/05/01/dumbap/"/>
-    <id>http://blog.jonnydu.me/2018/05/01/dumbap/</id>
-    <published>2018-05-01T13:39:00.580Z</published>
-    <updated>2016-07-21T08:44:06.000Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="Dumb-AP"><a href="#Dumb-AP" class="headerlink" title="Dumb AP"></a>Dumb AP</h2><p>Dumb AP，简单说，就是将路由器作为一个纯接入点，没有路由转发，没有DHCP。这时的路由器相当于一台二层交换机，没有三层功能。所以，实验环境中，将Dumb AP连接在上级路由器下，子网段为192.168.1.1/24。<br><a id="more"></a></p><h2 id="配置Dumb-AP"><a href="#配置Dumb-AP" class="headerlink" title="配置Dumb AP"></a>配置Dumb AP</h2><h3 id="修改网络配置文件-etc-config-network"><a href="#修改网络配置文件-etc-config-network" class="headerlink" title="修改网络配置文件(/etc/config/network)"></a>修改网络配置文件(/etc/config/network)</h3><p>修改OpenWrt的网络配置文件，将wan口和lan口桥接起来:<br><code>config interface lan</code><br>    <code>option type &#39;bridge&#39;</code><br>    <code>option ifname &#39;eth0.1 eth0.2&#39;</code>  ##将二者桥接<br>    <code>option proto static</code><br>    <code>option ipaddr &#39;192.168.1.196&#39;</code>  ##采用静态ip<br>    <code>option netmask 255.255.255.0</code><br>然后注释掉路由器关于wan口的设置，包括ipv4和ipv6。<br>需要说明的是，上述的配置文件中桥接的而是eth0.1和eth0.2，但事实上路由器的接口不尽相同，比如有的wan口事实上是eth1。所以，需要因地制宜。</p><h3 id="关掉DHCP"><a href="#关掉DHCP" class="headerlink" title="关掉DHCP"></a>关掉DHCP</h3><p>因为这里将路由器作为Dumb AP使用，作为一个纯无线接入点和交换机使用，不再需要其DHCP功能，所以关掉DHCP。<br>可以通过uci或者是修改配置文件(/etc/config/dhcp)设置DHCP。这里采用的是后者，即注释掉文件中lan口dhcp配置相关的设置。<br><code>#config dhcp &#39;lan&#39;</code><br>    <code>#option interface &#39;lan&#39;</code><br>    <code>#option dhcpv6 &#39;server&#39;</code><br>    <code>#option ra &#39;server&#39;</code><br>    <code>#option ignore &#39;1&#39;</code><br>    <code>#option ra_management &#39;1&#39;</code> </p><h3 id="关掉防火墙"><a href="#关掉防火墙" class="headerlink" title="关掉防火墙"></a>关掉防火墙</h3><p>某些情况下，需要关闭防火墙，同样的，修改配置文件/etc/config/firewall，将相应的REJECT改成ACCEPT即可，具体不再详述。<br>最后，载入新的配置即可。</p><h2 id="附：完整的-etc-config-network文件"><a href="#附：完整的-etc-config-network文件" class="headerlink" title="附：完整的/etc/config/network文件"></a>附：完整的/etc/config/network文件</h2><p><code>config interface &#39;loopback&#39;</code><br><code>option ifname &#39;lo&#39;</code><br><code>option proto &#39;static&#39;</code><br><code>option ipaddr &#39;127.0.0.1&#39;</code><br><code>option netmask &#39;255.0.0.0&#39;</code></p><p><code>config globals &#39;globals&#39;</code><br><code>option ula_prefix &#39;fd9f:91f8:3d14::/48&#39;</code></p><p><code>config interface &#39;lan&#39;</code><br><code>option ifname &#39;eth0.1 eth0.2&#39;</code><br><code>option force_link &#39;1&#39;</code><br><code>option macaddr &#39;b0:68:b6:ff:d6:b8&#39;</code><br><code>option type &#39;bridge&#39;</code><br><code>option proto &#39;static&#39;</code><br><code>option ipaddr &#39;192.168.1.196&#39;</code><br><code>option netmask &#39;255.255.255.0&#39;</code><br><code>option ip6assign &#39;60&#39;</code></p><p><code>#config interface &#39;wan&#39;</code><br><code>#option ifname &#39;eth0.2&#39;</code><br><code>#option force_link &#39;1&#39;</code><br><code>#option macaddr &#39;b0:68:b6:ff:d6:b9&#39;</code><br><code>#option proto &#39;dhcp&#39;</code></p><p><code>#config interface &#39;wan6&#39;</code><br><code>#option ifname &#39;eth0.2&#39;</code><br><code>#option proto &#39;dhcpv6&#39;</code></p><p><code>以下均保持原状</code><br><code>config switch</code><br><code>option name &#39;switch0&#39;</code><br><code>option reset &#39;1&#39;</code><br><code>option enable_vlan &#39;1&#39;</code><br><code>config switch_vlan</code><br><code>option device &#39;switch0&#39;</code><br><code>option vlan &#39;1&#39;</code><br><code>option ports &#39;0 1 2 3 6t&#39;</code><br><code>config switch_vlan</code><br><code>option device &#39;switch0&#39;</code><br><code>option vlan &#39;2&#39;</code><br><code>option ports &#39;4 6t</code></p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;Dumb-AP&quot;&gt;&lt;a href=&quot;#Dumb-AP&quot; class=&quot;headerlink&quot; title=&quot;Dumb AP&quot;&gt;&lt;/a&gt;Dumb AP&lt;/h2&gt;&lt;p&gt;Dumb AP，简单说，就是将路由器作为一个纯接入点，没有路由转发，没有DHCP。这时的路由器相当于一台二层交换机，没有三层功能。所以，实验环境中，将Dumb AP连接在上级路由器下，子网段为192.168.1.1/24。&lt;br&gt;
-    
-    </summary>
-    
-    
-      <category term="openwrt/wifi" scheme="http://blog.jonnydu.me/tags/openwrt-wifi/"/>
-    
-  </entry>
   
   <entry>
     <title>Linux块IO浅析</title>
@@ -417,6 +375,46 @@
     
     
       <category term="C++" scheme="http://blog.jonnydu.me/tags/C/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>《C++编程思想》之字符串学习笔记</title>
+    <link href="http://blog.jonnydu.me/2016/12/08/String/"/>
+    <id>http://blog.jonnydu.me/2016/12/08/String/</id>
+    <published>2016-12-08T13:10:07.000Z</published>
+    <updated>2016-12-07T08:33:14.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>字符串是C++标准库的一个重要组成部分，本文参照《C++编程思想》中字符串的相关内容，对该部分进行简单总结。<br><a id="more"></a></p><h3 id="C字符型数组和C-字符串"><a href="#C字符型数组和C-字符串" class="headerlink" title="C字符型数组和C++字符串"></a>C字符型数组和C++字符串</h3><p>在C语言中，字符串基本上就是字符串数组，并且总是以二进制零（空结束符）作为最末元素。C++ string与它们在C语言中的前身截然不同。首先，也是最重要的不同点，C++隐藏了它所包含的字符序列的物理表示。程序设计人员不必关心数组的维数或空结束符方面的问题。C++ string对象知道自己在内存中的开始位置、包含的内容、包含的字符长度以及在必需重新调整内部缓冲区的大小之前自己可以增长到的最大字符长度。C++字符串极大地减少了C语言编程中最常见且最具破坏性的错误：（1）超越数组边界；（2）通过未被初始化或被赋以错误值的指针来访问数组元素；（3）在释放了某一数组原先所分配的存储单元后仍保留了“悬挂”指针。<br>C++标准没有定义字符串类内存布局的确切实现。采用这种体系结构是为了获得足够的灵活性，从而允许不同的编译器厂商能够提供不同的实现，并且向用户保证提供可预测的行为。</p><h3 id="创建并初始化C-字符串"><a href="#创建并初始化C-字符串" class="headerlink" title="创建并初始化C++字符串"></a>创建并初始化C++字符串</h3><p>创建C++ string一般有以下几种方式：<br>（1）<code>string temp;</code>  创建空string对象，且并不立即用字符数据对其初始化；<br>（2）<code>string temp(&quot;hello world&quot;);</code>  将一个文字的引用数组作为参数传递给构造函数，以此来对一个string对象进行初始化；<br>（3）<code>string temp = &quot;hello world&quot;;</code>  用等号来初始化一个string对象;<br>（4）<code>string temp(str);</code>        用一个string对象看来初始化另一个string对象。<br>另外，还有一些相关的成员函数和特性：<br>（1）用operator+来将不同的初始化数据源结合在一起；</p><pre><code>string s1(&quot;hello&quot;);std::cout &lt;&lt; s1 + &quot; world&quot; &lt;&lt; std::endl;        //hello world</code></pre><p>（2）用string对象的成员函数substr()来创建一个子串。</p><pre><code>string s1(&quot;hello world, hello&quot;);std::cout &lt;&lt; s1.substr(0, 11) &lt;&lt; std::endl;        //hello world   \</code></pre><p>string类对象的成员函数substr()将开始位置作为其第一个参数，而将待选字符的个数作为其第2个参数。<br>（3）将string看做容器对象，利用string类的迭代器string::begin()和string::end()。</p><pre><code>string s1(&quot;hello world&quot;);string s2(s1.begin(), s2.end());std::cout &lt;&lt; s2 &lt;&lt; std::endl;        //hello world</code></pre><p>不可以使用单个的字符、ASCII码或其他整数值来初始化C++字符串。</p><h3 id="字符串的操作"><a href="#字符串的操作" class="headerlink" title="字符串的操作"></a>字符串的操作</h3><p>标准C语言的char型数组工具中存在着其固有的误区，那就是它们都显示地依赖一种假设：字符数组包括一个空结束符。若由于疏忽或是其他差错，这个空结束符被忽略或重写，这个小小的差错就会使C语言的char数组处理函数几乎不可避免地操作其已分配空间之外的内存，有时会带来灾难性后果。<br>C++提供的string类对象，在使用的便利性和安全性上都有很大的提高。     </p><h4 id="追加、插入和连接字符串"><a href="#追加、插入和连接字符串" class="headerlink" title="追加、插入和连接字符串"></a>追加、插入和连接字符串</h4><p>C++字符串一个便于使用的特色是：无需程序员干预，可根据需要自行扩充规模。这样程序员不再需要跟踪字符串的存储边界。此外，当字符串增长时，字符串成员函数append()–(追加)和insert()–(插入)很明显地重新分配了存储空间。<br>此外，还有一些成员函数：capacity()返回当前分配的存储空间的规模；reserve(int size)提供一种优化机制，按照程序员的意图，预留一定数量的存储空间，以便将来使用。而如果要生成的新字符串的规模比当前的字符串大或者需要截断原字符串，resize()函数就会在字符串的末尾追加空格或是指定的字符。</p><h4 id="替换字符串的字符"><a href="#替换字符串的字符" class="headerlink" title="替换字符串的字符"></a>替换字符串的字符</h4><p>insert()使程序员放心地向字符串中插入字符，而不必担心会使存储空间越界，或者会改写插入点之后紧跟的字符。存储空间增大了，原有的字符会该改变其存储位置，以便安置新元素。<br>replace()用于替换（删除）字符串中的字符，如果对replace()的调用使“替换”超出了原有序列的边界，这与追加操作是等价的，这样replace()也会增加存储空间。<br>此外，我们知道，STL中的算法功能很强大，由于string类几乎可以与STL容器等价，因此，string的很多解决方案可以由标准库的算法完成。比如，使用<code>std::replace(s.begin(), s.end(), &#39;X&#39;, &#39;Y&#39;)</code>将字符串中出现的某个字符（’X’）全部用另一个字符(‘Y’)替换掉。这里的replace()是STL通用算法，不是string的成员函数。</p><h4 id="使用非成员重载运算符连接"><a href="#使用非成员重载运算符连接" class="headerlink" title="使用非成员重载运算符连接"></a>使用非成员重载运算符连接</h4><p>C++ string类另一个令人欣喜的特性是可以借助operator+和operator+=来轻易地实现字符串的合并与追加操作。</p><pre><code>string str(&quot;hello&quot;);str += &quot; world&quot;;cout &lt;&lt; str &lt;&lt; endl;        //hello world</code></pre><h3 id="字符串的查找"><a href="#字符串的查找" class="headerlink" title="字符串的查找"></a>字符串的查找</h3><p>string成员函数中的find族是用来在给定字符串中定位某个或某组字符的。包括：<br>（1）find()：在字符串中查找一个指定的单个字符或字符组；<br>（2）find_first_of()：查找第一个与指定字符组任何字符匹配的字符位置；<br>（3）find_first_not_of()：查找第一个与指定字符组任何字符都不匹配的字符位置；<br>（4）find_last_of();<br>（5）find_last_not_of();<br>（6）rfind()：对一个字符串从尾到头查找指定的字符或字符组，返回首次匹配的开始位置。<br>string类中没有改变字符串大小写的函数，可以借助于标准C语言的toupper()和tolower()实现，这两个函数以此只能改变一个字符的大小写。</p><h3 id="字符串的删除"><a href="#字符串的删除" class="headerlink" title="字符串的删除"></a>字符串的删除</h3><p>使用erase()成员函数删除字符串中的字符，该函数有两个参数：一个参数表示开始删除字符的位置（默认值是0）；另一个表示要删除多少个字符（默认值是string::npos）。如果指定删除的字符个数比字符串中剩余的字符还多，那么剩余的字符将全部删除，所以，调用不含参数的erase()函数将删除字符串中的所有字符。</p><h3 id="字符串的比较"><a href="#字符串的比较" class="headerlink" title="字符串的比较"></a>字符串的比较</h3><p>字符串的比较，简而言之就是：当两个字符串比较遇到第一对不同的字符时，字符串s1中第一个不同的字符比字符串s2中同样位置的字符在ASCII表中的位置更靠后，那么s1“大于”s2。<br>C++提供了多种字符串比较方法，它们各具特色。其中最简单的就是使用非成员的重载运算符函数：operator==、operator!=、operator&gt;、operator&lt;、operator&gt;=、operator&lt;=。<br>此外，string类还提供compare()成员函数，用以提供更复杂紧密的比较手段。用多种重载版本来对比较的字串做控制。<br>C语言中获取字符串中的某个字符都是采用数组索引法（[]）,C++ string提供一种s[n]表示法的替代方法：at()成员函数。如果不出异常，这两种索引机制在C++中产生的结果是一样的。而有异常的情况时，比如程序员引用了一个超过边界的数组元素，at()将会友好地抛出一个异常，而普通的[]下标语法将让程序员自行决策。at()成员函数抛出的是一个out_of_range类对象，它(最终)派生于std::exception。程序可在一个异常处理器中捕获该对象，并采取适当的补救措施，比如重新计算越界下标或扩充数组。而string::operator<a href=""></a>不会有那样的保护性，它的危险性等同于C语言中国对char型数组的处理。    </p><h3 id="C语言函数处理时的转换"><a href="#C语言函数处理时的转换" class="headerlink" title="C语言函数处理时的转换"></a>C语言函数处理时的转换</h3><p>C++ string提供了c_str()函数返回一个const char*，它指向一个C语言风格的具有“空结束符”的字符串，此字符串与string对象的内容等价。当想将一个字符串传送给一个标准C语言函数时，比如atoi()、printf()，const char*可派上用场。不过，用c_str()的返回值作为非const参数应用于任一函数都是错误的。    </p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;字符串是C++标准库的一个重要组成部分，本文参照《C++编程思想》中字符串的相关内容，对该部分进行简单总结。&lt;br&gt;
+    
+    </summary>
+    
+    
+      <category term="C++" scheme="http://blog.jonnydu.me/tags/C/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Redis两种持久化方式比较</title>
+    <link href="http://blog.jonnydu.me/2016/12/03/Redis-RDB-AOF/"/>
+    <id>http://blog.jonnydu.me/2016/12/03/Redis-RDB-AOF/</id>
+    <published>2016-12-03T09:14:03.000Z</published>
+    <updated>2017-03-27T07:02:30.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>本文对前面所述的Redis两种持久化方式RDB和AOF做简单总结和比较。<br><a id="more"></a>  </p><h3 id="RDB和AOF简单总结"><a href="#RDB和AOF简单总结" class="headerlink" title="RDB和AOF简单总结"></a>RDB和AOF简单总结</h3><p>RDB持久化可以在指定的时间间隔内生成数据集的时间点快照，保存的是该时间点Redis在内存中的数据库状态。<br>AOF持久化记录的是服务器执行的所有写操作命令，并在服务器启动时，通过重新执行这些命令来还原数据集。AOF文件中的命令全部以Redis协议的格式来保存，新命令会被追加到文件的末尾。Redis还可以在后台对AOF文件进行重写，使得AOF文件的体积不会超出保存数据集状态所需的实际大小。Redis可以同时使用AOF持久化和RDB持久化，在这种情况下，当Redis重启下，它会优先使用AOF来还原数据集，因为AOF文件保存的数据集通常比RDB文件所保存的数据集更完整。           </p><h3 id="RDB"><a href="#RDB" class="headerlink" title="RDB"></a>RDB</h3><h4 id="RDB的优点"><a href="#RDB的优点" class="headerlink" title="RDB的优点"></a>RDB的优点</h4><p>RDB是一个非常紧凑的文件，它保存了Redis在某个时间点上的数据集，这种文件非常适合进行备份。比如，可以在一天内，每小时备份RDB文件，并在每月的每一天，也备份一个RDB文件。这样的话，即使遇上问题，也可以随时将数据集还原到不同的版本。RDB非常适用于灾难恢复，它只有一个文件，并且内容都非常紧凑，可以（在加密后）将它传送到别的数据中心。RDB可以最大化Redis的性能：父进程在保存RDB文件时唯一要做的就是fork出一个子进程，然后这个子进程就会处理接下来的所有保存工作，父进程无须执行任何磁盘I/O操作。RDB在恢复大数据集时的速度比AOF的恢复速度要快。          </p><h4 id="RDB的缺点"><a href="#RDB的缺点" class="headerlink" title="RDB的缺点"></a>RDB的缺点</h4><p>如果需要尽量避免在服务器故障时丢失数据，那么RDB不适合。因为，虽然Redis允许设置不同的保存点来控制保存RDB文件的频率，但是，因为RDB文件需要保存整个数据集的状态，所以它并不是一个轻松的操作。因此，可能会至少需要5分钟才保存一次RDB文件。这种情况下，一旦出现故障停机，那么便会丢失几分钟的数据。此外，每次保存RDB的时候，Redis都要fork出一个子进程，并由子进程来进行实际的持久化工作。当数据集比较庞大的时候，fork过程会非常耗时，造成服务器端在短时间内停止处理客户端。虽然AOF重写也需要进行fork，但无论fork重写的执行间隔有多长，数据的耐久性都不会有任何损失。</p><h3 id="AOF"><a href="#AOF" class="headerlink" title="AOF"></a>AOF</h3><h4 id="AOF的优点"><a href="#AOF的优点" class="headerlink" title="AOF的优点"></a>AOF的优点</h4><p>使用AOF持久化会让Redis变得非常耐久，AOF支持设置不同的fsync策略，比如每秒钟fsync、每次执行写命令时fsync。AOF的默认策略为每秒钟fsync一次，在这种配置下，Redis仍然可以保持良好的性能，并且就算发生故障停机，也最多只会丢失一秒钟的数据（fsync会在后台进程执行，所以主进程可以继续处理命令请求）。另外，AOF文件是一个只进行追加操作的日志文件，因此对AOF文件的写入不需要进行seek，即使日志因为某些原因而包含了未写入完整的命令（比如写入时磁盘已满，写入中途停机），redis-check-aof工具也可以轻易地修复这种问题。Redis可以在AOF文件体积变得过大时，自动地在后台对AOF进行重写，重写后的新AOF文件包含了恢复当前数据集所需的最小命令集合。整个重写操作是绝对安全的，因为Redis在创建AOF文件的过程中，会继续将命令追加到现有的AOF文件里面，即使重写过程中发生停机，现有的AOF文件也不会丢失。而一旦新AOF文件创建完毕，Redis就会从旧AOF文件切换到新AOF文件，并开始对新AOF文件进行追加操作。AOF文件有序地保存了对数据库执行的所有写操作，这些写入操作以Redis协议的格式保存，因此AOF文件的内容非常容易被人读懂，对文件进行分析也很轻松。比如，如果不小心执行了FLUSHALL命令，但只要AOF文件未被重写，那么只要停止服务器，移除AOF文件末尾的FLUSHALL命令，并重启Redis，就可以将数据集恢复到执行FLUSHALL之前的状态。           </p><h4 id="AOF的缺点"><a href="#AOF的缺点" class="headerlink" title="AOF的缺点"></a>AOF的缺点</h4><p>对同样的数据集，AOF文件通常要大于等价的RDB文件。<br>AOF可能比RDB慢，这取决于具体的fsync策略。<br>另外，Redis AOF是通过递增地更新一个已经存在的状态，而RDB快照则是一次又一次地从头开始创造一切，概念上更健壮。</p><h3 id="二者的使用"><a href="#二者的使用" class="headerlink" title="二者的使用"></a>二者的使用</h3><p>一般来说，如果想达到很高的数据安全性，那么应该同时使用两种持久化功能。如果可以承受数分钟以内的数据丢失，那么可以只使用RDB持久化。但是不建议只是用AOF持久化：因为定时生成RDB快照非常便于进行数据库备份，并且RDB恢复数据集的速度也要比AOF恢复的速度要快。</p><h3 id="其他一些问题"><a href="#其他一些问题" class="headerlink" title="其他一些问题"></a>其他一些问题</h3><h4 id="RDB设置"><a href="#RDB设置" class="headerlink" title="RDB设置"></a>RDB设置</h4><p>在默认情况下，Redis将数据库快照保存dump.rdb的二进制文件中。可以对Redis进行设置，让它在“N秒内数据集至少有M个改动”这样的条件满足时，自动保存一次数据集。此外，还可以使用SAVE或BGSAVE手动对Redis进行数据集保存操作。</p><h4 id="AOF文件出错"><a href="#AOF文件出错" class="headerlink" title="AOF文件出错"></a>AOF文件出错</h4><p>服务器可能在程序正在对AOF文件进行写入时停机，如果停机造成了AOF文件出错，那么Redis在重启时会拒绝载入这个AOF文件，从而确保数据的一致性不会被破坏。<br>当发生这种情况时，可以为现有的AOF文件创建一个备份，然后使用Redis附带的redis-check-aof程序，对原来的AOF文件进行修复，并查看两个文件的不同之处，最后重启Redis服务器，等待服务器载入修复后的AOF文件，并进行数据恢复。</p><h4 id="RDB和AOF之间的相互作用"><a href="#RDB和AOF之间的相互作用" class="headerlink" title="RDB和AOF之间的相互作用"></a>RDB和AOF之间的相互作用</h4><p>在版本大于等于2.4的Redis中，BGSAVE执行的过程中，不可以执行BGREWRITEAOF。同样，在执行BGREWRITEAOF的过程中，也不可执行BGSAVE。这样主要是防止两个Redis后台进程同时对磁盘进行大量的I/O操作。<br>如果BGSAVE正在执行，并且用户显示地调用BGREWRITEAOF命令， 那么服务器将向用户回复一个OK状态，并告知用户，BGREWRITEAOF已经被预定执行：一旦BGSAVE执行完毕，BGREWRITEAOF就会正式开始。<br>当Redis启动时，如果RDB持久化和AOF持久化都打开了，那么程序会优先使用AOF文件来恢复数据集，因为AOF文件所保存的数据通常是最完整的。</p><h4 id="RDB备份数据"><a href="#RDB备份数据" class="headerlink" title="RDB备份数据"></a>RDB备份数据</h4><p>Redis对于数据备份是非常友好的，可以在服务器运行的时候对 RDB 文件进行复制：RDB文件一旦被创建，就不会进行任何修改。当服务器要创建一个新的RDB文件时，它先将文件的内容保存在一个临时文件里，当临时文件写入完毕时，程序才原子地使用临时文件替换原来的RDB文件。即，无论何时，复制RDB文件都是绝对安全的。</p><p>参考： <a href="https://segmentfault.com/a/1190000005052628" target="_blank" rel="noopener">Redis持久化</a></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;本文对前面所述的Redis两种持久化方式RDB和AOF做简单总结和比较。&lt;br&gt;
+    
+    </summary>
+    
+    
+      <category term="Redis" scheme="http://blog.jonnydu.me/tags/Redis/"/>
     
   </entry>
   

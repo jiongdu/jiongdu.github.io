@@ -4,6 +4,38 @@
 
     
   <url>
+    <loc>http://blog.jonnydu.me/2016/03/08/dumbap/</loc>
+    <lastmod>2018-05-01T13:57:25.054Z</lastmod>
+    <data>
+        <display>
+        <title>配置OpenWrt路由器为Dumb AP</title>
+        <pubTime>2016-03-08T01:56:09.000Z</pubTime>
+        
+        <tag>openwrt/wifi</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2016/03/01/welcome/</loc>
+    <lastmod>2018-05-01T13:56:01.849Z</lastmod>
+    <data>
+        <display>
+        <title>Welcome to My Blog</title>
+        <pubTime>2016-03-01T01:56:09.000Z</pubTime>
+        
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>http://blog.jonnydu.me/2017/05/05/Linux-Block-IO/</loc>
     <lastmod>2017-05-31T02:45:42.000Z</lastmod>
     <data>
@@ -963,23 +995,6 @@
 
     
   <url>
-    <loc>http://blog.jonnydu.me/2018/05/01/dumbap/</loc>
-    <lastmod>2016-07-21T08:44:06.000Z</lastmod>
-    <data>
-        <display>
-        <title>配置OpenWrt路由器为Dumb AP</title>
-        <pubTime>2018-05-01T13:39:00.580Z</pubTime>
-        
-        <tag>openwrt/wifi</tag>
-         
-         
-           
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
     <loc>http://blog.jonnydu.me/2016/03/18/startAP/</loc>
     <lastmod>2016-07-21T08:44:06.000Z</lastmod>
     <data>
@@ -1064,19 +1079,4 @@
     </url>
 
     
-    
-  <url>
-    <loc>http://blog.jonnydu.me/2018/05/01/welcome/</loc>
-    <lastmod>2016-03-18T08:24:04.000Z</lastmod>
-    <data>
-        <display>
-        <title>Welcome to My Blog</title>
-        <pubTime>2018-05-01T13:39:00.756Z</pubTime>
-        
-         
-           
-        </display>
-    </data>
-    </url>
-
 </urlset>
