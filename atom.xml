@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://blog.jonnydu.me/"/>
-  <updated>2018-05-01T14:04:25.284Z</updated>
+  <updated>2018-07-22T10:19:07.564Z</updated>
   <id>http://blog.jonnydu.me/</id>
   
   <author>
@@ -15,6 +15,26 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title></title>
+    <link href="http://blog.jonnydu.me/2018/07/22/goroutine_and_scheduler/"/>
+    <id>http://blog.jonnydu.me/2018/07/22/goroutine_and_scheduler/</id>
+    <published>2018-07-22T10:19:33.466Z</published>
+    <updated>2018-07-22T10:19:07.564Z</updated>
+    
+    <content type="html"><![CDATA[<hr><p>title: goroutine和golang调度器<br>date: 2018-04-28 21:07:00<br>tags: [golang]</p><p>关于golang，自己听到的第一句话就是“原生支持并发”，而goroutine就是其具体实现。</p><a id="more"></a><h3 id="golang调度器"><a href="#golang调度器" class="headerlink" title="golang调度器"></a>golang调度器</h3><p>本节围绕“<strong>存在内核线程调度器的情况下，golang为什么要设计一个自己的调度器？</strong>”这一问题进行讨论。<br>我们知道，操作系统的内核调度器会将系统中的多个线程按照一定的算法调度到物理CPU上运行。最典型的例子如C/C++语言的并发实际上就是基于内核调度的，应用程序负责创建线程（比如linux下通过pthread库调用），内核负责调度。但是，这种传统方式存在一些不足：<br>1、<strong>代价较高</strong>：虽然线程的代价已经比进程小了很多，但仍占用不小的资源，并且线程切换也有不小的消耗，因此我们依然不能创建大量的线程。<br>2、常见的线程模型—N:1和1:1模型<strong>不能较好的兼顾</strong>1）充分利用多核CPU的优势；2）快速的上下文切换。<br>3、<strong>线程之间的通信不易掌握</strong>。虽然多线程之间的通信有多种方法，但使用起来都比较复杂、易错。比如常见的共享内存，各种加锁操作会使得程序开发和问题定位相当困难，甚至会出现死锁和挂掉等问题。<br>4、<strong>大量使用异步</strong>。比如很多网络服务程序，如上文所述，由于系统中不能创建大量线程，所以通常需要在线程中使用IO多路复用（如epoll），然后通过注册回调函数的机制实现各事件的异步调用。但是，异步调用的方式和我们通常的思维习惯不同，当系统中存在大量的回调函数时，会给程序的开发和维护带来较大困难。  </p><p><strong>基于以上问题，go采用了用户态轻量级线程（“goroutine”）的方式来解决</strong>。其主要特点可以归纳为：<br>1、<strong>用户态</strong>：goroutine在用户空间实现，其对于操作系统来说只是一个应用程序，操作系统甚至不知道有goroutine的存在，goroutine的调度需要自己完成。<br>2、<strong>轻量级</strong>：goroutine占用的资源很小，因此一个go程序可以创建成千上万个并发的goroutine。同时，goroutine之间的调度切换不需要陷入内核中，代价较低。将多个goroutine按照一定的算法调度到CPU上执行需要goroutine调度器。<br>3、倡导“<strong>通过通信来共享内存，而不是通过共享内存来通信</strong>”。go通过语法关键词提供了channel机制，用于goroutine之间的通信，实现了CSP并发模型。该并发范式逻辑简单清楚，系统有高正确性。</p><h3 id="golang调度模型"><a href="#golang调度模型" class="headerlink" title="golang调度模型"></a>golang调度模型</h3><p>golang试图通过M:N模型来兼顾N:1和1:1模型的优点，具体来说，每个用户线程可以对应多个内核线程，同时一个内核线程也可以对应多个用户线程。M:N模型的缺点是调度复杂，需要设计良好的调度器。  </p><p>如下图所示，goroutine调度器中使用了三种实体：（1）M：系统线程；（2）P：逻辑处理器（核）；（3）G：goroutine。图中，每个线程运行了一个goroutine，所以必须得维持一个上下文P。P的数量由启动时环境变量GOMAXPROCS决定，即在程序执行的过程中都只有GOMAXPROCS个gouroutine在同时运行。而灰色的goroutine在等待被调度，它们被维护在一个队列（runqueue）里。当一个go语句执行（即创建一个goroutine）时，就有一个新的goroutine被添加到runqueue队尾；当运行当前goroutine到调度点时，runqueue队头弹出一个goroutine进入运行。  </p><p><img src="C:\Users\jonnydu\Desktop\scheduler.jpg" alt="scheduler"></p><p>因此，当一个上下文（P）运行完要被调度的所有goroutine时，系统的稳定状态将被改变。此时如果各上下文的运行队列里的goroutine数目不均衡，将会导致一个上下文在执行完它的运行队列后就结束了，而系统中仍然有许多goroutine要执行。所以，调度系统需要维护一个全局队列，每个上下文能够从全局队列中获取goroutine，但如果全局队列中也没有goroutine了，上下文还能从其他上下文获取goroutine。该过程被称为“stealing”，goroutine通过“stealing”，确保每个上下文总是处于运行，同时保障所有线程都处于最大负载。<br>goroutine调度器模型践行了计算机界的一句名言：“<strong>计算机科学领域的绝大多数问题都可以采用增加一个间接的中间层解决</strong>”。每个G（goroutine）要想真正运行起来，首先需要被分配一个P（进入到P的local runqueue中），在G看来，P就是它所运行的“CPU”。但在go调度器看来，真正的“CPU”却是M，只有将P和M绑定才能让P的runqueue中的G真正运行起来。因此，goroutine调度器通过向G-M模型中增加一个中间层P，实现了高效、可扩展的调度。</p><h3 id="golang调度器跟踪"><a href="#golang调度器跟踪" class="headerlink" title="golang调度器跟踪"></a>golang调度器跟踪</h3><p>下面通过一个例子来查看go调度器的一些跟踪信息。 </p><p><img src="C:\Users\jonnydu\Desktop\1.jpg" alt="1">  </p><p>在main函数中，通过一个for循环创建了10个goroutine，然后在第16行等待所有的goroutine完成任务。每个goroutine执行的work函数中先sleep 1秒，然后循环计数1e9次。完成后调用waitGroup的Done方法返回。<br>然后在linux环境下运行该程序，并设置GODEBUG环境变量和schedtrace参数观察调度器的输出信息，其结果如下图所示。</p><p><img src="C:\Users\jonnydu\Desktop\2.jpg" alt="2"></p><p>其中，xxxms代表自程序开始运行时的毫秒数，gomaxprocx代表配置的处理器数，即上述golang调度器模型中的P，threads代表运行时管理的线程数，idleprocs代表空闲的处理器数，idlethreads代表空闲的线程数，spinningthreads处于自旋状态的线程数（M正在寻找可运行的G）。runqueue=xxx代表在全局队列中的goroutine数。[xxx]代表本地run队列中的goroutine数。<br>而如果还想更深入的了解goroutine调度的细节，可以添加scheddetail参数，该参数下将打印输出处理器P、线程M和goroutine的细节，如下图所示。</p><p><img src="C:\Users\jonnydu\Desktop\3.jpg" alt="3"></p><p>可以看出，与上图相比，添加scheddetail参数后P、M、G实体的状态和摘要信息更加清晰，这里就不再一一描述，有兴趣的同学可以参考：<a href="https://software.intel.com/en-us/blogs/2014/05/10/debugging-performance-issues-in-go-programs" target="_blank" rel="noopener">https://software.intel.com/en-us/blogs/2014/05/10/debugging-performance-issues-in-go-programs</a></p><h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>golang入门不久，对goroutine的设计及调度，高并发CSP模型等问题有较强的兴趣，本文从初学者的角度，简单学习、总结了goroutine和对应调度器的一些设计思路，希望借此能更好的理解go语言，后续还将对channel以及对应的CSP模型进行较深入的学习。</p><h3 id="附"><a href="#附" class="headerlink" title="附"></a>附</h3><p>本文参考：<br><a href="https://morsmachine.dk/netpoller" target="_blank" rel="noopener">https://morsmachine.dk/netpoller</a><br><a href="https://software.intel.com/en-us/blogs/2014/05/10/debugging-performance-issues-in-go-programs" target="_blank" rel="noopener">https://software.intel.com/en-us/blogs/2014/05/10/debugging-performance-issues-in-go-programs</a>   </p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;hr&gt;
+&lt;p&gt;title: goroutine和golang调度器&lt;br&gt;date: 2018-04-28 21:07:00&lt;br&gt;tags: [golang]&lt;/p&gt;
+&lt;p&gt;关于golang，自己听到的第一句话就是“原生支持并发”，而goroutine就是其具体实现。&lt;/p&gt;
+    
+    </summary>
+    
+    
+  </entry>
   
   <entry>
     <title>Linux块IO浅析</title>
@@ -395,26 +415,6 @@
     
     
       <category term="C++" scheme="http://blog.jonnydu.me/tags/C/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Redis两种持久化方式比较</title>
-    <link href="http://blog.jonnydu.me/2016/12/03/Redis-RDB-AOF/"/>
-    <id>http://blog.jonnydu.me/2016/12/03/Redis-RDB-AOF/</id>
-    <published>2016-12-03T09:14:03.000Z</published>
-    <updated>2017-03-27T07:02:30.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>本文对前面所述的Redis两种持久化方式RDB和AOF做简单总结和比较。<br><a id="more"></a>  </p><h3 id="RDB和AOF简单总结"><a href="#RDB和AOF简单总结" class="headerlink" title="RDB和AOF简单总结"></a>RDB和AOF简单总结</h3><p>RDB持久化可以在指定的时间间隔内生成数据集的时间点快照，保存的是该时间点Redis在内存中的数据库状态。<br>AOF持久化记录的是服务器执行的所有写操作命令，并在服务器启动时，通过重新执行这些命令来还原数据集。AOF文件中的命令全部以Redis协议的格式来保存，新命令会被追加到文件的末尾。Redis还可以在后台对AOF文件进行重写，使得AOF文件的体积不会超出保存数据集状态所需的实际大小。Redis可以同时使用AOF持久化和RDB持久化，在这种情况下，当Redis重启下，它会优先使用AOF来还原数据集，因为AOF文件保存的数据集通常比RDB文件所保存的数据集更完整。           </p><h3 id="RDB"><a href="#RDB" class="headerlink" title="RDB"></a>RDB</h3><h4 id="RDB的优点"><a href="#RDB的优点" class="headerlink" title="RDB的优点"></a>RDB的优点</h4><p>RDB是一个非常紧凑的文件，它保存了Redis在某个时间点上的数据集，这种文件非常适合进行备份。比如，可以在一天内，每小时备份RDB文件，并在每月的每一天，也备份一个RDB文件。这样的话，即使遇上问题，也可以随时将数据集还原到不同的版本。RDB非常适用于灾难恢复，它只有一个文件，并且内容都非常紧凑，可以（在加密后）将它传送到别的数据中心。RDB可以最大化Redis的性能：父进程在保存RDB文件时唯一要做的就是fork出一个子进程，然后这个子进程就会处理接下来的所有保存工作，父进程无须执行任何磁盘I/O操作。RDB在恢复大数据集时的速度比AOF的恢复速度要快。          </p><h4 id="RDB的缺点"><a href="#RDB的缺点" class="headerlink" title="RDB的缺点"></a>RDB的缺点</h4><p>如果需要尽量避免在服务器故障时丢失数据，那么RDB不适合。因为，虽然Redis允许设置不同的保存点来控制保存RDB文件的频率，但是，因为RDB文件需要保存整个数据集的状态，所以它并不是一个轻松的操作。因此，可能会至少需要5分钟才保存一次RDB文件。这种情况下，一旦出现故障停机，那么便会丢失几分钟的数据。此外，每次保存RDB的时候，Redis都要fork出一个子进程，并由子进程来进行实际的持久化工作。当数据集比较庞大的时候，fork过程会非常耗时，造成服务器端在短时间内停止处理客户端。虽然AOF重写也需要进行fork，但无论fork重写的执行间隔有多长，数据的耐久性都不会有任何损失。</p><h3 id="AOF"><a href="#AOF" class="headerlink" title="AOF"></a>AOF</h3><h4 id="AOF的优点"><a href="#AOF的优点" class="headerlink" title="AOF的优点"></a>AOF的优点</h4><p>使用AOF持久化会让Redis变得非常耐久，AOF支持设置不同的fsync策略，比如每秒钟fsync、每次执行写命令时fsync。AOF的默认策略为每秒钟fsync一次，在这种配置下，Redis仍然可以保持良好的性能，并且就算发生故障停机，也最多只会丢失一秒钟的数据（fsync会在后台进程执行，所以主进程可以继续处理命令请求）。另外，AOF文件是一个只进行追加操作的日志文件，因此对AOF文件的写入不需要进行seek，即使日志因为某些原因而包含了未写入完整的命令（比如写入时磁盘已满，写入中途停机），redis-check-aof工具也可以轻易地修复这种问题。Redis可以在AOF文件体积变得过大时，自动地在后台对AOF进行重写，重写后的新AOF文件包含了恢复当前数据集所需的最小命令集合。整个重写操作是绝对安全的，因为Redis在创建AOF文件的过程中，会继续将命令追加到现有的AOF文件里面，即使重写过程中发生停机，现有的AOF文件也不会丢失。而一旦新AOF文件创建完毕，Redis就会从旧AOF文件切换到新AOF文件，并开始对新AOF文件进行追加操作。AOF文件有序地保存了对数据库执行的所有写操作，这些写入操作以Redis协议的格式保存，因此AOF文件的内容非常容易被人读懂，对文件进行分析也很轻松。比如，如果不小心执行了FLUSHALL命令，但只要AOF文件未被重写，那么只要停止服务器，移除AOF文件末尾的FLUSHALL命令，并重启Redis，就可以将数据集恢复到执行FLUSHALL之前的状态。           </p><h4 id="AOF的缺点"><a href="#AOF的缺点" class="headerlink" title="AOF的缺点"></a>AOF的缺点</h4><p>对同样的数据集，AOF文件通常要大于等价的RDB文件。<br>AOF可能比RDB慢，这取决于具体的fsync策略。<br>另外，Redis AOF是通过递增地更新一个已经存在的状态，而RDB快照则是一次又一次地从头开始创造一切，概念上更健壮。</p><h3 id="二者的使用"><a href="#二者的使用" class="headerlink" title="二者的使用"></a>二者的使用</h3><p>一般来说，如果想达到很高的数据安全性，那么应该同时使用两种持久化功能。如果可以承受数分钟以内的数据丢失，那么可以只使用RDB持久化。但是不建议只是用AOF持久化：因为定时生成RDB快照非常便于进行数据库备份，并且RDB恢复数据集的速度也要比AOF恢复的速度要快。</p><h3 id="其他一些问题"><a href="#其他一些问题" class="headerlink" title="其他一些问题"></a>其他一些问题</h3><h4 id="RDB设置"><a href="#RDB设置" class="headerlink" title="RDB设置"></a>RDB设置</h4><p>在默认情况下，Redis将数据库快照保存dump.rdb的二进制文件中。可以对Redis进行设置，让它在“N秒内数据集至少有M个改动”这样的条件满足时，自动保存一次数据集。此外，还可以使用SAVE或BGSAVE手动对Redis进行数据集保存操作。</p><h4 id="AOF文件出错"><a href="#AOF文件出错" class="headerlink" title="AOF文件出错"></a>AOF文件出错</h4><p>服务器可能在程序正在对AOF文件进行写入时停机，如果停机造成了AOF文件出错，那么Redis在重启时会拒绝载入这个AOF文件，从而确保数据的一致性不会被破坏。<br>当发生这种情况时，可以为现有的AOF文件创建一个备份，然后使用Redis附带的redis-check-aof程序，对原来的AOF文件进行修复，并查看两个文件的不同之处，最后重启Redis服务器，等待服务器载入修复后的AOF文件，并进行数据恢复。</p><h4 id="RDB和AOF之间的相互作用"><a href="#RDB和AOF之间的相互作用" class="headerlink" title="RDB和AOF之间的相互作用"></a>RDB和AOF之间的相互作用</h4><p>在版本大于等于2.4的Redis中，BGSAVE执行的过程中，不可以执行BGREWRITEAOF。同样，在执行BGREWRITEAOF的过程中，也不可执行BGSAVE。这样主要是防止两个Redis后台进程同时对磁盘进行大量的I/O操作。<br>如果BGSAVE正在执行，并且用户显示地调用BGREWRITEAOF命令， 那么服务器将向用户回复一个OK状态，并告知用户，BGREWRITEAOF已经被预定执行：一旦BGSAVE执行完毕，BGREWRITEAOF就会正式开始。<br>当Redis启动时，如果RDB持久化和AOF持久化都打开了，那么程序会优先使用AOF文件来恢复数据集，因为AOF文件所保存的数据通常是最完整的。</p><h4 id="RDB备份数据"><a href="#RDB备份数据" class="headerlink" title="RDB备份数据"></a>RDB备份数据</h4><p>Redis对于数据备份是非常友好的，可以在服务器运行的时候对 RDB 文件进行复制：RDB文件一旦被创建，就不会进行任何修改。当服务器要创建一个新的RDB文件时，它先将文件的内容保存在一个临时文件里，当临时文件写入完毕时，程序才原子地使用临时文件替换原来的RDB文件。即，无论何时，复制RDB文件都是绝对安全的。</p><p>参考： <a href="https://segmentfault.com/a/1190000005052628" target="_blank" rel="noopener">Redis持久化</a></p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;本文对前面所述的Redis两种持久化方式RDB和AOF做简单总结和比较。&lt;br&gt;
-    
-    </summary>
-    
-    
-      <category term="Redis" scheme="http://blog.jonnydu.me/tags/Redis/"/>
     
   </entry>
   

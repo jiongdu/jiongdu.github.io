@@ -41,7 +41,7 @@
 <link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="数据结构与算法," />
+  <meta name="keywords" content="Hexo, NexT" />
 
 
 
@@ -59,20 +59,22 @@
 
 
 
-<meta name="description" content="线段树，又称为区间数，是一种二叉搜索树，它将一个区间划分成一些单元区间，每个单元区间对应线段树中的一个叶节点。而对于线段树中的每一个非叶节点[a,b]，它的左子树表示的区间为[a,(a+b)/2]，右子树表示的区间为[(a+b)/2+1,b]，因此线段树是平衡二叉树（结构平衡的二叉搜索树，即叶节点的深度差不超过1）。叶节点数目为N，即整个线段区间的长度。">
-<meta name="keywords" content="数据结构与算法">
+<meta name="description" content="title: goroutine和golang调度器date: 2018-04-28 21:07:00tags: [golang] 关于golang，自己听到的第一句话就是“原生支持并发”，而goroutine就是其具体实现。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="数据结构之线段树">
-<meta property="og:url" content="http://blog.jonnydu.me/2016/09/23/SegmentTree/index.html">
+<meta property="og:title" content="一期一会">
+<meta property="og:url" content="http://blog.jonnydu.me/2018/07/22/goroutine_and_scheduler/index.html">
 <meta property="og:site_name" content="一期一会">
-<meta property="og:description" content="线段树，又称为区间数，是一种二叉搜索树，它将一个区间划分成一些单元区间，每个单元区间对应线段树中的一个叶节点。而对于线段树中的每一个非叶节点[a,b]，它的左子树表示的区间为[a,(a+b)/2]，右子树表示的区间为[(a+b)/2+1,b]，因此线段树是平衡二叉树（结构平衡的二叉搜索树，即叶节点的深度差不超过1）。叶节点数目为N，即整个线段区间的长度。">
+<meta property="og:description" content="title: goroutine和golang调度器date: 2018-04-28 21:07:00tags: [golang] 关于golang，自己听到的第一句话就是“原生支持并发”，而goroutine就是其具体实现。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://i.imgur.com/JEkWmlu.png">
-<meta property="og:updated_time" content="2016-09-17T02:46:30.000Z">
+<meta property="og:image" content="c:/Users/jonnydu/Desktop/scheduler.jpg">
+<meta property="og:image" content="c:/Users/jonnydu/Desktop/1.jpg">
+<meta property="og:image" content="c:/Users/jonnydu/Desktop/2.jpg">
+<meta property="og:image" content="c:/Users/jonnydu/Desktop/3.jpg">
+<meta property="og:updated_time" content="2018-07-22T10:19:07.564Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="数据结构之线段树">
-<meta name="twitter:description" content="线段树，又称为区间数，是一种二叉搜索树，它将一个区间划分成一些单元区间，每个单元区间对应线段树中的一个叶节点。而对于线段树中的每一个非叶节点[a,b]，它的左子树表示的区间为[a,(a+b)/2]，右子树表示的区间为[(a+b)/2+1,b]，因此线段树是平衡二叉树（结构平衡的二叉搜索树，即叶节点的深度差不超过1）。叶节点数目为N，即整个线段区间的长度。">
-<meta name="twitter:image" content="http://i.imgur.com/JEkWmlu.png">
+<meta name="twitter:title" content="一期一会">
+<meta name="twitter:description" content="title: goroutine和golang调度器date: 2018-04-28 21:07:00tags: [golang] 关于golang，自己听到的第一句话就是“原生支持并发”，而goroutine就是其具体实现。">
+<meta name="twitter:image" content="c:/Users/jonnydu/Desktop/scheduler.jpg">
 
 
 
@@ -90,7 +92,7 @@
   };
 </script>
 
-  <title> 数据结构之线段树 | 一期一会 </title>
+  <title>  | 一期一会 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -250,7 +252,7 @@
             
             
               
-                数据结构之线段树
+                
               
             
           </h1>
@@ -262,8 +264,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-09-23T21:28:16+08:00" content="2016-09-23">
-              2016-09-23
+            <time itemprop="dateCreated" datetime="2018-07-22T18:19:33+08:00" content="2018-07-22">
+              2018-07-22
             </time>
           </span>
 
@@ -273,8 +275,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/09/23/SegmentTree/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/23/SegmentTree/" itemprop="commentsCount"></span>
+                <a href="/2018/07/22/goroutine_and_scheduler/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/07/22/goroutine_and_scheduler/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -296,90 +298,25 @@
       
 
       
-        <p>线段树，又称为区间数，是一种二叉搜索树，它将一个区间划分成一些单元区间，每个单元区间对应线段树中的一个叶节点。而对于线段树中的每一个非叶节点[a,b]，它的左子树表示的区间为[a,(a+b)/2]，右子树表示的区间为[(a+b)/2+1,b]，因此线段树是平衡二叉树（结构平衡的二叉搜索树，即叶节点的深度差不超过1）。叶节点数目为N，即整个线段区间的长度。<br><a id="more"></a><br>线段树具有如下性质：<br>（1）线段树是一棵平衡树，使用线段树可以快速地查找某一个节点在若干条线段中出现的次数，时间复杂度为O(logN)。<br>（2）线段树同一层的节点所代表的区间，相互不会重叠。<br>（3）线段树任两节点要么是包含关系要么是没有公共部分，不可能部分重叠。<br>（4）给定一个叶子l，从根到l路径上所有节点代表的区间都包含l，且其他节点代表的区间都不包含l。<br>一棵[1,10]的线段树表示如下。注意，线段树的构造在各区间的端点处的处理方式不一样，会导致线段树最终的表示有些差别，但是本质上是一样的。<br><img src="http://i.imgur.com/JEkWmlu.png" alt=""></p>
-<h3 id="线段树的基本操作"><a href="#线段树的基本操作" class="headerlink" title="线段树的基本操作"></a>线段树的基本操作</h3><p>线段树的基本操作和普通二叉树很类似，只不过线段树的节点上存储的是一个区间（左右端点值）。下面以线段树的建立、插入线段和删除线段为例简要说明线段树的基本操作。</p>
-<h4 id="线段树的构建"><a href="#线段树的构建" class="headerlink" title="线段树的构建"></a>线段树的构建</h4><p>首先定义线段树的结构，这里采用链表的方式组织。     </p>
-<pre><code>struct Node
-{
-    int left,right;
-    int cover;            
-    Node* leftChild;
-    Node* rightChild;    
-};
-</code></pre><p>其中，cover字段用于计算一条线段被覆盖的次数。接下来，以递归的方式构建线段树。     </p>
-<pre><code>Node* build(int l, int r)
-{
-    Node* root = new Node();
-    root-&gt;left = l;
-    root-&gt;right = r;
-    root-&gt;cover = 0;
-    root-&gt;leftChild = NULL;
-    root-&gt;rightChild = NULL;
-    if(r-l &gt; 1)
-    {
-        int mid = (l+r) &gt;&gt; 1;
-        root-&gt;leftChild = build(l,mid);
-        root-&gt;rightChild = build(mid,r);        //build(mid+1,r)
-    }
-    return root;
-}
-</code></pre><h4 id="线段插入与删除"><a href="#线段插入与删除" class="headerlink" title="线段插入与删除"></a>线段插入与删除</h4><p>如上所述，通过cover字段来计算一条线段被覆盖的次数。插入与删除时更新相应线段的cover。     </p>
-<pre><code>void Insert(int start, int end, Node* root)
-{
-    if(root==NULL || start&gt;root-&gt;right || end&lt;root-&gt;left)
-    {
-        cout &lt;&lt; &quot;error&quot; &lt;&lt; endl;
-        return;
-    }
-    if(start&lt;=root-&gt;left &amp;&amp; end&gt;=root-&gt;right)
-    {
-        root-&gt;cover++;
-        return;
-    }
-    int mid=(root-&gt;left+root-&gt;right)&gt;&gt;1;
-    if(end&lt;=mid)
-    {
-        Insert(start,end,root-&gt;leftChild);
-    }
-    else if(start&gt;=mid)
-    {
-        Insert(start,end,root-&gt;rightChild);
-    }
-    else
-    {
-        Insert(start,mid,root-&gt;leftChild);
-        Insert(mid,end,root-&gt;rightChild); 
-    }
-}
-
-void Delete(int start, int end, Node* root)
-{
-    if(root==NULL || start&gt;root-&gt;right || end&lt;root-&gt;left)
-    {
-        cout &lt;&lt; &quot;error&quot; &lt;&lt; endl;
-        return;
-    }
-    if(start&lt;=root-&gt;left &amp;&amp; end&gt;=root-&gt;right)
-    {
-        root-&gt;cover--;
-        return;
-    }
-    int mid=(root-&gt;left+root-&gt;right)&gt;&gt;1;
-    if(end&lt;=mid)
-    {
-        Delete(start,end,root-&gt;leftChild);
-    }
-    else if(start&gt;=mid)
-    {
-        Delete(start,end,root-&gt;rightChild);
-    }
-    else
-    {
-        Delete(start,mid,root-&gt;leftChild);
-        Delete(mid,end,root-&gt;rightChild);
-    }
-}    
-</code></pre><h3 id="线段树的应用"><a href="#线段树的应用" class="headerlink" title="线段树的应用"></a>线段树的应用</h3><p>TODO</p>
+        <hr>
+<p>title: goroutine和golang调度器<br>date: 2018-04-28 21:07:00<br>tags: [golang]</p>
+<p>关于golang，自己听到的第一句话就是“原生支持并发”，而goroutine就是其具体实现。</p>
+<a id="more"></a>
+<h3 id="golang调度器"><a href="#golang调度器" class="headerlink" title="golang调度器"></a>golang调度器</h3><p>本节围绕“<strong>存在内核线程调度器的情况下，golang为什么要设计一个自己的调度器？</strong>”这一问题进行讨论。<br>我们知道，操作系统的内核调度器会将系统中的多个线程按照一定的算法调度到物理CPU上运行。最典型的例子如C/C++语言的并发实际上就是基于内核调度的，应用程序负责创建线程（比如linux下通过pthread库调用），内核负责调度。但是，这种传统方式存在一些不足：<br>1、<strong>代价较高</strong>：虽然线程的代价已经比进程小了很多，但仍占用不小的资源，并且线程切换也有不小的消耗，因此我们依然不能创建大量的线程。<br>2、常见的线程模型—N:1和1:1模型<strong>不能较好的兼顾</strong>1）充分利用多核CPU的优势；2）快速的上下文切换。<br>3、<strong>线程之间的通信不易掌握</strong>。虽然多线程之间的通信有多种方法，但使用起来都比较复杂、易错。比如常见的共享内存，各种加锁操作会使得程序开发和问题定位相当困难，甚至会出现死锁和挂掉等问题。<br>4、<strong>大量使用异步</strong>。比如很多网络服务程序，如上文所述，由于系统中不能创建大量线程，所以通常需要在线程中使用IO多路复用（如epoll），然后通过注册回调函数的机制实现各事件的异步调用。但是，异步调用的方式和我们通常的思维习惯不同，当系统中存在大量的回调函数时，会给程序的开发和维护带来较大困难。  </p>
+<p><strong>基于以上问题，go采用了用户态轻量级线程（“goroutine”）的方式来解决</strong>。其主要特点可以归纳为：<br>1、<strong>用户态</strong>：goroutine在用户空间实现，其对于操作系统来说只是一个应用程序，操作系统甚至不知道有goroutine的存在，goroutine的调度需要自己完成。<br>2、<strong>轻量级</strong>：goroutine占用的资源很小，因此一个go程序可以创建成千上万个并发的goroutine。同时，goroutine之间的调度切换不需要陷入内核中，代价较低。将多个goroutine按照一定的算法调度到CPU上执行需要goroutine调度器。<br>3、倡导“<strong>通过通信来共享内存，而不是通过共享内存来通信</strong>”。go通过语法关键词提供了channel机制，用于goroutine之间的通信，实现了CSP并发模型。该并发范式逻辑简单清楚，系统有高正确性。</p>
+<h3 id="golang调度模型"><a href="#golang调度模型" class="headerlink" title="golang调度模型"></a>golang调度模型</h3><p>golang试图通过M:N模型来兼顾N:1和1:1模型的优点，具体来说，每个用户线程可以对应多个内核线程，同时一个内核线程也可以对应多个用户线程。M:N模型的缺点是调度复杂，需要设计良好的调度器。  </p>
+<p>如下图所示，goroutine调度器中使用了三种实体：（1）M：系统线程；（2）P：逻辑处理器（核）；（3）G：goroutine。图中，每个线程运行了一个goroutine，所以必须得维持一个上下文P。P的数量由启动时环境变量GOMAXPROCS决定，即在程序执行的过程中都只有GOMAXPROCS个gouroutine在同时运行。而灰色的goroutine在等待被调度，它们被维护在一个队列（runqueue）里。当一个go语句执行（即创建一个goroutine）时，就有一个新的goroutine被添加到runqueue队尾；当运行当前goroutine到调度点时，runqueue队头弹出一个goroutine进入运行。  </p>
+<p><img src="C:\Users\jonnydu\Desktop\scheduler.jpg" alt="scheduler"></p>
+<p>因此，当一个上下文（P）运行完要被调度的所有goroutine时，系统的稳定状态将被改变。此时如果各上下文的运行队列里的goroutine数目不均衡，将会导致一个上下文在执行完它的运行队列后就结束了，而系统中仍然有许多goroutine要执行。所以，调度系统需要维护一个全局队列，每个上下文能够从全局队列中获取goroutine，但如果全局队列中也没有goroutine了，上下文还能从其他上下文获取goroutine。该过程被称为“stealing”，goroutine通过“stealing”，确保每个上下文总是处于运行，同时保障所有线程都处于最大负载。<br>goroutine调度器模型践行了计算机界的一句名言：“<strong>计算机科学领域的绝大多数问题都可以采用增加一个间接的中间层解决</strong>”。每个G（goroutine）要想真正运行起来，首先需要被分配一个P（进入到P的local runqueue中），在G看来，P就是它所运行的“CPU”。但在go调度器看来，真正的“CPU”却是M，只有将P和M绑定才能让P的runqueue中的G真正运行起来。因此，goroutine调度器通过向G-M模型中增加一个中间层P，实现了高效、可扩展的调度。</p>
+<h3 id="golang调度器跟踪"><a href="#golang调度器跟踪" class="headerlink" title="golang调度器跟踪"></a>golang调度器跟踪</h3><p>下面通过一个例子来查看go调度器的一些跟踪信息。 </p>
+<p><img src="C:\Users\jonnydu\Desktop\1.jpg" alt="1">  </p>
+<p>在main函数中，通过一个for循环创建了10个goroutine，然后在第16行等待所有的goroutine完成任务。每个goroutine执行的work函数中先sleep 1秒，然后循环计数1e9次。完成后调用waitGroup的Done方法返回。<br>然后在linux环境下运行该程序，并设置GODEBUG环境变量和schedtrace参数观察调度器的输出信息，其结果如下图所示。</p>
+<p><img src="C:\Users\jonnydu\Desktop\2.jpg" alt="2"></p>
+<p>其中，xxxms代表自程序开始运行时的毫秒数，gomaxprocx代表配置的处理器数，即上述golang调度器模型中的P，threads代表运行时管理的线程数，idleprocs代表空闲的处理器数，idlethreads代表空闲的线程数，spinningthreads处于自旋状态的线程数（M正在寻找可运行的G）。runqueue=xxx代表在全局队列中的goroutine数。[xxx]代表本地run队列中的goroutine数。<br>而如果还想更深入的了解goroutine调度的细节，可以添加scheddetail参数，该参数下将打印输出处理器P、线程M和goroutine的细节，如下图所示。</p>
+<p><img src="C:\Users\jonnydu\Desktop\3.jpg" alt="3"></p>
+<p>可以看出，与上图相比，添加scheddetail参数后P、M、G实体的状态和摘要信息更加清晰，这里就不再一一描述，有兴趣的同学可以参考：<a href="https://software.intel.com/en-us/blogs/2014/05/10/debugging-performance-issues-in-go-programs" target="_blank" rel="noopener">https://software.intel.com/en-us/blogs/2014/05/10/debugging-performance-issues-in-go-programs</a></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>golang入门不久，对goroutine的设计及调度，高并发CSP模型等问题有较强的兴趣，本文从初学者的角度，简单学习、总结了goroutine和对应调度器的一些设计思路，希望借此能更好的理解go语言，后续还将对channel以及对应的CSP模型进行较深入的学习。</p>
+<h3 id="附"><a href="#附" class="headerlink" title="附"></a>附</h3><p>本文参考：<br><a href="https://morsmachine.dk/netpoller" target="_blank" rel="noopener">https://morsmachine.dk/netpoller</a><br><a href="https://software.intel.com/en-us/blogs/2014/05/10/debugging-performance-issues-in-go-programs" target="_blank" rel="noopener">https://software.intel.com/en-us/blogs/2014/05/10/debugging-performance-issues-in-go-programs</a>   </p>
 
       
     </div>
@@ -392,28 +329,18 @@ void Delete(int start, int end, Node* root)
 
     <footer class="post-footer">
       
-        <div class="post-tags">
-          
-            <a href="/tags/数据结构与算法/" rel="tag">#数据结构与算法</a>
-          
-        </div>
-      
 
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/09/18/spinlock-vs-mutex/" rel="next" title="Spin lock与Mutex">
-                <i class="fa fa-chevron-left"></i> Spin lock与Mutex
+              <a href="/2017/05/05/Linux-Block-IO/" rel="next" title="Linux块IO浅析">
+                <i class="fa fa-chevron-left"></i> Linux块IO浅析
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/09/28/tcp-backlog/" rel="prev" title="浅谈tcp backlog">
-                浅谈tcp backlog <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -439,8 +366,8 @@ void Delete(int start, int end, Node* root)
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/09/23/SegmentTree/"
-           data-title="数据结构之线段树" data-url="http://blog.jonnydu.me/2016/09/23/SegmentTree/">
+      <div class="ds-thread" data-thread-key="2018/07/22/goroutine_and_scheduler/"
+           data-title="" data-url="http://blog.jonnydu.me/2018/07/22/goroutine_and_scheduler/">
       </div>
     
   </div>
@@ -554,7 +481,7 @@ void Delete(int start, int end, Node* root)
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#线段树的基本操作"><span class="nav-number">1.</span> <span class="nav-text">线段树的基本操作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#线段树的构建"><span class="nav-number">1.1.</span> <span class="nav-text">线段树的构建</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#线段插入与删除"><span class="nav-number">1.2.</span> <span class="nav-text">线段插入与删除</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#线段树的应用"><span class="nav-number">2.</span> <span class="nav-text">线段树的应用</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#golang调度器"><span class="nav-number">1.</span> <span class="nav-text">golang调度器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#golang调度模型"><span class="nav-number">2.</span> <span class="nav-text">golang调度模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#golang调度器跟踪"><span class="nav-number">3.</span> <span class="nav-text">golang调度器跟踪</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#附"><span class="nav-number">5.</span> <span class="nav-text">附</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">

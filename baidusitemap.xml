@@ -4,6 +4,21 @@
 
     
   <url>
+    <loc>http://blog.jonnydu.me/2018/07/22/goroutine_and_scheduler/</loc>
+    <lastmod>2018-07-22T10:19:07.564Z</lastmod>
+    <data>
+        <display>
+        <title></title>
+        <pubTime>2018-07-22T10:19:33.466Z</pubTime>
+        
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>http://blog.jonnydu.me/2017/05/05/Linux-Block-IO/</loc>
     <lastmod>2018-05-01T14:04:25.284Z</lastmod>
     <data>
@@ -226,12 +241,12 @@
 
     
   <url>
-    <loc>http://blog.jonnydu.me/2017/01/15/Redis-Cluster/</loc>
+    <loc>http://blog.jonnydu.me/2017/01/11/Redis-sentinel/</loc>
     <lastmod>2017-03-29T13:53:04.000Z</lastmod>
     <data>
         <display>
-        <title>搭建Redis集群</title>
-        <pubTime>2017-01-15T07:08:05.000Z</pubTime>
+        <title>Redis Sentinel原理及实践</title>
+        <pubTime>2017-01-11T07:21:58.000Z</pubTime>
         
         <tag>Redis</tag>
          
@@ -243,12 +258,12 @@
 
     
   <url>
-    <loc>http://blog.jonnydu.me/2017/01/11/Redis-sentinel/</loc>
+    <loc>http://blog.jonnydu.me/2017/01/15/Redis-Cluster/</loc>
     <lastmod>2017-03-29T13:53:04.000Z</lastmod>
     <data>
         <display>
-        <title>Redis Sentinel原理及实践</title>
-        <pubTime>2017-01-11T07:21:58.000Z</pubTime>
+        <title>搭建Redis集群</title>
+        <pubTime>2017-01-15T07:08:05.000Z</pubTime>
         
         <tag>Redis</tag>
          
