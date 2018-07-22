@@ -41,7 +41,7 @@
 <link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="NVMe over RDMA," />
+  <meta name="keywords" content="golang," />
 
 
 
@@ -59,21 +59,23 @@
 
 
 
-<meta name="description" content="NVMe SSD具有极高的I/O读写性能，不存在传统磁盘所具有的访问寻道、抖动问题。为了发挥NVMe SSD的性能，无论在软件还是在硬件上都需要采用多队列技术，通过多队列方式充分发挥NVMe SSD的性能。">
-<meta name="keywords" content="NVMe over RDMA">
+<meta name="description" content="关于golang，自己听到的第一句话就是“原生支持并发”，而goroutine就是其具体实现。">
+<meta name="keywords" content="golang">
 <meta property="og:type" content="article">
-<meta property="og:title" content="NVMe驱动之I&#x2F;O请求">
-<meta property="og:url" content="http://blog.jonnydu.me/2017/04/27/NVMe-IO-Request/index.html">
+<meta property="og:title" content="goroutine和golang调度器">
+<meta property="og:url" content="http://blog.jonnydu.me/2018/04/28/goroutine_and_scheduler/index.html">
 <meta property="og:site_name" content="一期一会">
-<meta property="og:description" content="NVMe SSD具有极高的I/O读写性能，不存在传统磁盘所具有的访问寻道、抖动问题。为了发挥NVMe SSD的性能，无论在软件还是在硬件上都需要采用多队列技术，通过多队列方式充分发挥NVMe SSD的性能。">
+<meta property="og:description" content="关于golang，自己听到的第一句话就是“原生支持并发”，而goroutine就是其具体实现。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://i.imgur.com/sIdEXDh.gif">
-<meta property="og:image" content="http://i.imgur.com/bsa3KFs.png">
-<meta property="og:updated_time" content="2017-05-23T14:19:14.000Z">
+<meta property="og:image" content="c:/Users/jonnydu/Desktop/scheduler.jpg">
+<meta property="og:image" content="c:/Users/jonnydu/Desktop/1.jpg">
+<meta property="og:image" content="c:/Users/jonnydu/Desktop/2.jpg">
+<meta property="og:image" content="c:/Users/jonnydu/Desktop/3.jpg">
+<meta property="og:updated_time" content="2018-07-22T10:45:12.525Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="NVMe驱动之I&#x2F;O请求">
-<meta name="twitter:description" content="NVMe SSD具有极高的I/O读写性能，不存在传统磁盘所具有的访问寻道、抖动问题。为了发挥NVMe SSD的性能，无论在软件还是在硬件上都需要采用多队列技术，通过多队列方式充分发挥NVMe SSD的性能。">
-<meta name="twitter:image" content="http://i.imgur.com/sIdEXDh.gif">
+<meta name="twitter:title" content="goroutine和golang调度器">
+<meta name="twitter:description" content="关于golang，自己听到的第一句话就是“原生支持并发”，而goroutine就是其具体实现。">
+<meta name="twitter:image" content="c:/Users/jonnydu/Desktop/scheduler.jpg">
 
 
 
@@ -91,7 +93,7 @@
   };
 </script>
 
-  <title> NVMe驱动之I/O请求 | 一期一会 </title>
+  <title> goroutine和golang调度器 | 一期一会 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -251,7 +253,7 @@
             
             
               
-                NVMe驱动之I/O请求
+                goroutine和golang调度器
               
             
           </h1>
@@ -263,8 +265,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-04-27T20:31:41+08:00" content="2017-04-27">
-              2017-04-27
+            <time itemprop="dateCreated" datetime="2018-04-28T21:07:00+08:00" content="2018-04-28">
+              2018-04-28
             </time>
           </span>
 
@@ -274,8 +276,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2017/04/27/NVMe-IO-Request/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/04/27/NVMe-IO-Request/" itemprop="commentsCount"></span>
+                <a href="/2018/04/28/goroutine_and_scheduler/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/04/28/goroutine_and_scheduler/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -297,91 +299,23 @@
       
 
       
-        <p>NVMe SSD具有极高的I/O读写性能，不存在传统磁盘所具有的访问寻道、抖动问题。为了发挥NVMe SSD的性能，无论在软件还是在硬件上都需要采用多队列技术，通过多队列方式充分发挥NVMe SSD的性能。<br><a id="more"></a><br>Linux的NVMe驱动采用一个Core独占一个Queue（包含一个Completion Queue和至少一个Submission Queue）的方式来充分发挥NVMe SSD的性能，这样可以避免一个队列被多个Core竞争访问（引起的锁竞争等问题），各CPU使用自己的Queue，互不影响。 </p>
-<p><img src="http://i.imgur.com/sIdEXDh.gif" alt="">   </p>
-<p>NVMe响应I/O的过程已经在<a href="http://blog.dujiong.net/2017/02/17/NVMe/" target="_blank" rel="noopener">NVMe技术浅析</a>一文中详细描述，这里将结合部分源码做进一步说明。    </p>
-<h3 id="创建NVMe-Queue"><a href="#创建NVMe-Queue" class="headerlink" title="创建NVMe Queue"></a>创建NVMe Queue</h3><pre><code>/*
- * pci.c
- */
-static int nvme_setup_io_queues(struct nvme_dev* dev){
-    struct nvme_queue* adminq = dev-&gt;queues[0];
-    struct pci_dev* pdev = to_pci_dev(dev-&gt;dev);
-    int result, nr_io_queues, size;
-
-    nr_io_queues = num_online_cpus();
-    result = nvme_set_queue_count(&amp;dev-&gt;ctrl, &amp;nr_io_queues);
-    ...
-
-    result = queue_request_irq(adminq);
-    if(result){
-        admin-&gt;cq_vector = -1;
-        return result;
-    }
-    return nvme_create_io_queues(dev);
-}
-</code></pre><p>驱动程序在创建队列之前首先通过内核函数num_online_cpus获取当前系统中运行的CPU数量m，然后通过nvme_set_queue_count得到SSD的队列数量限制n，选择二者较小值作为所创建的队列数。<br>此外，关于Queue还有一个重要的概念，那就是队列深度，简单来说就是这个Queue能够放多少个成员（比如NVMe Command）。在NVMe中，这个队列深度是由NVMe SSD决定的，存储在NVMe设备的BAR空间里。另外，NVMe驱动没有区分Namespace，也就是一个设备上的多个Namespace共享这些队列资源。<br>因此，它们之间的关系是：队列用来存放NVMe Command，NVMe Command是Host与SSD Controller交流的基本单元，应用的I/O请求也要转化成NVMe Command。</p>
-<h3 id="提交I-O请求"><a href="#提交I-O请求" class="headerlink" title="提交I/O请求"></a>提交I/O请求</h3><p>Block层下发的IO请求以BIO表示，我们需要通过DMA发送这些数据，Command使用dma_alloc_coherent分配DMA地址，但是BIO是存放在普通的内核线程空间的（线程的虚拟空间不能直接作为DMA地址），使用dma_alloc_coherent分配再将BIO中的数据拷贝显然不是有效的方法。这里linux提供了另一个函数dma_map_single，这个函数能够将虚拟空间地址（BIO数据存放地址）转换成DMA可用地址，并且多个IO请求的DMA地址可以通过scatterlist来表示。有了DMA地址就可以把BIO封装成NVMe Command发送出去。从BIO到NVMe Command有可能会经过拆分，放入等待队列等。我们知道，驱动会给每个CPU分配一个Queue，那么I/O请求到来时，该由哪个Queue来存放这个Command呢？你可能已经想到，应该由当前线程运行的CPU所属的Queue，这样才能保证Queue不被其他Core抢占，驱动使用get_cpu()获得当前处理I/O请求的CPU号来索引对应的Queue。 </p>
-<pre><code>/*
- * pci.c
- */
-static void __nvme_submit_cmd(struct nvme_queue* nvmeq, struct nvme_command* cmd){
-    u16 tail = nvmeq-&gt;sq_tail;
-    if(nvmeq-&gt;sq_cmds_io){
-        memcpy_toio(&amp;nvmeq-&gt;sq_cmds_io[tail], cmd, sizeof(*cmd));
-    }else{
-        memcpy(&amp;nvmeq-&gt;sq_cmds[tail], cmd, sizeof(*cmd));
-    }
-
-    if(++tail == nvmeq-&gt;q_depth)
-        tail = 0;
-    writel(tail, nvmeq-&gt;q_db);
-    nvmeq-&gt;sq_tail = tail;
-}
-</code></pre><p>BIO封装成的Command会顺序存入Submission Queue中。对于Submission Queue来说，使用Tail表示最后操作的Command Index（nvmeq-&gt;sq_tail）。每存入一个Command，Host就会更新Queue对应的Doorbell寄存器中的Tail值。Doorbell定义在BAR空间，通过QID可以索引到。NVMe没有规定Command存入队列的执行顺序，Controller可以一次取出多个Command进行批量处理，所以一个队列中的Command执行顺序是不固定的（可能导致先提交的请求后处理）。</p>
-<h3 id="获得处理结果"><a href="#获得处理结果" class="headerlink" title="获得处理结果"></a>获得处理结果</h3><p>SSD Controller根据Doorbell的值，获取NVMe Command和对应数据，待处理完成后将结果存入Completion Queue中。Controller通过中断的方式通知Host，驱动为每一个Queue分配一个MSI/MSI-X中断。<br>驱动使用request_irq将中断注册到kernel，并且绑定中断处理函数nvme_irq。此中断处理函数调用__nvme_process_cq，先将Completion Command从Completion Queue中取出，然后把队列的head增加1，并调用上层的callback函数，完成IO处理。由于NVMe Command可以批量处理，这里使用while循环取出所有新的Completion Command。     </p>
-<pre><code>/*
- * pci.c
- */
-static void __nvme_process_cq(struct nvme_queue *nvmeq, unsigned int *tag){
-    u16 head, phase;
-
-    head = nvmeq-&gt;cq_head;
-    phase = nvmeq-&gt;cq_phase;
-
-    while(nvme_cqe_valid(nvmeq, head, phase)){
-        struct nvme_completion cqe = nvmeq-&gt;cqes[head];
-        struct request *req;
-
-        if(++head == nvmeq-&gt;q_depth){
-            head = 0;
-            phase = !phase;
-        }
-        ...
-        if (unlikely(nvmeq-&gt;qid == 0 &amp;&amp;
-            cqe.command_id &gt;= NVME_AQ_BLKMQ_DEPTH)) {
-                nvme_complete_async_event(&amp;nvmeq-&gt;dev-&gt;ctrl,
-                                        cqe.status, &amp;cqe.result);
-                continue;
-        }
-        req = blk_mq_tag_to_rq(*nvmeq-&gt;tags, cqe.command_id);
-        nvme_req(req)-&gt;result = cqe.result;
-        blk_mq_complete_request(req, le16_to_cpu(cqe.status) &gt;&gt; 1);    
-    }
-    if (head == nvmeq-&gt;cq_head &amp;&amp; phase == nvmeq-&gt;cq_phase)
-        return;
-
-    if (likely(nvmeq-&gt;cq_vector &gt;= 0))
-        writel(head, nvmeq-&gt;q_db + nvmeq-&gt;dev-&gt;db_stride);
-    nvmeq-&gt;cq_head = head;
-    nvmeq-&gt;cq_phase = phase;
-
-    nvmeq-&gt;cqe_seen = 1;
-}
-</code></pre><p>处理完Command后，往Completion Queue的Doorbell写入Head值，通知NVMe Controller操作完成。中断处理结束。</p>
-<h3 id="Head-Tail机制"><a href="#Head-Tail机制" class="headerlink" title="Head/Tail机制"></a>Head/Tail机制</h3><p>我们知道，SQ和CQ都是队列，队列的头尾很重要，头决定谁会最先被服务，尾决定新到来命令的位置，所以，我们需要记录SQ和CQ的头尾位置。  </p>
-<p><img src="http://i.imgur.com/bsa3KFs.png" alt=""></p>
-<p>对一个SQ来说，它的生产者是Host，因为它往SQ的Tail位置写入命令；消费者是SSD，它从SQ的Head取出指令执行。CQ则刚刚相反，生产者是SSD，消费者是Host。     </p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>本文简单介绍了NVMe I/O请求的处理过程，其核心是多队列，Submission Queue/Completion Queue、Doorbell寄存器和Head/Tail机制。</p>
+        <p>关于golang，自己听到的第一句话就是“原生支持并发”，而goroutine就是其具体实现。</p>
+<a id="more"></a>
+<h3 id="golang调度器"><a href="#golang调度器" class="headerlink" title="golang调度器"></a>golang调度器</h3><p>本节围绕“<strong>存在内核线程调度器的情况下，golang为什么要设计一个自己的调度器？</strong>”这一问题进行讨论。<br>我们知道，操作系统的内核调度器会将系统中的多个线程按照一定的算法调度到物理CPU上运行。最典型的例子如C/C++语言的并发实际上就是基于内核调度的，应用程序负责创建线程（比如linux下通过pthread库调用），内核负责调度。但是，这种传统方式存在一些不足：<br>1、<strong>代价较高</strong>：虽然线程的代价已经比进程小了很多，但仍占用不小的资源，并且线程切换也有不小的消耗，因此我们依然不能创建大量的线程。<br>2、常见的线程模型—N:1和1:1模型<strong>不能较好的兼顾</strong>1）充分利用多核CPU的优势；2）快速的上下文切换。<br>3、<strong>线程之间的通信不易掌握</strong>。虽然多线程之间的通信有多种方法，但使用起来都比较复杂、易错。比如常见的共享内存，各种加锁操作会使得程序开发和问题定位相当困难，甚至会出现死锁和挂掉等问题。<br>4、<strong>大量使用异步</strong>。比如很多网络服务程序，如上文所述，由于系统中不能创建大量线程，所以通常需要在线程中使用IO多路复用（如epoll），然后通过注册回调函数的机制实现各事件的异步调用。但是，异步调用的方式和我们通常的思维习惯不同，当系统中存在大量的回调函数时，会给程序的开发和维护带来较大困难。  </p>
+<p><strong>基于以上问题，go采用了用户态轻量级线程（“goroutine”）的方式来解决</strong>。其主要特点可以归纳为：<br>1、<strong>用户态</strong>：goroutine在用户空间实现，其对于操作系统来说只是一个应用程序，操作系统甚至不知道有goroutine的存在，goroutine的调度需要自己完成。<br>2、<strong>轻量级</strong>：goroutine占用的资源很小，因此一个go程序可以创建成千上万个并发的goroutine。同时，goroutine之间的调度切换不需要陷入内核中，代价较低。将多个goroutine按照一定的算法调度到CPU上执行需要goroutine调度器。<br>3、倡导“<strong>通过通信来共享内存，而不是通过共享内存来通信</strong>”。go通过语法关键词提供了channel机制，用于goroutine之间的通信，实现了CSP并发模型。该并发范式逻辑简单清楚，系统有高正确性。</p>
+<h3 id="golang调度模型"><a href="#golang调度模型" class="headerlink" title="golang调度模型"></a>golang调度模型</h3><p>golang试图通过M:N模型来兼顾N:1和1:1模型的优点，具体来说，每个用户线程可以对应多个内核线程，同时一个内核线程也可以对应多个用户线程。M:N模型的缺点是调度复杂，需要设计良好的调度器。  </p>
+<p>如下图所示，goroutine调度器中使用了三种实体：（1）M：系统线程；（2）P：逻辑处理器（核）；（3）G：goroutine。图中，每个线程运行了一个goroutine，所以必须得维持一个上下文P。P的数量由启动时环境变量GOMAXPROCS决定，即在程序执行的过程中都只有GOMAXPROCS个gouroutine在同时运行。而灰色的goroutine在等待被调度，它们被维护在一个队列（runqueue）里。当一个go语句执行（即创建一个goroutine）时，就有一个新的goroutine被添加到runqueue队尾；当运行当前goroutine到调度点时，runqueue队头弹出一个goroutine进入运行。  </p>
+<p><img src="C:\Users\jonnydu\Desktop\scheduler.jpg" alt="scheduler"></p>
+<p>因此，当一个上下文（P）运行完要被调度的所有goroutine时，系统的稳定状态将被改变。此时如果各上下文的运行队列里的goroutine数目不均衡，将会导致一个上下文在执行完它的运行队列后就结束了，而系统中仍然有许多goroutine要执行。所以，调度系统需要维护一个全局队列，每个上下文能够从全局队列中获取goroutine，但如果全局队列中也没有goroutine了，上下文还能从其他上下文获取goroutine。该过程被称为“stealing”，goroutine通过“stealing”，确保每个上下文总是处于运行，同时保障所有线程都处于最大负载。<br>goroutine调度器模型践行了计算机界的一句名言：“<strong>计算机科学领域的绝大多数问题都可以采用增加一个间接的中间层解决</strong>”。每个G（goroutine）要想真正运行起来，首先需要被分配一个P（进入到P的local runqueue中），在G看来，P就是它所运行的“CPU”。但在go调度器看来，真正的“CPU”却是M，只有将P和M绑定才能让P的runqueue中的G真正运行起来。因此，goroutine调度器通过向G-M模型中增加一个中间层P，实现了高效、可扩展的调度。</p>
+<h3 id="golang调度器跟踪"><a href="#golang调度器跟踪" class="headerlink" title="golang调度器跟踪"></a>golang调度器跟踪</h3><p>下面通过一个例子来查看go调度器的一些跟踪信息。 </p>
+<p><img src="C:\Users\jonnydu\Desktop\1.jpg" alt="1">  </p>
+<p>在main函数中，通过一个for循环创建了10个goroutine，然后在第16行等待所有的goroutine完成任务。每个goroutine执行的work函数中先sleep 1秒，然后循环计数1e9次。完成后调用waitGroup的Done方法返回。<br>然后在linux环境下运行该程序，并设置GODEBUG环境变量和schedtrace参数观察调度器的输出信息，其结果如下图所示。</p>
+<p><img src="C:\Users\jonnydu\Desktop\2.jpg" alt="2"></p>
+<p>其中，xxxms代表自程序开始运行时的毫秒数，gomaxprocx代表配置的处理器数，即上述golang调度器模型中的P，threads代表运行时管理的线程数，idleprocs代表空闲的处理器数，idlethreads代表空闲的线程数，spinningthreads处于自旋状态的线程数（M正在寻找可运行的G）。runqueue=xxx代表在全局队列中的goroutine数。[xxx]代表本地run队列中的goroutine数。<br>而如果还想更深入的了解goroutine调度的细节，可以添加scheddetail参数，该参数下将打印输出处理器P、线程M和goroutine的细节，如下图所示。</p>
+<p><img src="C:\Users\jonnydu\Desktop\3.jpg" alt="3"></p>
+<p>可以看出，与上图相比，添加scheddetail参数后P、M、G实体的状态和摘要信息更加清晰，这里就不再一一描述，有兴趣的同学可以参考：<a href="https://software.intel.com/en-us/blogs/2014/05/10/debugging-performance-issues-in-go-programs" target="_blank" rel="noopener">https://software.intel.com/en-us/blogs/2014/05/10/debugging-performance-issues-in-go-programs</a></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>golang入门不久，对goroutine的设计及调度，高并发CSP模型等问题有较强的兴趣，本文从初学者的角度，简单学习、总结了goroutine和对应调度器的一些设计思路，希望借此能更好的理解go语言，后续还将对channel以及对应的CSP模型进行较深入的学习。</p>
+<h3 id="附"><a href="#附" class="headerlink" title="附"></a>附</h3><p>本文参考：<br><a href="https://morsmachine.dk/netpoller" target="_blank" rel="noopener">https://morsmachine.dk/netpoller</a><br><a href="https://software.intel.com/en-us/blogs/2014/05/10/debugging-performance-issues-in-go-programs" target="_blank" rel="noopener">https://software.intel.com/en-us/blogs/2014/05/10/debugging-performance-issues-in-go-programs</a>   </p>
 
       
     </div>
@@ -396,7 +330,7 @@ static void __nvme_process_cq(struct nvme_queue *nvmeq, unsigned int *tag){
       
         <div class="post-tags">
           
-            <a href="/tags/NVMe-over-RDMA/" rel="tag">#NVMe over RDMA</a>
+            <a href="/tags/golang/" rel="tag">#golang</a>
           
         </div>
       
@@ -405,17 +339,13 @@ static void __nvme_process_cq(struct nvme_queue *nvmeq, unsigned int *tag){
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/04/21/trace-linux-network-stack/" rel="next" title="理解TCP/IP网络栈">
-                <i class="fa fa-chevron-left"></i> 理解TCP/IP网络栈
+              <a href="/2017/05/05/Linux-Block-IO/" rel="next" title="Linux块IO浅析">
+                <i class="fa fa-chevron-left"></i> Linux块IO浅析
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/05/05/Linux-Block-IO/" rel="prev" title="Linux块IO浅析">
-                Linux块IO浅析 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -441,8 +371,8 @@ static void __nvme_process_cq(struct nvme_queue *nvmeq, unsigned int *tag){
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2017/04/27/NVMe-IO-Request/"
-           data-title="NVMe驱动之I/O请求" data-url="http://blog.jonnydu.me/2017/04/27/NVMe-IO-Request/">
+      <div class="ds-thread" data-thread-key="2018/04/28/goroutine_and_scheduler/"
+           data-title="goroutine和golang调度器" data-url="http://blog.jonnydu.me/2018/04/28/goroutine_and_scheduler/">
       </div>
     
   </div>
@@ -556,7 +486,7 @@ static void __nvme_process_cq(struct nvme_queue *nvmeq, unsigned int *tag){
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建NVMe-Queue"><span class="nav-number">1.</span> <span class="nav-text">创建NVMe Queue</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#提交I-O请求"><span class="nav-number">2.</span> <span class="nav-text">提交I/O请求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获得处理结果"><span class="nav-number">3.</span> <span class="nav-text">获得处理结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Head-Tail机制"><span class="nav-number">4.</span> <span class="nav-text">Head/Tail机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#golang调度器"><span class="nav-number">1.</span> <span class="nav-text">golang调度器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#golang调度模型"><span class="nav-number">2.</span> <span class="nav-text">golang调度模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#golang调度器跟踪"><span class="nav-number">3.</span> <span class="nav-text">golang调度器跟踪</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#附"><span class="nav-number">5.</span> <span class="nav-text">附</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">
