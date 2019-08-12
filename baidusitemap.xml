@@ -4,6 +4,23 @@
 
     
   <url>
+    <loc>http://blog.jonnydu.me/2019/08/12/k8s-practice/</loc>
+    <lastmod>2019-08-12T15:01:56.999Z</lastmod>
+    <data>
+        <display>
+        <title>k8s实践系列---从Docker到k8s</title>
+        <pubTime>2019-08-12T14:56:20.000Z</pubTime>
+        
+        <tag>k8s</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>http://blog.jonnydu.me/2019/07/27/k8s-knowledge/</loc>
     <lastmod>2019-08-12T14:54:17.010Z</lastmod>
     <data>
