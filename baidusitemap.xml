@@ -4,12 +4,29 @@
 
     
   <url>
-    <loc>http://blog.jonnydu.me/2018/09/28/Logging-Tracing-Metrics/</loc>
-    <lastmod>2019-08-12T14:46:15.204Z</lastmod>
+    <loc>http://blog.jonnydu.me/2018/09/15/golang-channel/</loc>
+    <lastmod>2019-08-12T14:49:41.587Z</lastmod>
+    <data>
+        <display>
+        <title>golang中channel的属性分析</title>
+        <pubTime>2018-09-15T11:26:20.000Z</pubTime>
+        
+        <tag>golang</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2018/12/15/Logging-Tracing-Metrics/</loc>
+    <lastmod>2019-08-12T14:48:24.723Z</lastmod>
     <data>
         <display>
         <title>Logging、Metrics和Tracing</title>
-        <pubTime>2018-09-28T11:26:20.000Z</pubTime>
+        <pubTime>2018-12-15T11:26:20.000Z</pubTime>
         
         <tag>DevOps</tag>
          
@@ -294,12 +311,12 @@
 
     
   <url>
-    <loc>http://blog.jonnydu.me/2017/01/15/Redis-Cluster/</loc>
+    <loc>http://blog.jonnydu.me/2017/01/11/Redis-sentinel/</loc>
     <lastmod>2017-03-29T13:53:04.000Z</lastmod>
     <data>
         <display>
-        <title>搭建Redis集群</title>
-        <pubTime>2017-01-15T07:08:05.000Z</pubTime>
+        <title>Redis Sentinel原理及实践</title>
+        <pubTime>2017-01-11T07:21:58.000Z</pubTime>
         
         <tag>Redis</tag>
          
@@ -311,12 +328,12 @@
 
     
   <url>
-    <loc>http://blog.jonnydu.me/2017/01/11/Redis-sentinel/</loc>
+    <loc>http://blog.jonnydu.me/2017/01/15/Redis-Cluster/</loc>
     <lastmod>2017-03-29T13:53:04.000Z</lastmod>
     <data>
         <display>
-        <title>Redis Sentinel原理及实践</title>
-        <pubTime>2017-01-11T07:21:58.000Z</pubTime>
+        <title>搭建Redis集群</title>
+        <pubTime>2017-01-15T07:08:05.000Z</pubTime>
         
         <tag>Redis</tag>
          
