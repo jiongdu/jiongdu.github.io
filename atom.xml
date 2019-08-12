@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://blog.jonnydu.me/"/>
-  <updated>2019-08-12T14:32:33.215Z</updated>
+  <updated>2019-08-12T14:46:15.204Z</updated>
   <id>http://blog.jonnydu.me/</id>
   
   <author>
@@ -15,6 +15,26 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Logging、Metrics和Tracing</title>
+    <link href="http://blog.jonnydu.me/2018/09/28/Logging-Tracing-Metrics/"/>
+    <id>http://blog.jonnydu.me/2018/09/28/Logging-Tracing-Metrics/</id>
+    <published>2018-09-28T11:26:20.000Z</published>
+    <updated>2019-08-12T14:46:15.204Z</updated>
+    
+    <content type="html"><![CDATA[<p>近来研究了一系列面向DevOps的诊断与分析系统，并在部门结合业务场景逐步落地。本文记录了该过程中的一些思考和总结。</p><a id="more"></a><h3 id="三类系统的诞生"><a href="#三类系统的诞生" class="headerlink" title="三类系统的诞生"></a>三类系统的诞生</h3><p>随着DevOps、微服务、容器等理念的逐步落地和发展，传统软件架构正在发生着较大的变化，其主要体现在：</p><ul><li>应用架构开始从单体系统逐步转变为微服务，其中的业务逻辑随之会变成微服务之间的调用与请求。</li><li>从资源的角度来，服务器这个物理单元正在淡化，取而代之的是看不见摸不着的虚拟资源模式。</li></ul><p><img src="http://km.oa.com/files/photos/pictures/201810/1538896485_13_w694_h347.png" alt=""></p><p>以上两个变化使得分布式系统的运维与监控变得越来越复杂。为了应对这一趋势，诞生了一系列面向DevOps的诊断与监控系统，包括三大类：</p><ul><li>集中式日志系统（<strong>Logging</strong>）</li><li>集中式度量系统（<strong>Metrics</strong>）</li><li>分布式追踪系统（<strong>Tracing</strong>）</li></ul><h3 id="一些疑问"><a href="#一些疑问" class="headerlink" title="一些疑问"></a>一些疑问</h3><p>对Logging、Metrics和Tracing三种系统有了初步认识和了解之后，我对它们的关系产生了疑问：</p><ul><li>Logging和Metrics的区别是什么？</li><li>什么时候需要Metrics？</li><li>Tracing和Logging之间有什么关联？</li><li>三种系统各自解决的主要问题是什么？有无交集？</li></ul><h3 id="一些思考"><a href="#一些思考" class="headerlink" title="一些思考"></a>一些思考</h3><p><img src="http://km.oa.com/files/photos/pictures/201810/1538897894_21_w392_h400.jpg" alt=""></p><ul><li>Logging是以<strong>事件</strong>为元数据，记录某个时刻（离散时间）发生的事件，比如将应用的调试或错误信息发送到ElasticSearch，跟踪时间信息通过消息队列处理发送到数据仓库等。它的特点是大多数情况下记录的数据很分散，并且相互独立，也许是错误信息，也许仅仅是记录当前的事件状态等，这是Logging的关注属性。</li><li>Metrics有其特有的属性—<strong>可聚合性</strong>。比如我们想知道服务请求的QPS，用户的登录次数等指标，这时我们需要将一部分事件进行聚合或计数，这就是Metrics。它是一段时间内某个度量（计数器或直方图）的元数据。</li><li>在记录Tracing数据的时候，或多或少会有Logging的数据，比如在Tracing中的链路数据指标（rpc调用，请求处理时间是多少等），同样会被记录在Logging中，但Tracing同样也有自己独特的属性—<strong>请求范围</strong>，即可以绑定到系统单个“事务”对象的生命周期的任何元数据。例如一次HTTP请求的tracing，我们只需要关注请求到达时的节点状态，接收方和处理耗时等，不用关心具体的系统日志、错误信息等Logging事件。</li></ul><p>因此，根据上述的描述，我们可以标记上图中三者的重叠部分。<br><img src="http://km.oa.com/files/photos/pictures/201810/1538899025_24_w676_h400.png" alt=""><br>当然，大量被诊断的应用具有分布式的能力，逻辑处理在单次请求的范围内完成。因此，讨论追踪的上下文是有意义的。但是，我们注意到，并不是所有的诊断系统都绑定在请求的生命周期上的。他们可能是逻辑组件诊断信息、处理过程的生命周期明细。所以，不是所有的metrics和logging都可以塞进tracing系统的概念中，至少在不经过数据处理是不行的。<br>此外，上图中我们还能看到，在三个功能域中，metric倾向于更节省资源，因为它会“天然”压缩数据。相反，日志倾向于无限增加，会频繁的超出预期的容量，所以，图中纵向绘制了容量的需求趋势，metrics低到logging高。</p><h3 id="业界代表性系统"><a href="#业界代表性系统" class="headerlink" title="业界代表性系统"></a>业界代表性系统</h3><ul><li><strong>ELK</strong><ul><li>简介：专注于<strong>Logging</strong>领域，由ElasticSearch、Logstash和Kibana三款软件组成的一整套解决方案，提供了日志的收集、传输、存储和分析等功能。该架构由Logstash分布于各个节点上搜集相关日志、数据，并经过分析、过滤后发送给远端服务器上的ElasticSearch进行存储，用户通过直观地配置Kibana对日志进行可视化查询、生成报表等。该架构现已在部门内落地。</li><li>官网：<a href="https://www.elastic.co/cn/elk-stack" target="_blank" rel="noopener">https://www.elastic.co/cn/elk-stack</a></li></ul></li><li><strong>Prometheus</strong><ul><li>简介：主要聚焦<strong>Metrics</strong>领域（正在集成更多的tracing功能），既适用于面向服务器等硬件指标的监控，也适用于高动态的面向服务架构的监控。Prometheus的基本原理是通过HTTP协议周期性抓取被监控组件的状态，任意组件只要提供对应的HTTP接口就可以介入监控，不需要任何SDK或者其他的集成过程。</li><li>官网：<a href="https://prometheus.io/" target="_blank" rel="noopener">https://prometheus.io/</a></li></ul></li><li><strong>Zipkin</strong><ul><li>简介：专注于<strong>Tracing</strong>领域，根据Google Dapper论文设计的全链路监控系统，由Twitter公司开发。每个服务向Zipkin报告及时数据，Zipkin会根据调用关系通过UI生成依赖关系图，显示有多少跟踪请求通过每个服务，该系统让开发者可通过Web轻松的收集和分析数据，例如用户每次请求服务的处理时间，可方便的检测系统中的瓶颈。</li><li>官网：<a href="https://zipkin.io/" target="_blank" rel="noopener">https://zipkin.io/</a></li></ul></li></ul><h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="https://peter.bourgon.org/blog/2017/02/21/metrics-tracing-and-logging.html" target="_blank" rel="noopener">https://peter.bourgon.org/blog/2017/02/21/metrics-tracing-and-logging.html</a><br><a href="https://yq.aliyun.com/articles/394183" target="_blank" rel="noopener">https://yq.aliyun.com/articles/394183</a><br><a href="https://techbeacon.com/monitoring-demystified-top-logging-tracing-metrics-resources" target="_blank" rel="noopener">https://techbeacon.com/monitoring-demystified-top-logging-tracing-metrics-resources</a></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;近来研究了一系列面向DevOps的诊断与分析系统，并在部门结合业务场景逐步落地。本文记录了该过程中的一些思考和总结。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="DevOps" scheme="http://blog.jonnydu.me/tags/DevOps/"/>
+    
+  </entry>
   
   <entry>
     <title>golang反射三法则</title>
@@ -395,26 +415,6 @@
     
     
       <category term="进程/线程/并发" scheme="http://blog.jonnydu.me/tags/%E8%BF%9B%E7%A8%8B-%E7%BA%BF%E7%A8%8B-%E5%B9%B6%E5%8F%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>使用STL算法时需注意的问题</title>
-    <link href="http://blog.jonnydu.me/2016/12/19/Effective-STL-2/"/>
-    <id>http://blog.jonnydu.me/2016/12/19/Effective-STL-2/</id>
-    <published>2016-12-19T12:21:14.000Z</published>
-    <updated>2016-12-29T13:46:38.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>接着上一篇，对STL中非常有用而又容易犯错的一些算法做总结和记录。希望在后面的使用中更加注重STL算法。<br><a id="more"></a></p><h3 id="确保目标空间足够大"><a href="#确保目标空间足够大" class="headerlink" title="确保目标空间足够大"></a>确保目标空间足够大</h3><p>如上篇所述，当有新的对象加入容器时，STL容器会自动扩充存储空间以容纳这些对象。但是，需要注意的是，STL容器并不总是能够正确地管理其存储空间。比如下面这个例子：     </p><pre><code>int trans(int x){    return -x;}vector&lt;int&gt; ivec{1,2};vector&lt;int&gt; res;std::transform(ivec.begin(), ivec.end(), res.begin(), trans);    // error</code></pre><p>这段代码中，transform首先以ivec[0]为参数调用trans，并将结果赋给<em>\res.end()。然后，再以ivec[1]为参数调用trans，并将结果赋给\</em>(res.end()+1)。这可能会引起灾难性的后果，因为在*res.end()中并没有对象，*(res.end()+1)就更没有对象了。这种transform调用时错误的，因为导致了对无效对象的赋值操作。<br>犯这种错误的程序员总是希望他们所调用的算法的结果会被插入到目标容器中。事实上，必须向STL明确表达意图。所以，上面的例子需要通过调用back_insert生成一个迭代器来指定目标区间的起始位置：      </p><pre><code>int trans(int x){    return -x;    }vector&lt;int&gt; ivec{1,2};vector&lt;int&gt; res;std::transform(ivec.begin(), ivec.end(), back_inserter(res), trans);</code></pre><p>在内部，back_insert返回的迭代器将使得push_back被调用，所以back_insert可使用于所有提供push_back方法的容器。而如果想让一个算法在容器的头部而不是尾部插入对象可以使用front_inserter。<br>因此，无论何时，如果所使用的算法需要指定一个目标区间，那么必须确保目标区间足够大，或者确保它会随着算法的运行而增大。要么在算法执行过程中增大目标区间，请使用插入型迭代器，比如ostream_iterator，或者由back_inserter、front_inserter返回的迭代器。</p><h3 id="与排序有关的选择"><a href="#与排序有关的选择" class="headerlink" title="与排序有关的选择"></a>与排序有关的选择</h3><p>提到排序，首先想到的是std::sort。但需要注意的是，std::sort并非在任何场合下都是完美无缺的。有些场景并不需要完全的排序操作。比如使用partial_sort来选择前n个最好的商品送给n个最重要的客户，或者当只需要将最好的20个商品送给最重要的20个客户，而不关心哪个商品送给哪位客户的时候选用nth_element。   </p><pre><code>vector&lt;int&gt; ivec{2,5,10,23,12,56,34,100};std::partial_sort(ivec.begin(), ivec.begin()+4, ivec.end(), greater&lt;int&gt;());for(auto n : ivec){    cout &lt;&lt; n &lt;&lt; endl}</code></pre><p>运行结果：<br><img src="http://i.imgur.com/5BIVF20.png" alt="">   </p><pre><code>vector&lt;int&gt; ivec{2,5,10,23,12,56,34,100};std::nth_element(ivec.begin(), ivec.begin()+3, ivec.end(), greater&lt;int&gt;());for(auto n : ivec){    cout &lt;&lt; n &lt;&lt; endl}</code></pre><p>运行结果:<br><img src="http://i.imgur.com/aZpaEcc.png" alt=""><br>可以看出，对nth_element的调用与partial_sort几乎一样。在效果上唯一不同之处在于，partial_sort对前20个元素进行了排序，而nth_element没有对他们进行排序。<br>sort、partial_sort、nth_element和stable_sort都属于非稳定的排序算法，有一个名为stable_sort的算法可以提供稳定排序特性。<br>另外，sort、partial_sort、nth_element和stable_sort算法都要求随机访问迭代器，所以这些算法只能被应用于vector、string、deque和数组。对标准关联容器中的元素进行排序并没有实际意义，因为这样的容器总是使用比较函数来维护内部元素的有序性。list是唯一需要排序却无法使用这些排序算法的容器，为此，list特别提供了sort成员函数（稳定排序）。    </p><h3 id="remove算法后调用erase删除元素"><a href="#remove算法后调用erase删除元素" class="headerlink" title="remove算法后调用erase删除元素"></a>remove算法后调用erase删除元素</h3><p>我们需要知道，从容器中删除元素唯一的办法是调用容器的成员函数，几乎总是erase的某种形式。因此，remove并不知道它操作的元素所在的容器，所以remove不可能从容器中删除元素。那么remove究竟做了什么？<br>其实，remove移动了区间中的元素，其结果是，“不用背删除”的元素移到了区间的前部（保持原来的相对顺序）。返回的是一个迭代器指向最后一个“不用背删除”的元素之后的元素。这个返回值相当于该区间“新的逻辑结尾”。但是，需要注意的是，通常来说，当调用了remove以后，从区间中被删除的那些元素可能在也可能不在区间中，这是算法操作的附带结果。<br>所以，如果真想删除元素，那就必须在remove之后使用erase。要删除的元素的位置从“新的逻辑结尾”一直到原区间的结尾。比如:</p><pre><code>vector&lt;int&gt; ivec;...v.erase(remove(v.begin(), v.end(), 99), v.end());    </code></pre><p>此外，remove并不是唯一一个适用于这种情形的算法，其他还有两个属于“remove类”的算法：remove_if和unique。</p><h3 id="使用accumulate或者for-each进行区间统计"><a href="#使用accumulate或者for-each进行区间统计" class="headerlink" title="使用accumulate或者for_each进行区间统计"></a>使用accumulate或者for_each进行区间统计</h3><p>有时候，我们需要按照某种自定义的方式对区间进行统计处理。这个时候，必须自己定义统计方法。STL通过算法accumulate来提供。<br>accumulate有两种形式：第一种形式有两个迭代器和一个初始值，它返回该初始值加上由迭代器标识的区间中的值的总和。如下面的例子：      </p><pre><code>vector&lt;int&gt; ivec{1,2,3};std::accumulate(ivec.begin(), ivec.end(), 0);</code></pre><p>而另一种形式是accumulate带一个初始值和一个任意的统计函数。</p><pre><code>vector&lt;int&gt; ivec{2,2,3};std::accumulate(ivec.begin(), ivec.end(), 2, multiplies&lt;int&gt;());  //24    </code></pre><p>另一个可用来统计区间的算法时for_each，如图accumulate一样，for_each也带两个参数：一个是区间，另一个是函数（通常是函数对象）—对区间中的每个元素都要调用这个函数，但是，传给for_each的这个函数只接受一个实参（即当前的区间元素）；for_each执行完毕后会返回它的函数。</p><h3 id="使用排序的区间作为参数的算法"><a href="#使用排序的区间作为参数的算法" class="headerlink" title="使用排序的区间作为参数的算法"></a>使用排序的区间作为参数的算法</h3><p>有些算法既可以与排序的区间一起工作，也可以与未排序的区间一起工作，但是当它们作用在排序的区间上时，算法会更加有效。<br>首先，罗列出要求排序区间的STL算法:<br>binary_search, lower_bound, upper_bound, equal_range, set_union, set_intersection, set_difference, set_symmetric_difference, merge, inplace_merge, includes<br>还有一些算法并不一定要求排序的区间，但通常情况下会与排序区间一起使用。<br>unique, unique_copy<br>这其中，用于查找的算法binary_search, lower_bound, upper_bound, equal_range要求排序的区间，因为它们用二分法查找数据。<br>set_union, set_intersection, set_difference, set_symmetric_difference这四个算法提供了线性时间效率的集合操作。它们要求排序的区间，因为如果不满足，它们就无法在线性时间内完成工作。<br>merge和inplace_merge实际上实现了合并和排序的联合操作：它们读入两个排序的区间，然后合并成一个新的排序区间。如果源区间没有排过序，就不可能在线性时间内完成。<br>同样，includes也要求两个区间是排序的，承诺线性时间的效率。<br>而unique和unique_copy与上述讨论过的算法有所不同，它们即使对于未排序的区间也有很好的行为。以unique为例，unique用于删除区间中所有重复的元素，所以必须保证所有相等的元素都是连续存放的。因此，总是要确保传给unique的区间是排序的。<br>顺便提一下，unique使用了与remove类似的办法来删除区间中的元素，而并非真正意义上的删除。</p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;接着上一篇，对STL中非常有用而又容易犯错的一些算法做总结和记录。希望在后面的使用中更加注重STL算法。&lt;br&gt;
-    
-    </summary>
-    
-    
-      <category term="C++" scheme="http://blog.jonnydu.me/tags/C/"/>
     
   </entry>
   
