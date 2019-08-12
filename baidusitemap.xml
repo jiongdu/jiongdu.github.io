@@ -4,12 +4,12 @@
 
     
   <url>
-    <loc>http://blog.jonnydu.me/2019/08/02/distributed-unique-id/</loc>
-    <lastmod>2019-08-12T14:19:25.663Z</lastmod>
+    <loc>http://blog.jonnydu.me/2018/08/02/distributed-unique-id/</loc>
+    <lastmod>2019-08-12T14:23:12.539Z</lastmod>
     <data>
         <display>
         <title>常见分布式唯一ID生成策略总结</title>
-        <pubTime>2019-08-02T01:56:09.000Z</pubTime>
+        <pubTime>2018-08-02T01:56:09.000Z</pubTime>
         
         <tag>分布式系统</tag>
          
@@ -260,12 +260,12 @@
 
     
   <url>
-    <loc>http://blog.jonnydu.me/2017/01/15/Redis-Cluster/</loc>
+    <loc>http://blog.jonnydu.me/2017/01/11/Redis-sentinel/</loc>
     <lastmod>2017-03-29T13:53:04.000Z</lastmod>
     <data>
         <display>
-        <title>搭建Redis集群</title>
-        <pubTime>2017-01-15T07:08:05.000Z</pubTime>
+        <title>Redis Sentinel原理及实践</title>
+        <pubTime>2017-01-11T07:21:58.000Z</pubTime>
         
         <tag>Redis</tag>
          
@@ -277,12 +277,12 @@
 
     
   <url>
-    <loc>http://blog.jonnydu.me/2017/01/11/Redis-sentinel/</loc>
+    <loc>http://blog.jonnydu.me/2017/01/15/Redis-Cluster/</loc>
     <lastmod>2017-03-29T13:53:04.000Z</lastmod>
     <data>
         <display>
-        <title>Redis Sentinel原理及实践</title>
-        <pubTime>2017-01-11T07:21:58.000Z</pubTime>
+        <title>搭建Redis集群</title>
+        <pubTime>2017-01-15T07:08:05.000Z</pubTime>
         
         <tag>Redis</tag>
          
