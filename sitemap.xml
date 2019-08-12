@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://blog.jonnydu.me/2019/08/02/distributed-unique-id/</loc>
+    
+    <lastmod>2019-08-12T14:19:25.663Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://blog.jonnydu.me/2018/04/28/goroutine_and_scheduler/</loc>
     
     <lastmod>2018-07-22T11:26:48.982Z</lastmod>
