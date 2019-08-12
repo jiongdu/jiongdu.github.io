@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://blog.jonnydu.me/"/>
-  <updated>2019-08-12T14:48:24.723Z</updated>
+  <updated>2019-08-12T14:54:17.010Z</updated>
   <id>http://blog.jonnydu.me/</id>
   
   <author>
@@ -15,6 +15,26 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>k8s知识图谱</title>
+    <link href="http://blog.jonnydu.me/2019/07/27/k8s-knowledge/"/>
+    <id>http://blog.jonnydu.me/2019/07/27/k8s-knowledge/</id>
+    <published>2019-07-27T11:26:20.000Z</published>
+    <updated>2019-08-12T14:54:17.010Z</updated>
+    
+    <content type="html"><![CDATA[<p>k8s技能升级中</p><a id="more"></a><p><img src="http://km.oa.com/files/photos/pictures/201905/1557659219_89_w2614_h1825.png" alt=""><br>地址：<a href="https://www.processon.com/view/link/5cd7fb4ee4b07a8b07682787#map" target="_blank" rel="noopener">https://www.processon.com/view/link/5cd7fb4ee4b07a8b07682787#map</a></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;k8s技能升级中&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="k8s" scheme="http://blog.jonnydu.me/tags/k8s/"/>
+    
+  </entry>
   
   <entry>
     <title>Logging、Metrics和Tracing</title>
@@ -395,26 +415,6 @@
     
     
       <category term="Redis" scheme="http://blog.jonnydu.me/tags/Redis/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>更好地使用STL关联容器</title>
-    <link href="http://blog.jonnydu.me/2016/12/30/Effective-STL-3/"/>
-    <id>http://blog.jonnydu.me/2016/12/30/Effective-STL-3/</id>
-    <published>2016-12-30T02:13:50.000Z</published>
-    <updated>2017-01-19T07:13:30.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>在STL的使用过程中，一直对关联容器掌握的不够熟练。这一篇就来总结下使用关联容器时的一些注意问题。<br><a id="more"></a></p><h3 id="理解等价关系"><a href="#理解等价关系" class="headerlink" title="理解等价关系"></a>理解等价关系</h3><p>在STL中，对两个对象进行比较，看它们的值是否相等，这样的操作随处可见。在实际操作中，相等的概念是基于operator==的。如果表达式“x==y”返回真，则x和y的值相等。<br>等价关系是以“在以排序的区间中对象值的相对顺序”为基础的。如果从每个标准关联容器的排列顺序来考虑等价关系，那么这将是非常有意义的。对于两个对象x和y，如果按照关联容器c的排列顺序，每个都不在另一个的前面，那么称这两个对象按照c的排列顺序由等价的值。<br>下面以一个实例进行说明：    </p><pre><code>bool ciCharLess(char c1, char c2){    return tolower(static_cast&lt;unsigned char&gt;(c1))&lt;tolower(static_cast&lt;unsigned char&gt;(c2));}bool ciStringCompare(const string&amp; s1, const string&amp; s2){    return lexicographical_compare(s1.begin(), s1.end(), s2.begin(), s2.end(), ciCharLess);}struct CIStringCompare : public binary_function&lt;string, string, bool&gt;{    bool operator()(const string&amp; lhs, const string&amp; rhs){        return ciStringCompare(lhs, rhs);     }}int main(){    set&lt;string, CIStringCompare&gt; s;    s.insert(&quot;STL&quot;);    s.insert(&quot;stl&quot;);    for(auto n:s){        cout &lt;&lt; n &lt;&lt; endl;            //STL    }    if(s.find(&quot;stl&quot;)!=s.end()){        cout &lt;&lt; &quot;success&quot; &lt;&lt; endl;        //success    }else{        cout &lt;&lt; &quot;fail&quot; &lt;&lt; endl;    }    if(std::find(s.begin(), s.end(), &quot;stl&quot;)!=s.end()){        cout &lt;&lt; &quot;success&quot; &lt;&lt; endl;    }else{        cout &lt;&lt; &quot;fail&quot; &lt;&lt; endl;            //fail    }    return 0;}</code></pre><p>s是一个不区分大小写的set<string>，即当set的比较函数忽略字符串中字符的大小写时的set<string>。这样一个比较函数将把“STL”和“stl”看做是等价的。因此，在先后插入“STL”和“stl”时，只有“STL”会成功插入。如果使用set的find成员函数来查找“stl”时，该查找会成功；而如果是使用非成员的find算法，则查找将失败。因为“STL”和“stl”是等价的。顺便说一句，该例子从一个方面解释了为什么应该优先选用成员函数而不是与之对应的非成员函数。</string></string></p><h3 id="为包含指针的关联容器指定比较类型"><a href="#为包含指针的关联容器指定比较类型" class="headerlink" title="为包含指针的关联容器指定比较类型"></a>为包含指针的关联容器指定比较类型</h3><p>假如有一个包含string*指针的set，把一些动物的名字插入到该集合中：     </p><pre><code>set&lt;string*&gt; ssp;ssp.insert(new string(&quot;Anteater&quot;));ssp.insert(new string(&quot;Wombat&quot;));ssp.insert(new string(&quot;Lemur&quot;));ssp.insert(new string(&quot;Penguin&quot;));</code></pre><p>因为集合中所包含的是指针，所以，可能会想到使用下面的代码来打印出动物的名字：</p><pre><code>for(set&lt;string*&gt;::const_iterator i=ssp.begin(); i!=ssp.end(); ++i){    cout &lt;&lt; **i &lt;&lt; endl;}</code></pre><p>没错，动物的名称会被打印出来，但它们以字母顺序出现的概率仅为1/24。ssp会按顺序保存它的内容，但因为它包含的是指针，所以会按指针的值而不是按字符串的值进行排序，4个指针的值共有24个可能的排列方式，所以对要存储的指针会有24种可能的排列。<br>为了解决这个问题，需要知道set&lt;string*&gt; ssp是如下代码set&lt;string*,less&lt;string<em>&gt;&gt; ssp的缩写，当然，更精确的讲是set&lt;string\</em>,less&lt;string*&gt;,allocator&lt;string*&gt;&gt;的缩写，只是这里不考虑分配子的影响。<br>因此，如果想让string*指针在集合中按字符串的值排序，那么不能使用默认的比较函数子类。必须自己编写比较函数子类。        </p><pre><code>struct StringPtrLess : public binary_function&lt;const string*, const string*, bool&gt;{    bool operator() (const string* s1, const string* s2) const{        return *s1 &lt; *s2;    }};  set&lt;string*, StringPtrLess&gt; ssp;/*void print(const string* ps){    cout &lt;&lt; *ps &lt;&lt; endl;}for_each(ssp.begin(), ssp.end(), print);*/</code></pre><p>现在上述的打印循环可以做到预期的事情了。<br>所以，当需要创建包含指针的关联容器时，容器将会按照指针的值进行排序。绝大多数情况下，这不会是所希望的，这种情况下，几乎肯定要创建自己的函数子类作为该关联容器的比较类型。</p><h3 id="考虑用排序的vector替代关联容器"><a href="#考虑用排序的vector替代关联容器" class="headerlink" title="考虑用排序的vector替代关联容器"></a>考虑用排序的vector替代关联容器</h3><p>个人使用STL的经历中，当需要一个可提供快速查找功能的数据结构时，都会立刻想到标准关联容器，即set、multiset、map和multimap。但是，它们并不总是适合的。比如，如果查找速度真的很重要，那么，非标准的散列容器（unordered_map等）几乎是值得考虑的。因为通过适当的散列函数，散列容器几乎能提供常数时间的查找能力，优于set、multiset、map和multimap的确定的对数时间查找能力。<br>但是，即使确定的对数时间查找能力满足需求，标准关联容器可能也不是最好的选择。标准关联容器的效率比vector还低的情况并不少见。标准关联容器通常被实现为平衡的二叉查找树。二叉查找树这种数据结构对插入、删除和查找的混合操作做了优化，也就是，它所适合的那些应用程序的主要特征是插入、删除和查找混在一起。即没办法预测出针对这棵树的下一个操作是什么。<br>而还有很多应用程序使用其数据结构的方式并不这么混乱。它们使用其数据结构的过程可以明显地分为三个阶段：<br>（1）设置阶段。创建新的数据结构，并插入大量元素。<br>（2）查找阶段。查询该数据结构以找到特定的信息。<br>（3）重组阶段。改变该数据结构的内容。<br>对于以这种方式使用其数据结构的应用程序来说，vector可能比关联容器提供了更好的性能。但是不是任意的vector，而必须是排序的vector，因为只有对排序的容器才能够正确地使用查找算法binary_search、lower_bound和equal_range等。<br>那么，为什么通过排序的vector执行的二分搜索，比通过二叉查找树执行的二分搜索具有更好的性能呢？<br>其原因主要是：关联容器几乎肯定在使用平衡二叉树。这就意味着在一个关联容器中存储一个类型所伴随的空间开销至少是三个指针（父指针，左儿子，右儿子）。相反，存储在vector中则不会有任何的额外开销；只是简单地存储一个类型。<br>当然，对于排序的vector，最不利的地方在于它必须保持有序！当一个新的元素被插入时，新元素之后的所有元素都必须向后移动一个元素的位置。当一个元素从vector中删除了，则在它之后的所有元素也都要向前移动。插入和删除操作对于vector来说是昂贵的，但对于关联容器却是廉价的。这就是为什么当“对数据结构的使用方式是：查找操作几乎从不跟插入和删除操作混在一起”时，再考虑使用排序的vector而不是关联容器才是合理的。     </p><h3 id="在map-operator-和map-insert之间选择"><a href="#在map-operator-和map-insert之间选择" class="headerlink" title="在map::operator[]和map::insert之间选择"></a>在map::operator[]和map::insert之间选择</h3><p>map的operator[]函数与众不同。它与vector、deque和string的operator[]函数无关，与用于数组的内置operator[]也没有关系。相反，map::operator[]的设计目的是为了提供“添加和更新”的功能，也就是说，对于map&lt;K,V&gt; m；来说，表达式m[k]=v;检查键k是否已经在map中了，如果没有，它就被加入，并以v作为相应的值。如果k已经在映射表中了，则与之关联的值被更新为v。<br>下面以一个例子来说明：      </p><pre><code>class Widget {    public:        Widget();        Widget(double weight);        Widget&amp; operator=(double weight);    private:        double weight_;    ...        };map&lt;int, Widget&gt; m;m[1]=1.50;</code></pre><p>表达式m[1]是m.operator[](1)的缩写形式，即对map::operator[]的调用。该函数必须返回一个指向Widget的引用，因为m所映射的值类型是Widget。这时，m中什么都没有，所以键1没有对应的值对象。因此，operator[]默认构造了一个Widget，作为与1相关联的值，然后返回一个指向该Widget的引用。最后，这个Widget成了赋值的目标。因此，m[1]=1.50在功能上等价于以下代码：      </p><pre><code>typedef map&lt;int, Widget&gt; IntWidgetMap;pair&lt;IntWidgetMap::iterator, bool&gt; result = m.insert(IntWidgetMap::value_type(1, Widget()));result.first-&gt;second = 1.50;</code></pre><p>因此，使用operator[]会降低效率。因为我们先默认构造了一个Widget，然后立刻赋给它新的值。而如果我们换成对insert的直接调用：    </p><pre><code>m.insert(IntWidgetMap::value_type(1, 1.50));</code></pre><p>最终效果和前面相同，但是它通常会节省三个函数调用：一个用于创建默认构造的临时Widget对象，一个用于析构该临时对象，还有一个是调用Widget的赋值描述符。<br>而operator[]的设计目的是为了提供“添加和更新”的功能，现在我们已经知道，当做为“添加”操作时，insert比operator[]效率更高，而当我们做更新操作时，即当一个等价的键已经在映射表中时，形势就反过来了。因为调用insert时，必须构造和析构一个pair类型的对象，需要付出一个pair构造函数和一个pair析构函数的代价。而这又会导致对Widget的构造和析构动作。而operator[]不使用pair对象，所以它不会构造和析构任何pair或Widget。<br>总结：当向映射表中添加元素时，优先选用insert而不是operator[]；而当更新已经在映射表中的元素的值时，要优先选择operator[]。</p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;在STL的使用过程中，一直对关联容器掌握的不够熟练。这一篇就来总结下使用关联容器时的一些注意问题。&lt;br&gt;
-    
-    </summary>
-    
-    
-      <category term="C++" scheme="http://blog.jonnydu.me/tags/C/"/>
     
   </entry>
   

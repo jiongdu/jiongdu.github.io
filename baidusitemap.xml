@@ -4,6 +4,23 @@
 
     
   <url>
+    <loc>http://blog.jonnydu.me/2019/07/27/k8s-knowledge/</loc>
+    <lastmod>2019-08-12T14:54:17.010Z</lastmod>
+    <data>
+        <display>
+        <title>k8s知识图谱</title>
+        <pubTime>2019-07-27T11:26:20.000Z</pubTime>
+        
+        <tag>k8s</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>http://blog.jonnydu.me/2018/09/15/golang-channel/</loc>
     <lastmod>2019-08-12T14:49:41.587Z</lastmod>
     <data>
@@ -311,12 +328,12 @@
 
     
   <url>
-    <loc>http://blog.jonnydu.me/2017/01/11/Redis-sentinel/</loc>
+    <loc>http://blog.jonnydu.me/2017/01/15/Redis-Cluster/</loc>
     <lastmod>2017-03-29T13:53:04.000Z</lastmod>
     <data>
         <display>
-        <title>Redis Sentinel原理及实践</title>
-        <pubTime>2017-01-11T07:21:58.000Z</pubTime>
+        <title>搭建Redis集群</title>
+        <pubTime>2017-01-15T07:08:05.000Z</pubTime>
         
         <tag>Redis</tag>
          
@@ -328,12 +345,12 @@
 
     
   <url>
-    <loc>http://blog.jonnydu.me/2017/01/15/Redis-Cluster/</loc>
+    <loc>http://blog.jonnydu.me/2017/01/11/Redis-sentinel/</loc>
     <lastmod>2017-03-29T13:53:04.000Z</lastmod>
     <data>
         <display>
-        <title>搭建Redis集群</title>
-        <pubTime>2017-01-15T07:08:05.000Z</pubTime>
+        <title>Redis Sentinel原理及实践</title>
+        <pubTime>2017-01-11T07:21:58.000Z</pubTime>
         
         <tag>Redis</tag>
          
