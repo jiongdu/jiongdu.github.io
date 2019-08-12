@@ -4,12 +4,29 @@
 
     
   <url>
-    <loc>http://blog.jonnydu.me/2018/08/02/distributed-unique-id/</loc>
-    <lastmod>2019-08-12T14:23:12.539Z</lastmod>
+    <loc>http://blog.jonnydu.me/2018/07/22/golang-reflection/</loc>
+    <lastmod>2019-08-12T14:32:33.215Z</lastmod>
+    <data>
+        <display>
+        <title>golang反射三法则</title>
+        <pubTime>2018-07-22T11:26:20.000Z</pubTime>
+        
+        <tag>golang</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://blog.jonnydu.me/2018/07/22/distributed-unique-id/</loc>
+    <lastmod>2019-08-12T14:29:45.248Z</lastmod>
     <data>
         <display>
         <title>常见分布式唯一ID生成策略总结</title>
-        <pubTime>2018-08-02T01:56:09.000Z</pubTime>
+        <pubTime>2018-07-22T10:30:20.000Z</pubTime>
         
         <tag>分布式系统</tag>
          

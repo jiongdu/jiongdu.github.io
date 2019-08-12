@@ -2,9 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://blog.jonnydu.me/2018/08/02/distributed-unique-id/</loc>
+    <loc>http://blog.jonnydu.me/2018/07/22/golang-reflection/</loc>
     
-    <lastmod>2019-08-12T14:23:12.539Z</lastmod>
+    <lastmod>2019-08-12T14:32:33.215Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.jonnydu.me/2018/07/22/distributed-unique-id/</loc>
+    
+    <lastmod>2019-08-12T14:29:45.248Z</lastmod>
     
   </url>
   
