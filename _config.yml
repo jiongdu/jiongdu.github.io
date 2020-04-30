@@ -47,7 +47,7 @@ highlight:
 # Category & Tag
 default_category: uncategorized
 category_map:
-tag_map: openwrt/wifi c/c++ java muduo network/linux 设计模式 进程/线程/并发 数据结构与算法 Redis NVMe over RDMA LevelDB golang
+tag_map: openwrt/wifi c/c++ java muduo network/linux 设计模式 进程/线程/并发 数据结构与算法 Redis NVMe over RDMA LevelDB golang hexo
 
 # Date / Time format
 ## Hexo uses Moment.js to parse and display date
