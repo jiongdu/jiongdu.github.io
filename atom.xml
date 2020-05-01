@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://blog.jonnydu.me/"/>
-  <updated>2020-04-30T14:22:45.996Z</updated>
+  <updated>2020-05-01T07:55:52.209Z</updated>
   <id>http://blog.jonnydu.me/</id>
   
   <author>
@@ -17,11 +17,11 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>hexo move to new pc</title>
+    <title>hexo博客迁移新电脑</title>
     <link href="http://blog.jonnydu.me/2020/04/30/hexo-move-to-new-pc/"/>
     <id>http://blog.jonnydu.me/2020/04/30/hexo-move-to-new-pc/</id>
     <published>2020-04-30T12:51:53.000Z</published>
-    <updated>2020-04-30T14:22:45.996Z</updated>
+    <updated>2020-05-01T07:55:52.209Z</updated>
     
     <content type="html"><![CDATA[<p>本文介绍如何将hexo博客迁移到新电脑。</p><a id="more"></a>]]></content>
     
