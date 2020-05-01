@@ -1,0 +1,889 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="C++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一期一会" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="前面在浅谈C++值语义和对象语义一文中简要的阐述了一下智能指针shared_ptr的作用和用法，作为C++11中最为广泛使用的智能指针，shared_ptr虽然解决了裸指针的诸多问题，但是它并非完美、无懈可击，所以，本文就shared_ptr使用过程中需要注意的一些问题做一下总结。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="shared_ptr的注意事项">
+<meta property="og:url" content="http://blog.jonnydu.me/2016/08/08/shared-ptr/index.html">
+<meta property="og:site_name" content="一期一会">
+<meta property="og:description" content="前面在浅谈C++值语义和对象语义一文中简要的阐述了一下智能指针shared_ptr的作用和用法，作为C++11中最为广泛使用的智能指针，shared_ptr虽然解决了裸指针的诸多问题，但是它并非完美、无懈可击，所以，本文就shared_ptr使用过程中需要注意的一些问题做一下总结。">
+<meta property="og:image" content="http://i.imgur.com/dqHRq8F.png">
+<meta property="og:image" content="http://i.imgur.com/cG2fmZx.png">
+<meta property="og:image" content="http://i.imgur.com/WZNNAPg.png">
+<meta property="og:image" content="http://i.imgur.com/21rnuTE.png">
+<meta property="og:image" content="http://i.imgur.com/ZuA23y9.png">
+<meta property="article:published_time" content="2016-08-08T13:38:44.000Z">
+<meta property="article:modified_time" content="2020-04-30T14:16:30.248Z">
+<meta property="article:author" content="jonnydu">
+<meta property="article:tag" content="C++">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://i.imgur.com/dqHRq8F.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '一期一会'
+    }
+  };
+</script>
+
+  <title> shared_ptr的注意事项 | 一期一会 </title>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">一期一会</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CFymCPjb2LHwhFXVjxQk','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                shared_ptr的注意事项
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-08-08T21:38:44+08:00" content="2016-08-08">
+              2016-08-08
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/08/08/shared-ptr/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/08/shared-ptr/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>前面在<a href="http://blog.dujiong.net/2016/05/15/cplusplus-sematics/" target="_blank" rel="noopener">浅谈C++值语义和对象语义</a>一文中简要的阐述了一下智能指针shared_ptr的作用和用法，作为C++11中最为广泛使用的智能指针，shared_ptr虽然解决了裸指针的诸多问题，但是它并非完美、无懈可击，所以，本文就shared_ptr使用过程中需要注意的一些问题做一下总结。</p>
+<a id="more"></a>  
+<h3 id="循环引用"><a href="#循环引用" class="headerlink" title="循环引用"></a>循环引用</h3><p>首当其冲的便是shared_ptr造成的循环引用。     </p>
+<pre><code>#include &lt;iostream&gt;
+#include &lt;memory&gt;
+
+using namespace std;
+
+class BaseClass;
+class DerivedClass;
+
+typedef std::shared_ptr&lt;BaseClass&gt; BaseClassPtr;
+typedef std::shared_ptr&lt;DerivedClass&gt; DerivedClassPtr;
+
+class BaseClass
+{
+    public:
+        DerivedClassPtr derivedPtr;
+        ~BaseClass()
+        {
+            cout &lt;&lt; &quot;~BaseClass()&quot; &lt;&lt; endl;
+        }
+};
+
+class DerivedClass
+{
+    public:
+        BaseClassPtr basePtr;
+        ~DerivedClass()
+        {
+            cout &lt;&lt; &quot;~DerivedClass()&quot; &lt;&lt; endl;
+        }
+};
+
+int main()
+{
+    BaseClassPtr base(new BaseClass());
+    DerivedClassPtr derived(new DerivedClass());
+
+    base-&gt;derivedPtr = derived;
+    derived-&gt;basePtr = base;
+
+    cout &lt;&lt; base.use_count() &lt;&lt; endl;
+    cout &lt;&lt; derived.use_count() &lt;&lt; endl;
+}</code></pre><p>程序运行结果如下。<br><img src="http://i.imgur.com/dqHRq8F.png" alt=""><br>从结果可以看出，堆上的BaseClass和DerivedClass都没有被析构，因为二者的引用都为1，并形成了循环引用，类似于“放开我的引用”，“你先放开我的我就放你的”的恶性循环，所以，造成了内存泄露。<br>解决方法是使用弱智能指针weak_ptr，让BaseClass和DerivedClass分别持有对方的weak_ptr，而不是shared_ptr，weak_ptr也是一个引用计数型智能指针，但是它不增加对象的引用计数。这样，就可以保证内存正常释放。<br><img src="http://i.imgur.com/cG2fmZx.png" alt="">    </p>
+<h3 id="线程安全"><a href="#线程安全" class="headerlink" title="线程安全"></a>线程安全</h3><p>shared_ptr是引用计数型智能指针，几乎所有的实现都采用在堆上存放计数值的方法。具体来说，shared_ptr<Foo>包含两个成员，一个是指向Foo的指针ptr，另一个是ref_count指针（不一定是原始指针），指向堆上的ref_count对象。ref_count对象有多个成员。</p>
+<p><img src="http://i.imgur.com/WZNNAPg.png" alt=""></p>
+<p>所以，如果执行：</p>
+<pre><code>shared_ptr&lt;Foo&gt; x(new Foo);
+shared_ptr&lt;Foo&gt; y = x;</code></pre><p>y=x将会涉及两个成员的拷贝,ptr和ref_count指针。这两步不是原子的，所以在多线程中会有race condition，需要加锁保护。     </p>
+<h3 id="内存多次释放"><a href="#内存多次释放" class="headerlink" title="内存多次释放"></a>内存多次释放</h3><p>shared_ptr多次引用同一数据会导致内存多次释放。</p>
+<pre><code>#include &lt;iostream&gt;
+#include &lt;memory&gt;
+
+using namespace std;
+
+int main()
+{
+    int* ptr = new int(100);
+    std::shared_ptr sptr1(ptr);
+    ...
+    std::shared_ptr sptr2(ptr);
+
+    return 0;
+}</code></pre><p>只分配了一次内存，却两次释放。</p>
+<h3 id="enable-shared-from-this"><a href="#enable-shared-from-this" class="headerlink" title="enable_shared_from_this"></a>enable_shared_from_this</h3><p>当使用智能指针时，类的某些成员函数需要返回的是管理自身的shared_ptr，这时就需要使A继承自enable_shared_from_this（顾名思义，将this指针变身为shared_ptr），然后通过其成员函数shared_from_this()返回指向自身的shared_ptr。      </p>
+<p>首先看没有使用它会发生什么？</p>
+<pre><code>#include &lt;iostream&gt;
+#include &lt;memory&gt;
+
+using namespace std;
+
+class A
+{
+    public:
+        ~A()
+        {
+            cout &lt;&lt; &quot;~A()&quot; &lt;&lt; endl;
+        }
+        shared_ptr&lt;A&gt; get_sptr()
+        {
+            return shared_ptr&lt;A&gt;(this);
+        }
+};
+
+int main()
+{
+    shared_ptr&lt;A&gt; a(new A());
+    shared_ptr&lt;A&gt; b = a-&gt;get_sptr();
+
+    return 0;
+}  </code></pre><p>运行结果为：<br><img src="http://i.imgur.com/21rnuTE.png" alt=""><br>可以看出，只new了一个A对象，但是却调用了两次析构函数。产生这个错误的原因get_sptr()成员函数中将shared_ptr中的引用计数器的值加了1。所以，需要解决的是，怎样通过一个类的成员函数获取当前对象的shared_ptr？<br>方法就是使类继承enable_shared_from_this，然后在需要shared_ptr的地方调用其成员函数shared_from_this()即可。</p>
+<pre><code>#include &lt;iostream&gt;
+#include &lt;memory&gt;
+
+using namespace std;
+
+class A : public enable_shared_from_this&lt;A&gt;
+{
+    public:
+        ~A()
+        {
+            cout &lt;&lt; &quot;~A()&quot; &lt;&lt; endl;
+        }
+        shared_ptr&lt;A&gt; get_sptr()
+        {
+            return shared_from_this();
+        }
+};
+
+int main()
+{
+    shared_ptr&lt;A&gt; a(new A());
+    shared_ptr&lt;A&gt; b = a-&gt;get_sptr();
+
+    return 0;
+}  </code></pre><p>运行结果为：<br><img src="http://i.imgur.com/ZuA23y9.png" alt=""><br>需要注意的是，不能在构造函数中使用<code>shared_from_this()</code>，因为虽然对象的基类<code>enable_shared_from_this</code>的构造函数已经调用，但是<code>shared_ptr</code>的构造函数并没有调用，所以这个时候调用<code>shared_from_this()</code>是错的。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>智能指针虽好，但也并非完美，在使用的过程中还是需要注意。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag">#C++</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/07/29/epoll/" rel="next" title="epoll总结">
+                <i class="fa fa-chevron-left"></i> epoll总结
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/08/21/Singleton/" rel="prev" title="单例模式">
+                单例模式 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/08/08/shared-ptr/"
+           data-title="shared_ptr的注意事项" data-url="http://blog.jonnydu.me/2016/08/08/shared-ptr/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="jonnydu" />
+          <p class="site-author-name" itemprop="name">jonnydu</p>
+          <p class="site-description motion-element" itemprop="description">jonnydu.uestc@gmail.com</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">71</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jiongdu" target="_blank">
+                  
+                    <i class="fa fa-https://github.com/jiongdu"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/3309795495" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 微博
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#循环引用"><span class="nav-number">1.</span> <span class="nav-text">循环引用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#线程安全"><span class="nav-number">2.</span> <span class="nav-text">线程安全</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内存多次释放"><span class="nav-number">3.</span> <span class="nav-text">内存多次释放</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#enable-shared-from-this"><span class="nav-number">4.</span> <span class="nav-text">enable_shared_from_this</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">jonnydu</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io" target="_blank" rel="noopener">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" target="_blank" rel="noopener">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+  
+  
+<script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = NexT.utils.escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    NexT.motion.middleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+
+      if (CONFIG.sidebar.display === 'post' || CONFIG.sidebar.display === 'always') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          NexT.utils.displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"jonnydu"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+  
+
+
+
+
+
+  
+  
+  
+
+  
+
+
+</body>
+</html>

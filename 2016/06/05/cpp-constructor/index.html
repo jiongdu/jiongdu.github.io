@@ -1,0 +1,833 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="C++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一期一会" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="近期，在阅读陈皓老师博客的时候，看到几年前的一篇关于C++构造函数的FAQ，想来自己学习C++也有段时间了，就尝试着回答一下，并乘机总结一下C++构造函数的一些常见问题，记录于此。借此机会逛了逛C++ FAQ，以前都不了解，以后得多去学习学习，检验下自己的C++基础知识扎不扎实。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++构造函数一些常见问题分析">
+<meta property="og:url" content="http://blog.jonnydu.me/2016/06/05/cpp-constructor/index.html">
+<meta property="og:site_name" content="一期一会">
+<meta property="og:description" content="近期，在阅读陈皓老师博客的时候，看到几年前的一篇关于C++构造函数的FAQ，想来自己学习C++也有段时间了，就尝试着回答一下，并乘机总结一下C++构造函数的一些常见问题，记录于此。借此机会逛了逛C++ FAQ，以前都不了解，以后得多去学习学习，检验下自己的C++基础知识扎不扎实。">
+<meta property="article:published_time" content="2016-06-05T08:58:57.000Z">
+<meta property="article:modified_time" content="2020-04-30T14:16:30.255Z">
+<meta property="article:author" content="jonnydu">
+<meta property="article:tag" content="C++">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '一期一会'
+    }
+  };
+</script>
+
+  <title> C++构造函数一些常见问题分析 | 一期一会 </title>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">一期一会</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CFymCPjb2LHwhFXVjxQk','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                C++构造函数一些常见问题分析
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-06-05T16:58:57+08:00" content="2016-06-05">
+              2016-06-05
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/06/05/cpp-constructor/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/06/05/cpp-constructor/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>近期，在阅读陈皓老师博客的时候，看到几年前的一篇<a href="http://coolshell.cn/articles/804.html" target="_blank" rel="noopener">关于C++构造函数的FAQ</a>，想来自己学习C++也有段时间了，就尝试着回答一下，并乘机总结一下C++构造函数的一些常见问题，记录于此。<br>借此机会逛了逛C++ FAQ，以前都不了解，以后得多去学习学习，检验下自己的C++基础知识扎不扎实。</p>
+<a id="more"></a>  
+
+<h3 id="构造函数是用来干什么的？"><a href="#构造函数是用来干什么的？" class="headerlink" title="构造函数是用来干什么的？"></a>构造函数是用来干什么的？</h3><p>顾名思义，构造函数是用来从无到有的构建对象。它将一些（连续的）最小粒度的内存单元变成对象。它要初始化对象内部所定义的域，还可以分配资源(内存、文件、套接字等)。</p>
+<h3 id="List-x-和List-x-有什么不同？"><a href="#List-x-和List-x-有什么不同？" class="headerlink" title="List x;和List x();有什么不同？"></a>List x;和List x();有什么不同？</h3><p>List x;是声明了一个类List的对象x，而List x()是声明了一个函数x()，它返回一个List对象。二者自然是有本质的差别。 </p>
+<h3 id="一个类的构造函数可否调用另一个构造函数来初始化自己？"><a href="#一个类的构造函数可否调用另一个构造函数来初始化自己？" class="headerlink" title="一个类的构造函数可否调用另一个构造函数来初始化自己？"></a>一个类的构造函数可否调用另一个构造函数来初始化自己？</h3><p>不能。如果调用另一个构造函数，编译器将初始化一个临时局部对象，而不是初始化this对象。</p>
+<h3 id="是否Fred类的默认的构造函数就一定是Fred-Fred-？"><a href="#是否Fred类的默认的构造函数就一定是Fred-Fred-？" class="headerlink" title="是否Fred类的默认的构造函数就一定是Fred::Fred()？"></a>是否Fred类的默认的构造函数就一定是Fred::Fred()？</h3><p>不，默认构造函数是可以带提供默认值的参数的。<br>比如这里：</p>
+<pre><code>class Fred
+{
+    public:
+        Fred(int i=1);
+};</code></pre><h3 id="如果要创建一个Fred对象数组，什么样的构造函数会被调用？"><a href="#如果要创建一个Fred对象数组，什么样的构造函数会被调用？" class="headerlink" title="如果要创建一个Fred对象数组，什么样的构造函数会被调用？"></a>如果要创建一个Fred对象数组，什么样的构造函数会被调用？</h3><p>Fred类的默认构造函数。<br>当然，更多的情况下我们都会选择使用标准容器vector，而且vector的一大优势是可以指定Fred的构造函数，而不仅仅是默认构造函数。</p>
+<h3 id="构造函数初始化成员变量时，用”初始化列表”还是”赋值”？"><a href="#构造函数初始化成员变量时，用”初始化列表”还是”赋值”？" class="headerlink" title="构造函数初始化成员变量时，用”初始化列表”还是”赋值”？"></a>构造函数初始化成员变量时，用”初始化列表”还是”赋值”？</h3><p>无疑，初始化列表，在很多C++语法方面的书上都会讲，这里再总结一下。<br>使用”初始化列表”最大的好处是可以提高性能，比如使用 Fred::Fread() :x_(x)来初始化成员变量x_，x_直接由x构造–编译器不会产生对象的拷贝。<br>而通过赋值的话，<code>Fred::Fred() { x_ = x }</code>，x作为一个临时对象被建立，并传递给x_成员作为赋值操作，然后临时对象x在语句的结束被析构，所以，这样的效率是较低的。<br>当然，如果x_的类型是int/char这样的内置类型的话，性能是没有区别的。总之，使用初始化列表来初始化成员变量是更佳的选择。</p>
+<h3 id="构造函数初始化列表的初始化顺序？"><a href="#构造函数初始化列表的初始化顺序？" class="headerlink" title="构造函数初始化列表的初始化顺序？"></a>构造函数初始化列表的初始化顺序？</h3><p>C++初始化成员变量的顺序是按照它们定义的顺序，而非在初始化列表的顺序。<br>如果有继承关系的话，先基类，再派生类。</p>
+<h3 id="在构造函数中用this指针是否有问题？"><a href="#在构造函数中用this指针是否有问题？" class="headerlink" title="在构造函数中用this指针是否有问题？"></a>在构造函数中用this指针是否有问题？</h3><p>一般情况下是不应该的，因为在构造阶段，this对象还没有完全形成。<br>当然也不绝对，比如构造函数的函数体或其中调用的函数可以访问基类中声明的数据成员或类的静态数据成员，这时它们都已经完整的建立起来了。<br>所以，一般情况下不这样做，如果要，也得记住，唯一准则是：这时this指针已经完整构造形成了。</p>
+<h3 id="什么是“命名的构造函数法”？"><a href="#什么是“命名的构造函数法”？" class="headerlink" title="什么是“命名的构造函数法”？"></a>什么是“命名的构造函数法”？</h3><p>为类的用户提供一种更安全、直接的构造。<br>因为构造函数的特殊性，函数名和类名相同。因此，区分类的不同的构造函数只能通过参数列表。但如果有多个构造函数，很好地区分它们并不容易。<br>命名的构造函数法就是在private或protected内声明类所有的构造函数，并提供返回对象的public static函数。</p>
+<pre><code>class Point
+{
+    public:
+        static Point rectangular(float x, float y);
+        static Point polar(float radius, float angle);
+    private:
+        Point(float x, float y);
+        float x_, y_;
+};    
+inline Point::Point(float x, float y) : x_(x), y_(y) {}
+inline Point::rectangular(float x, float y) { return Point(x, y); }
+inline Point::polar(float radius, float angle)
+{
+    return Point(radius*cos(angle), radius*sin(angle));
+}
+int main()
+{
+    Point p1 = Point::rectangular(5.0,5.0);
+    Point p2 = Point::polar(5.0,5.0);
+}    </code></pre><h3 id="为什么不能在构造函数的初始化列表中初始化static数据？"><a href="#为什么不能在构造函数的初始化列表中初始化static数据？" class="headerlink" title="为什么不能在构造函数的初始化列表中初始化static数据？"></a>为什么不能在构造函数的初始化列表中初始化static数据？</h3><p>因为static数据成员是属于类的，而不是类的对象，所以，必须显示定义类的静态数据成员。</p>
+<h3 id="为什么有静态数据成员的类得到了链接错误？"><a href="#为什么有静态数据成员的类得到了链接错误？" class="headerlink" title="为什么有静态数据成员的类得到了链接错误？"></a>为什么有静态数据成员的类得到了链接错误？</h3><p>因为如上一条所述，static数据成员必须显示定义在一个编译单元中。<br>通常在在.cpp源文件中定义static数据成员。</p>
+<h3 id="什么是”static-initialization-order-fiasco”？"><a href="#什么是”static-initialization-order-fiasco”？" class="headerlink" title="什么是”static initialization order fiasco”？"></a>什么是”static initialization order fiasco”？</h3><p>还是初始化顺序的问题，比如两个源文件a.cpp和b.cpp中分别有两个静态对象a和b。假定a对象的构造函数会调用b对象的某些成员函数。由于static对象构造在main()开始之前，且顺序未知，所以，很可能发生a对象的构造函数先运行，当其想调用b对象的成员函数时，发现b对象还没被构造。</p>
+<h3 id="如何处理构造函数的失败？"><a href="#如何处理构造函数的失败？" class="headerlink" title="如何处理构造函数的失败？"></a>如何处理构造函数的失败？</h3><p>当然是抛异常啦。关于C++的异常机制，后面还得好好学学。</p>
+<h3 id="explicit关键字的作用？"><a href="#explicit关键字的作用？" class="headerlink" title="explicit关键字的作用？"></a>explicit关键字的作用？</h3><p>使用explicit就是告诉编译器禁止隐式转换。<br>下面通过实例说明。</p>
+<pre><code>class Foo
+{
+    public:
+        Foo(int x);
+        operator int();
+};        
+int main()
+{
+    Foo a = 42;                  
+    Foo b(42);              
+    Foo c = (Foo)(42);      //显示转换
+    int d = c;
+    return 0;    
+}</code></pre><p>以上都会编译成功，需要注意的是main()中的第一、四行，都涉及到了隐式转换。<br>但是，有些时候需要禁止这样的隐式转换。就得使用explicit关键字。</p>
+<pre><code>class Foo
+{
+    public:
+        explicit Foo(int x);
+        explicit operator int();
+};     
+int main()
+{
+    Foo a = 42;        //error
+    Foo b(42);
+    Foo c = (Foo)(42);
+    int d = c;        //error
+}</code></pre><p>这样的话，main()中的隐式转换（第一、四行）将不被允许。</p>
+<h3 id="待续"><a href="#待续" class="headerlink" title="待续"></a>待续</h3><p>C++博大精深，构造函数又是其中非常重要的部分，后面还需要继续学习、补充。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag">#C++</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/05/28/concurrent-server-conclusion/" rel="next" title="常见并发网络服务程序设计方案">
+                <i class="fa fa-chevron-left"></i> 常见并发网络服务程序设计方案
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/06/13/tcp-1/" rel="prev" title="TCP协议总结（一）">
+                TCP协议总结（一） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/06/05/cpp-constructor/"
+           data-title="C++构造函数一些常见问题分析" data-url="http://blog.jonnydu.me/2016/06/05/cpp-constructor/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="jonnydu" />
+          <p class="site-author-name" itemprop="name">jonnydu</p>
+          <p class="site-description motion-element" itemprop="description">jonnydu.uestc@gmail.com</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">71</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jiongdu" target="_blank">
+                  
+                    <i class="fa fa-https://github.com/jiongdu"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/3309795495" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 微博
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#构造函数是用来干什么的？"><span class="nav-number">1.</span> <span class="nav-text">构造函数是用来干什么的？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#List-x-和List-x-有什么不同？"><span class="nav-number">2.</span> <span class="nav-text">List x;和List x();有什么不同？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#一个类的构造函数可否调用另一个构造函数来初始化自己？"><span class="nav-number">3.</span> <span class="nav-text">一个类的构造函数可否调用另一个构造函数来初始化自己？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#是否Fred类的默认的构造函数就一定是Fred-Fred-？"><span class="nav-number">4.</span> <span class="nav-text">是否Fred类的默认的构造函数就一定是Fred::Fred()？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如果要创建一个Fred对象数组，什么样的构造函数会被调用？"><span class="nav-number">5.</span> <span class="nav-text">如果要创建一个Fred对象数组，什么样的构造函数会被调用？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#构造函数初始化成员变量时，用”初始化列表”还是”赋值”？"><span class="nav-number">6.</span> <span class="nav-text">构造函数初始化成员变量时，用”初始化列表”还是”赋值”？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#构造函数初始化列表的初始化顺序？"><span class="nav-number">7.</span> <span class="nav-text">构造函数初始化列表的初始化顺序？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在构造函数中用this指针是否有问题？"><span class="nav-number">8.</span> <span class="nav-text">在构造函数中用this指针是否有问题？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是“命名的构造函数法”？"><span class="nav-number">9.</span> <span class="nav-text">什么是“命名的构造函数法”？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么不能在构造函数的初始化列表中初始化static数据？"><span class="nav-number">10.</span> <span class="nav-text">为什么不能在构造函数的初始化列表中初始化static数据？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么有静态数据成员的类得到了链接错误？"><span class="nav-number">11.</span> <span class="nav-text">为什么有静态数据成员的类得到了链接错误？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是”static-initialization-order-fiasco”？"><span class="nav-number">12.</span> <span class="nav-text">什么是”static initialization order fiasco”？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何处理构造函数的失败？"><span class="nav-number">13.</span> <span class="nav-text">如何处理构造函数的失败？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#explicit关键字的作用？"><span class="nav-number">14.</span> <span class="nav-text">explicit关键字的作用？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#待续"><span class="nav-number">15.</span> <span class="nav-text">待续</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">jonnydu</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io" target="_blank" rel="noopener">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" target="_blank" rel="noopener">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+  
+  
+<script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = NexT.utils.escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    NexT.motion.middleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+
+      if (CONFIG.sidebar.display === 'post' || CONFIG.sidebar.display === 'always') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          NexT.utils.displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"jonnydu"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+  
+
+
+
+
+
+  
+  
+  
+
+  
+
+
+</body>
+</html>

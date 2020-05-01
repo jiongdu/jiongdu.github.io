@@ -1,0 +1,789 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="network/linux," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一期一会" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="在现如今的并发网络服务器程序开发中，我们都会见到IO多路复用（Linux下的epoll、Windows下的IOCP等）的影子，它们是各种服务器并发方案（常见并发网络服务程序设计方案）的基础，而我们知道，绝大部分服务器都是运行在Linux系统下，所以，本文就现如今Linux下用的最多的epoll的原理、用法进行一个简单总结。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="epoll总结">
+<meta property="og:url" content="http://blog.jonnydu.me/2016/07/29/epoll/index.html">
+<meta property="og:site_name" content="一期一会">
+<meta property="og:description" content="在现如今的并发网络服务器程序开发中，我们都会见到IO多路复用（Linux下的epoll、Windows下的IOCP等）的影子，它们是各种服务器并发方案（常见并发网络服务程序设计方案）的基础，而我们知道，绝大部分服务器都是运行在Linux系统下，所以，本文就现如今Linux下用的最多的epoll的原理、用法进行一个简单总结。">
+<meta property="article:published_time" content="2016-07-29T11:03:21.000Z">
+<meta property="article:modified_time" content="2020-04-30T14:16:30.272Z">
+<meta property="article:author" content="jonnydu">
+<meta property="article:tag" content="network&#x2F;linux">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '一期一会'
+    }
+  };
+</script>
+
+  <title> epoll总结 | 一期一会 </title>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">一期一会</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CFymCPjb2LHwhFXVjxQk','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                epoll总结
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-07-29T19:03:21+08:00" content="2016-07-29">
+              2016-07-29
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/07/29/epoll/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/07/29/epoll/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在现如今的并发网络服务器程序开发中，我们都会见到IO多路复用（Linux下的epoll、Windows下的IOCP等）的影子，它们是各种服务器并发方案（<a href="http://blog.dujiong.net/2016/05/28/concurrent-server-conclusion/" target="_blank" rel="noopener">常见并发网络服务程序设计方案</a>）的基础，而我们知道，绝大部分服务器都是运行在Linux系统下，所以，本文就现如今Linux下用的最多的epoll的原理、用法进行一个简单总结。   </p>
+<a id="more"></a>
+
+<h3 id="什么是epoll？"><a href="#什么是epoll？" class="headerlink" title="什么是epoll？"></a>什么是epoll？</h3><p>epoll是在Linux 2.6内核中提出的，是之前select/poll的增强版本，相比如后两种IO多路复用版本，它能显著提高程序在大量并发连接中只有少量活跃的情况下的系统CPU利用率，因为它会复用文件描述符集合来传递结果而不用迫使开发者每次等待事件之前都必须重新准备要被侦听的文件描述符集合，另一点提升是获取事件的时候，epoll无须遍历整个被侦听的描述符，只要遍历那些被内核IO事件异步唤醒而加入就绪队列中的描述符集合就行了。此外，epoll除了提供select/poll那种IO事件的电平触发（LT）模式外，还提供边沿触发（ET），这样使得用户空间程序可以缓存IO状态，减少epoll_wait的调用，提高应用程序效率。        </p>
+<h3 id="epoll的优点"><a href="#epoll的优点" class="headerlink" title="epoll的优点"></a>epoll的优点</h3><p>上面笼统的说了一下epoll的一些优点，下面分条做一个总结。<br>（1）支持一个大数目的socket描述符（FD）<br>epoll没有文件描述符的限制，它所支持的FD上限是最大可以打开文件的数目，这个数字远远大于select所支持的1024/2048。可以通过<code>cat /proc/sys/fs/file-max</code>查看这个值，下面是我笔记本上的显示结果。     </p>
+<pre><code>pt@Ubuntu:~$ cat /proc/sys/fs/file-max   
+6815744</code></pre><p>（2）IO效率不随FD数目增加而线性下降<br>传统select/poll的另一个致命弱点是当拥有一个很大的socket集合，由于网络的时延，使得任一时间只有部分的socket是“活跃”的，而select/poll每次调用都会线性扫描全部的集合，导致效率呈现线性下降。epoll对其进行了优化，它只会对“活跃”的socket进行操作：这是因为在内核实现中epoll是根据每个fd上面的callback函数实现的。所以，只有“活跃”的socket才会主动去调用callback函数，其他idle状态的socket则不会。在这点上，epoll实现了一个”伪”AIO”，因为这时候推动力在os内核。在一些 benchmark中，如果所有的socket基本上都是活跃的，比如一个高速LAN环境，epoll也不比select/poll效率低，但若过多使用的调用epoll_ctl，效率稍微有些下降。然而一旦使用idle connections模拟WAN环境，那么epoll的效率就远在select/poll之上了。<br>（3）使用mmap加速内核与用户空间的消息传递<br>无论是select,poll还是epoll都需要内核把FD消息通知给用户空间，如何避免不必要的内存拷贝就显得很重要。在这点上，epoll是通过内核于用户空间mmap同一块内存实现。</p>
+<h3 id="epoll的两种工作模式"><a href="#epoll的两种工作模式" class="headerlink" title="epoll的两种工作模式"></a>epoll的两种工作模式</h3><h4 id="LT模式"><a href="#LT模式" class="headerlink" title="LT模式"></a>LT模式</h4><p>LT（Level Triggered，水平触发）模式，这是缺省的工作模式，同时支持block和non-block socket，在这种模式中，内核告诉你一个文件描述符是否就绪了，然后你可以对这个就绪的fd进行IO操作。如果你不作任何操作，内核还是会继续通知你的，所以，这种模式编程出错误可能性要小一点。传统的select/poll都是这种模型的代表。 </p>
+<h4 id="ET模式"><a href="#ET模式" class="headerlink" title="ET模式"></a>ET模式</h4><p>ET(Edge Triggered，边沿触发)模式，这是高速工作模式，只支持non-block socket。在这种模式下，当描述符从未就绪变为就绪时，内核就通过epoll告诉你，然后它会假设你知道文件描述符已经就绪，并且不会再为那个文件描述符发送更多的就绪通知，直到你做了某些操作而导致那个文件描述符不再是就绪状态(比如你在发送、接收或是接受请求，或者发送接收的数据少于一定量时导致了一个EWOULDBLOCK 错误)。但是请注意，如果一直不对这个fd作IO操作(从而导致它再次变成未就绪)，内核就不会发送更多的通知(only once)。不过在TCP协议中，ET模式的加速效用仍需要更多的benchmark确认。所以，这种方式下，出错率比较高，需要增加一些检测程序。</p>
+<h4 id="使用ET和LT模式"><a href="#使用ET和LT模式" class="headerlink" title="使用ET和LT模式"></a>使用ET和LT模式</h4><p>上面已经说过了二者分别的特点，ET会更高效，但是只支持non-block socket，LT更加易用，且不易出错。个人觉得，一般的场景下，使用LT模式足以解决问题，如果碰到一些特殊场景要使用ET模式，一定要增加出错监测程序。        </p>
+<h3 id="使用epoll"><a href="#使用epoll" class="headerlink" title="使用epoll"></a>使用epoll</h3><p>epoll用到的所有数据结构和函数都是在头文件sys/epoll.h中声明的，下面逐一介绍。    </p>
+<h4 id="相关数据结构"><a href="#相关数据结构" class="headerlink" title="相关数据结构"></a>相关数据结构</h4><pre><code>typedef union epoll_data{
+    void* ptr;
+    int fd;
+    __uint32_t u32;
+    __uint43_t u64;
+}epoll_data_t;
+
+struct epoll_event{
+    __uint32_t events;    //Epoll events
+    epoll_data_t data;    //User data variable    
+};</code></pre><p>结构体epoll_event被用于注册所感兴趣的事件和回传发生待处理的事件。epoll_event 结构体的events字段是表示感兴趣的事件和被触发的事件，可能的取值为：<br>EPOLLIN： 表示对应的文件描述符可以读；<br>EPOLLOUT： 表示对应的文件描述符可以写；<br>EPOLLPRI： 表示对应的文件描述符有紧急的数据可读；<br>EPOLLERR： 表示对应的文件描述符发生错误；<br>EPOLLHUP： 表示对应的文件描述符被挂断；<br>EPOLLET： 表示对应的文件描述符有事件发生；<br>联合体epoll_data用来保存触发事件的某个文件描述符相关的数据。例如一个client连接到服务器，服务器通过调用accept函数可以得到于这个client对应的socket文件描述符，可以把这文件描述符赋给epoll_data的fd字段，以便后面的读写操作在这个文件描述符上进行。</p>
+<h4 id="epoll函数"><a href="#epoll函数" class="headerlink" title="epoll函数"></a>epoll函数</h4><p>1.创建函数<br><code>int epoll_create(int size)</code><br>该函数创建一个epoll实例，通知内核需要监听size个fd。size指的并不是最大的后备存储设备，而是衡量内核内部结构大小的一个提示。当创建成功后，会占用一个fd，所以记得在使用完之后调用close()，否则fd可能会被耗尽。不过，自Linux 2.6.8版本之后，size值没什么作用，只需大于0，因为内核可以动态的分配大小，不需要size这个提示了。<br>2.注册函数<br><code>int epoll_ctl(int epfd, int op, int fd, struct epoll_event* event)</code><br>第一个参数epfd，为上一步epoll_create()返回的epoll fd。<br>第二个参数op表示操作值，有三个类型：<br>EPOLL_CTL_ADD ：注册目标到epfd中，同时关联内部event到fd上<br>EPOLL_CTL_MOD ：修改已经注册到fd的监听事件<br>EPOLL_CTL_DEL ：从epfd中删除/移除已注册的fd<br>第三个参数fd表示需要监听的fd。<br>第四个参数event表示需要监听的事件。<br>3.等待函数<br><code>int epoll_wait(int epfd, structepoll_event * events, int maxevents, int timeout)</code><br>该函数用于轮询IO事件的发生。函数如果等待成功，则返回fd的数字；0表示等待fd超时，其他错误返回errno值。       </p>
+<h4 id="使用综述"><a href="#使用综述" class="headerlink" title="使用综述"></a>使用综述</h4><p>首先通过<code>int create\_epoll(int maxfds)</code>来创建一个epoll的句柄fd，其中maxfds为你的epoll所支持的最大句柄数（现只需设置大于0）。这个函数会返回一个新的epoll句柄，之后的所有操作都将通过这个句柄来进行操作。在用完之后，记得用close()来关闭这个创建出来的fd。<br>然后在你的网络主循环里面，调用epoll_wait(int epfd, epoll_event events, int max_events,int timeout)来查询所有的网络接口，看哪一个可以读，哪一个可以写。基本的语法为： <code>nfds = epoll_wait(kdpfd, events, maxevents, -1);</code> 其中kdpfd为用epoll_create创建之后的句柄，events是一个epoll_event*的指针，当epoll_wait函数操作成功之后，events里面将储存所有的读写事件。max_events是当前需要监听的所有socket句柄数。最后一个timeout参数指示 epoll_wait的超时条件，为0时表示马上返回；为-1时表示函数会一直等下去直到有事件返回；为任意正整数时表示等这么长的时间，如果一直没有事件，则会返回。一般情况下如果网络主循环是单线程的话，可以用-1来等待，这样可以保证一些效率，如果是和主循环在同一个线程的话，则可以用0来保证主循环的效率。epoll_wait返回之后，应该进入一个循环，以便遍历所有的事件。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/network-linux/" rel="tag">#network/linux</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/07/21/internetcompany/" rel="next" title="2015-2016年互联网公司校招编程题汇总">
+                <i class="fa fa-chevron-left"></i> 2015-2016年互联网公司校招编程题汇总
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/08/08/shared-ptr/" rel="prev" title="shared_ptr的注意事项">
+                shared_ptr的注意事项 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/07/29/epoll/"
+           data-title="epoll总结" data-url="http://blog.jonnydu.me/2016/07/29/epoll/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="jonnydu" />
+          <p class="site-author-name" itemprop="name">jonnydu</p>
+          <p class="site-description motion-element" itemprop="description">jonnydu.uestc@gmail.com</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">71</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jiongdu" target="_blank">
+                  
+                    <i class="fa fa-https://github.com/jiongdu"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/3309795495" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 微博
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是epoll？"><span class="nav-number">1.</span> <span class="nav-text">什么是epoll？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#epoll的优点"><span class="nav-number">2.</span> <span class="nav-text">epoll的优点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#epoll的两种工作模式"><span class="nav-number">3.</span> <span class="nav-text">epoll的两种工作模式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#LT模式"><span class="nav-number">3.1.</span> <span class="nav-text">LT模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ET模式"><span class="nav-number">3.2.</span> <span class="nav-text">ET模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用ET和LT模式"><span class="nav-number">3.3.</span> <span class="nav-text">使用ET和LT模式</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用epoll"><span class="nav-number">4.</span> <span class="nav-text">使用epoll</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#相关数据结构"><span class="nav-number">4.1.</span> <span class="nav-text">相关数据结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#epoll函数"><span class="nav-number">4.2.</span> <span class="nav-text">epoll函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用综述"><span class="nav-number">4.3.</span> <span class="nav-text">使用综述</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">jonnydu</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io" target="_blank" rel="noopener">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" target="_blank" rel="noopener">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+  
+  
+<script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = NexT.utils.escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    NexT.motion.middleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+
+      if (CONFIG.sidebar.display === 'post' || CONFIG.sidebar.display === 'always') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          NexT.utils.displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"jonnydu"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+  
+
+
+
+
+
+  
+  
+  
+
+  
+
+
+</body>
+</html>

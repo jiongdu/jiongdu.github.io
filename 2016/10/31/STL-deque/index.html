@@ -1,0 +1,892 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="C++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一期一会" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="C++标准模板库序列式容器中，使用最少的估计就是deque了。但是，了解下deque这种双向开口的连续线性空间容器的底层设计与实现仍是很有帮助的。此外，stack和queue这两种适配器容器（容器底层是调用其他容器）底层实现默认就是使用deque。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++ STL之deque">
+<meta property="og:url" content="http://blog.jonnydu.me/2016/10/31/STL-deque/index.html">
+<meta property="og:site_name" content="一期一会">
+<meta property="og:description" content="C++标准模板库序列式容器中，使用最少的估计就是deque了。但是，了解下deque这种双向开口的连续线性空间容器的底层设计与实现仍是很有帮助的。此外，stack和queue这两种适配器容器（容器底层是调用其他容器）底层实现默认就是使用deque。">
+<meta property="og:image" content="http://i.imgur.com/SsE0h85.png">
+<meta property="article:published_time" content="2016-10-31T09:49:42.000Z">
+<meta property="article:modified_time" content="2020-04-30T14:16:30.268Z">
+<meta property="article:author" content="jonnydu">
+<meta property="article:tag" content="C++">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://i.imgur.com/SsE0h85.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '一期一会'
+    }
+  };
+</script>
+
+  <title> C++ STL之deque | 一期一会 </title>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">一期一会</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CFymCPjb2LHwhFXVjxQk','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                C++ STL之deque
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-10-31T17:49:42+08:00" content="2016-10-31">
+              2016-10-31
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/10/31/STL-deque/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/31/STL-deque/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>C++标准模板库序列式容器中，使用最少的估计就是deque了。但是，了解下deque这种双向开口的连续线性空间容器的底层设计与实现仍是很有帮助的。此外，stack和queue这两种适配器容器（容器底层是调用其他容器）底层实现默认就是使用deque。</p>
+<a id="more"></a>
+<h3 id="与vector比较"><a href="#与vector比较" class="headerlink" title="与vector比较"></a>与vector比较</h3><p>deque和vector的最大差异，一是deque允许常熟时间内对起头端进行元素的插入或移除操作，二在于deque没有所谓容量观念，因为它是动态地以分段连续空间组合而成，随时可以增加一段新的空间并链接起来。即，像vector那样“因旧空间不足而重新配置一块更大空间，然后复制元素，再释放旧空间”这样的事情在deque是不会发生的。也因此，deque没有必要提供所谓的空间保留功能。<br>更具体的，array无法增长，vector虽可增长，却只能向尾端增长，而且所谓增长是个假象，事实上是（1）另觅更大空间；（2）将原数据复制过去；（3）释放原空间 三部曲。<br>deque是由一段一段的定量连续空间构成。一旦有必要在deque的前端或尾端增加新空间，便配置一段定量连续空间，串接在整个deque的头端或尾端。deque的最大任务，便是在这些分段的定量连续空间上，维护其整体连续的假象，并提供随机存取的接口。这样避开了“重新配置、复制、释放”的轮回，代价则是复杂的迭代器架构。    </p>
+<h3 id="deque的中控器和迭代器"><a href="#deque的中控器和迭代器" class="headerlink" title="deque的中控器和迭代器"></a>deque的中控器和迭代器</h3><p>deque底层实现一个中控器，即一个指针数组，其中的每一个元素都是指针，指向另一段连续线性空间，称为缓冲区。缓冲区才是deque的存储空间主体。<br>迭代器由以下四个部分组成：<br>（1）cur：指向缓冲区当前元素。<br>（2）first：指向缓冲区的第一个位置。<br>（3）last：指向末节点，即最后一个元素的下一个位置。<br>（4）node：指向主控器相应的索引位置。<br>中控器、缓冲区、迭代器之间的关系如下图所示。<br><img src="http://i.imgur.com/SsE0h85.png" alt=""><br>以下是中控器和迭代器的相关源代码。     </p>
+<pre><code>template &lt;class T, class Alloc = alloc, size_t BufSiz = 0&gt;
+class deque {
+public:
+    typedef T value_type;
+    typedef value_type* pointer;        
+    ...
+protected:
+    typedef pointer* map_pointer;        //指针的指针
+    map_pointer map;        //map是指针数组，中控器
+    size_type map_size;        //map内可容纳多少指针
+};</code></pre><p>可以看出，中控器map其实是一个T**，即是指向指针的指针，T为元素型别。      </p>
+<pre><code>template &lt;class T, class Ref, class Ptr, size_t BufSiz&gt;
+struct __deque_iterator {
+    typedef __deque_iterator&lt;T, T&amp;, T*, BufSiz&gt; iterator;
+    typedef __deque_iterator&lt;T, const T&amp;, const T*, BufSiz&gt; const_iterator;
+    static size_t buffer_size() { return __deque_buf_size(BufSiz, sizeof(T)); }
+    typedef random_access_iterator_tag iterator_category;    //RandomAccess Iterator
+    typedef T value_type; 
+    typedef Ptr pointer;
+    typedef Ref reference;
+    typedef size_t size_type;
+    typedef ptrdiff_t difference_type;
+    typedef T** map_pointer;                //指向主控器的指针
+
+    T* cur;
+    T* first;
+    T* last;
+    map_pointer node;
+};</code></pre><p>迭代器的四个主要组成：cur、first、last、node的定义。<br>接下来是构造函数和迭代器的重载运算因子。          </p>
+<pre><code>__deque_iterator(T* x, map_pointer y)    //用T类型数据和指向中控器的指针初始化一个迭代器
+    : cur(x), first(*y), last(*y+buffer_size()), node(y) {}
+__deque_iterator() : cur(0), first(0), last(0), node(0) {}    //创建一个空的迭代器
+__deque_iterator(const iterator&amp; x) : cur(x.cur), first(x.first), last(x.last), node(x.node) {}    //复制构造函数
+
+reference operator*() const { return *cur; }
+pointer operator-&gt;() const { return &amp;(operator*()); }
+difference_type operator-(const self&amp; x) const {
+    return difference_type(buffer_size())*(node-x.node-1)+(cur-first)+(x.last-x.cur);
+}
+...
+self&amp; operator+=(difference_type n){
+    difference_type offset=n+(cur-first);
+    if(offset&gt;=0 &amp;&amp; offset&lt;difference_type(buffer_size())){    //目标在同一个缓冲区内
+        cur+=n;
+    }else{            //目标位置不在同一个缓冲区内
+        difference_type node_offset = offset&gt;0 ? offset/difference_type(buffer_size()) : -difference_type((-offset-1) / buffer_size())-1;
+        set_node(node + node_offset);
+        cur = first+(offset-node_offset*difference_type(buffer_size()));
+    }
+    return *this;
+}</code></pre><p>在进行+=n运算时，要判断+n之后的索引是否还在当前缓冲区内，如果在，cur简单+n即可，如果不在，则要计算正确的缓存节点和正确的元素位置。其他+n，-=n，-运算都可以通过+=运算得出。</p>
+<h3 id="deque的结构"><a href="#deque的结构" class="headerlink" title="deque的结构"></a>deque的结构</h3><p>deque除了维护一个指向map的指针外，还维护start、finish两个迭代器，分别指向第一缓冲区的第一个元素和最后缓冲区的最后一个元素（的下一个位置）。    </p>
+<pre><code>template &lt;class T, class Alloc = alloc, size_t BufSiz = 0&gt;
+class deque {
+public:
+    typedef T value_type;
+    typedef value_type* pointer;
+    typedef size_t size_type;
+    typedef __deque_iterator&lt;T, T&amp;, T*, BufSiz&gt; iterator;
+    typedef simple_alloc&lt;value_type, Alloc&gt; data_allocator;
+    typedef simple_alloc&lt;pointer, Alloc&gt; map_allocator;
+    ...
+protected:
+    typedef pointer* map_pointer;
+    iterator start;
+    iterator finish;
+    map_pointer map;
+    size_type map_size;        //map容纳指针的个数    
+    ...
+};</code></pre><h4 id="默认构造函数"><a href="#默认构造函数" class="headerlink" title="默认构造函数"></a>默认构造函数</h4><pre><code>deque()
+    : start(), finish(), map(0), map_size(0) {
+    create_map_nodes(0);
+} </code></pre><p>默认构造函数先初始化两个迭代器为空迭代器，然后设置map和map_size，接着调用create_map_and_nodes(size_type num_elements)来初始化一块内存。</p>
+<pre><code>template&lt;class T, class Alloc, size_t BufSize&gt;
+void deque&lt;T, Alloc, BufSize&gt;::create_map_and_nodes(size_type num_elements) {
+    size_type num_nodes = num_elements/buffer_size() + 1;    //    需要节点数
+    map_size = max(initial_map_size(), num_nodes+2);    //一个map管理的节点数，最少8个，最多是“所需节点加2”
+    map = map_allocator::allocate(map_size);
+
+    map_pointer nstart = map+(map_size-num_nodes)/2;
+    map_pointer nfinish = nstart+num_nodes-1;
+    map_pointer cur;
+
+    __STL_TRY {
+        for(cur=nstart; cur&lt;=nfinish; ++cur){
+            *cur = allocate_node();
+        }
+    }catch(...){
+        ...
+    }
+    //为deque内的两个迭代器设定正确的内容
+    start.set_node(nstart);
+    finish.set_node(nfinish);
+    start.cur = start.first;
+    finish.cur = finish.first + num_elements%buffer_size();
+}</code></pre><h4 id="由n个value初始化的构造函数"><a href="#由n个value初始化的构造函数" class="headerlink" title="由n个value初始化的构造函数"></a>由n个value初始化的构造函数</h4><pre><code>deque(size_type n, const value_type&amp; value)
+    : start(), finish(), map(0), map_size(0) {
+    fill_initialize(n, value);
+}</code></pre><p>该构造函数调用fill_initialize函数来初始化deque，fill_initialize函数负责产生并安排好deque的结构，并将元素的初值设定妥当。     </p>
+<pre><code>template &lt;class T, class Alloc, size_t BufSize&gt;
+void deque&lt;T, Alloc, BufSize&gt;::fill_initialize(
+    size_type n, const value_type&amp; value) {
+    create_map_and_nodes(n);
+    map_pointer cur;
+    __STL_TRY {
+        //为每个节点的缓冲区设定初值
+        for(cur=start.node; cur&lt;finish.node;++cur){
+            uninitialized_fill(*cur, *cur + buffer_size(), value);
+        }
+        uninitialized_fill(finish.first, finish.cur, value);    //最后一个节点单独对待
+    }
+}</code></pre><h4 id="两个迭代器初始化的构造函数"><a href="#两个迭代器初始化的构造函数" class="headerlink" title="两个迭代器初始化的构造函数"></a>两个迭代器初始化的构造函数</h4><pre><code>template &lt;class InputIterator&gt;
+deque(InputIterator first, InputIterator last)
+    : start(), finish(), map(0), map_size(0) {
+    range_initialize(first, last, iterator_category(first));
+}</code></pre><p>该构造函数调用range_initialize来用迭代器范围内的元素初始化deque.range_initialize，根据迭代器类型，调用对应的版本。</p>
+<h4 id="析构函数"><a href="#析构函数" class="headerlink" title="析构函数"></a>析构函数</h4><p>deque的析构函数先是调用destroy析构缓冲区内的数据，然后调用destroy_map_and_nodes函数析构缓冲区和中控器内存。    </p>
+<pre><code>~deque() {
+    destroy(start, finish);
+    destroy_map_and_nodes();
+}</code></pre><h3 id="deque的一些常用操作"><a href="#deque的一些常用操作" class="headerlink" title="deque的一些常用操作"></a>deque的一些常用操作</h3><p>deque所提供的元素操作很多，如pop_back、pop_front、clear、erase、insert等，这里不再一一列举，在理解时，只需把握“deque是多个连续缓冲区组合在一起的分段线性空间”即可。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag">#C++</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/28/STL-list/" rel="next" title="C++ STL之list">
+                <i class="fa fa-chevron-left"></i> C++ STL之list
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/11/05/Redis-event/" rel="prev" title="Redis之事件驱动">
+                Redis之事件驱动 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/10/31/STL-deque/"
+           data-title="C++ STL之deque" data-url="http://blog.jonnydu.me/2016/10/31/STL-deque/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="jonnydu" />
+          <p class="site-author-name" itemprop="name">jonnydu</p>
+          <p class="site-description motion-element" itemprop="description">jonnydu.uestc@gmail.com</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">71</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jiongdu" target="_blank">
+                  
+                    <i class="fa fa-https://github.com/jiongdu"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/3309795495" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 微博
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#与vector比较"><span class="nav-number">1.</span> <span class="nav-text">与vector比较</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#deque的中控器和迭代器"><span class="nav-number">2.</span> <span class="nav-text">deque的中控器和迭代器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#deque的结构"><span class="nav-number">3.</span> <span class="nav-text">deque的结构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#默认构造函数"><span class="nav-number">3.1.</span> <span class="nav-text">默认构造函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#由n个value初始化的构造函数"><span class="nav-number">3.2.</span> <span class="nav-text">由n个value初始化的构造函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#两个迭代器初始化的构造函数"><span class="nav-number">3.3.</span> <span class="nav-text">两个迭代器初始化的构造函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#析构函数"><span class="nav-number">3.4.</span> <span class="nav-text">析构函数</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#deque的一些常用操作"><span class="nav-number">4.</span> <span class="nav-text">deque的一些常用操作</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">jonnydu</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io" target="_blank" rel="noopener">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" target="_blank" rel="noopener">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+  
+  
+<script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = NexT.utils.escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    NexT.motion.middleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+
+      if (CONFIG.sidebar.display === 'post' || CONFIG.sidebar.display === 'always') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          NexT.utils.displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"jonnydu"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+  
+
+
+
+
+
+  
+  
+  
+
+  
+
+
+</body>
+</html>

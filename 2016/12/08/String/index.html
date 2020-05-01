@@ -1,0 +1,786 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="C++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一期一会" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="字符串是C++标准库的一个重要组成部分，本文参照《C++编程思想》中字符串的相关内容，对该部分进行简单总结。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《C++编程思想》之字符串学习笔记">
+<meta property="og:url" content="http://blog.jonnydu.me/2016/12/08/String/index.html">
+<meta property="og:site_name" content="一期一会">
+<meta property="og:description" content="字符串是C++标准库的一个重要组成部分，本文参照《C++编程思想》中字符串的相关内容，对该部分进行简单总结。">
+<meta property="article:published_time" content="2016-12-08T13:10:07.000Z">
+<meta property="article:modified_time" content="2020-04-30T14:16:30.259Z">
+<meta property="article:author" content="jonnydu">
+<meta property="article:tag" content="C++">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '一期一会'
+    }
+  };
+</script>
+
+  <title> 《C++编程思想》之字符串学习笔记 | 一期一会 </title>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">一期一会</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CFymCPjb2LHwhFXVjxQk','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                《C++编程思想》之字符串学习笔记
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-12-08T21:10:07+08:00" content="2016-12-08">
+              2016-12-08
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/12/08/String/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/12/08/String/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>字符串是C++标准库的一个重要组成部分，本文参照《C++编程思想》中字符串的相关内容，对该部分进行简单总结。</p>
+<a id="more"></a>
+<h3 id="C字符型数组和C-字符串"><a href="#C字符型数组和C-字符串" class="headerlink" title="C字符型数组和C++字符串"></a>C字符型数组和C++字符串</h3><p>在C语言中，字符串基本上就是字符串数组，并且总是以二进制零（空结束符）作为最末元素。C++ string与它们在C语言中的前身截然不同。首先，也是最重要的不同点，C++隐藏了它所包含的字符序列的物理表示。程序设计人员不必关心数组的维数或空结束符方面的问题。C++ string对象知道自己在内存中的开始位置、包含的内容、包含的字符长度以及在必需重新调整内部缓冲区的大小之前自己可以增长到的最大字符长度。C++字符串极大地减少了C语言编程中最常见且最具破坏性的错误：（1）超越数组边界；（2）通过未被初始化或被赋以错误值的指针来访问数组元素；（3）在释放了某一数组原先所分配的存储单元后仍保留了“悬挂”指针。<br>C++标准没有定义字符串类内存布局的确切实现。采用这种体系结构是为了获得足够的灵活性，从而允许不同的编译器厂商能够提供不同的实现，并且向用户保证提供可预测的行为。</p>
+<h3 id="创建并初始化C-字符串"><a href="#创建并初始化C-字符串" class="headerlink" title="创建并初始化C++字符串"></a>创建并初始化C++字符串</h3><p>创建C++ string一般有以下几种方式：<br>（1）<code>string temp;</code>  创建空string对象，且并不立即用字符数据对其初始化；<br>（2）<code>string temp(&quot;hello world&quot;);</code>  将一个文字的引用数组作为参数传递给构造函数，以此来对一个string对象进行初始化；<br>（3）<code>string temp = &quot;hello world&quot;;</code>  用等号来初始化一个string对象;<br>（4）<code>string temp(str);</code>        用一个string对象看来初始化另一个string对象。<br>另外，还有一些相关的成员函数和特性：<br>（1）用operator+来将不同的初始化数据源结合在一起；</p>
+<pre><code>string s1(&quot;hello&quot;);
+std::cout &lt;&lt; s1 + &quot; world&quot; &lt;&lt; std::endl;        //hello world</code></pre><p>（2）用string对象的成员函数substr()来创建一个子串。</p>
+<pre><code>string s1(&quot;hello world, hello&quot;);
+std::cout &lt;&lt; s1.substr(0, 11) &lt;&lt; std::endl;        //hello world   \</code></pre><p>string类对象的成员函数substr()将开始位置作为其第一个参数，而将待选字符的个数作为其第2个参数。<br>（3）将string看做容器对象，利用string类的迭代器string::begin()和string::end()。</p>
+<pre><code>string s1(&quot;hello world&quot;);
+string s2(s1.begin(), s2.end());
+std::cout &lt;&lt; s2 &lt;&lt; std::endl;        //hello world</code></pre><p>不可以使用单个的字符、ASCII码或其他整数值来初始化C++字符串。</p>
+<h3 id="字符串的操作"><a href="#字符串的操作" class="headerlink" title="字符串的操作"></a>字符串的操作</h3><p>标准C语言的char型数组工具中存在着其固有的误区，那就是它们都显示地依赖一种假设：字符数组包括一个空结束符。若由于疏忽或是其他差错，这个空结束符被忽略或重写，这个小小的差错就会使C语言的char数组处理函数几乎不可避免地操作其已分配空间之外的内存，有时会带来灾难性后果。<br>C++提供的string类对象，在使用的便利性和安全性上都有很大的提高。     </p>
+<h4 id="追加、插入和连接字符串"><a href="#追加、插入和连接字符串" class="headerlink" title="追加、插入和连接字符串"></a>追加、插入和连接字符串</h4><p>C++字符串一个便于使用的特色是：无需程序员干预，可根据需要自行扩充规模。这样程序员不再需要跟踪字符串的存储边界。此外，当字符串增长时，字符串成员函数append()–(追加)和insert()–(插入)很明显地重新分配了存储空间。<br>此外，还有一些成员函数：capacity()返回当前分配的存储空间的规模；reserve(int size)提供一种优化机制，按照程序员的意图，预留一定数量的存储空间，以便将来使用。而如果要生成的新字符串的规模比当前的字符串大或者需要截断原字符串，resize()函数就会在字符串的末尾追加空格或是指定的字符。</p>
+<h4 id="替换字符串的字符"><a href="#替换字符串的字符" class="headerlink" title="替换字符串的字符"></a>替换字符串的字符</h4><p>insert()使程序员放心地向字符串中插入字符，而不必担心会使存储空间越界，或者会改写插入点之后紧跟的字符。存储空间增大了，原有的字符会该改变其存储位置，以便安置新元素。<br>replace()用于替换（删除）字符串中的字符，如果对replace()的调用使“替换”超出了原有序列的边界，这与追加操作是等价的，这样replace()也会增加存储空间。<br>此外，我们知道，STL中的算法功能很强大，由于string类几乎可以与STL容器等价，因此，string的很多解决方案可以由标准库的算法完成。比如，使用<code>std::replace(s.begin(), s.end(), &#39;X&#39;, &#39;Y&#39;)</code>将字符串中出现的某个字符（’X’）全部用另一个字符(‘Y’)替换掉。这里的replace()是STL通用算法，不是string的成员函数。</p>
+<h4 id="使用非成员重载运算符连接"><a href="#使用非成员重载运算符连接" class="headerlink" title="使用非成员重载运算符连接"></a>使用非成员重载运算符连接</h4><p>C++ string类另一个令人欣喜的特性是可以借助operator+和operator+=来轻易地实现字符串的合并与追加操作。</p>
+<pre><code>string str(&quot;hello&quot;);
+str += &quot; world&quot;;
+cout &lt;&lt; str &lt;&lt; endl;        //hello world</code></pre><h3 id="字符串的查找"><a href="#字符串的查找" class="headerlink" title="字符串的查找"></a>字符串的查找</h3><p>string成员函数中的find族是用来在给定字符串中定位某个或某组字符的。包括：<br>（1）find()：在字符串中查找一个指定的单个字符或字符组；<br>（2）find_first_of()：查找第一个与指定字符组任何字符匹配的字符位置；<br>（3）find_first_not_of()：查找第一个与指定字符组任何字符都不匹配的字符位置；<br>（4）find_last_of();<br>（5）find_last_not_of();<br>（6）rfind()：对一个字符串从尾到头查找指定的字符或字符组，返回首次匹配的开始位置。<br>string类中没有改变字符串大小写的函数，可以借助于标准C语言的toupper()和tolower()实现，这两个函数以此只能改变一个字符的大小写。</p>
+<h3 id="字符串的删除"><a href="#字符串的删除" class="headerlink" title="字符串的删除"></a>字符串的删除</h3><p>使用erase()成员函数删除字符串中的字符，该函数有两个参数：一个参数表示开始删除字符的位置（默认值是0）；另一个表示要删除多少个字符（默认值是string::npos）。如果指定删除的字符个数比字符串中剩余的字符还多，那么剩余的字符将全部删除，所以，调用不含参数的erase()函数将删除字符串中的所有字符。</p>
+<h3 id="字符串的比较"><a href="#字符串的比较" class="headerlink" title="字符串的比较"></a>字符串的比较</h3><p>字符串的比较，简而言之就是：当两个字符串比较遇到第一对不同的字符时，字符串s1中第一个不同的字符比字符串s2中同样位置的字符在ASCII表中的位置更靠后，那么s1“大于”s2。<br>C++提供了多种字符串比较方法，它们各具特色。其中最简单的就是使用非成员的重载运算符函数：operator==、operator!=、operator&gt;、operator&lt;、operator&gt;=、operator&lt;=。<br>此外，string类还提供compare()成员函数，用以提供更复杂紧密的比较手段。用多种重载版本来对比较的字串做控制。<br>C语言中获取字符串中的某个字符都是采用数组索引法（[]）,C++ string提供一种s[n]表示法的替代方法：at()成员函数。如果不出异常，这两种索引机制在C++中产生的结果是一样的。而有异常的情况时，比如程序员引用了一个超过边界的数组元素，at()将会友好地抛出一个异常，而普通的[]下标语法将让程序员自行决策。at()成员函数抛出的是一个out_of_range类对象，它(最终)派生于std::exception。程序可在一个异常处理器中捕获该对象，并采取适当的补救措施，比如重新计算越界下标或扩充数组。而string::operator<a href=""></a>不会有那样的保护性，它的危险性等同于C语言中国对char型数组的处理。    </p>
+<h3 id="C语言函数处理时的转换"><a href="#C语言函数处理时的转换" class="headerlink" title="C语言函数处理时的转换"></a>C语言函数处理时的转换</h3><p>C++ string提供了c_str()函数返回一个const char*，它指向一个C语言风格的具有“空结束符”的字符串，此字符串与string对象的内容等价。当想将一个字符串传送给一个标准C语言函数时，比如atoi()、printf()，const char*可派上用场。不过，用c_str()的返回值作为非const参数应用于任一函数都是错误的。    </p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag">#C++</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/03/Redis-RDB-AOF/" rel="next" title="Redis两种持久化方式比较">
+                <i class="fa fa-chevron-left"></i> Redis两种持久化方式比较
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/11/Effective-STL-1/" rel="prev" title="使用vector和string时需注意的问题">
+                使用vector和string时需注意的问题 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/12/08/String/"
+           data-title="《C++编程思想》之字符串学习笔记" data-url="http://blog.jonnydu.me/2016/12/08/String/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="jonnydu" />
+          <p class="site-author-name" itemprop="name">jonnydu</p>
+          <p class="site-description motion-element" itemprop="description">jonnydu.uestc@gmail.com</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">71</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jiongdu" target="_blank">
+                  
+                    <i class="fa fa-https://github.com/jiongdu"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/3309795495" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 微博
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#C字符型数组和C-字符串"><span class="nav-number">1.</span> <span class="nav-text">C字符型数组和C++字符串</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建并初始化C-字符串"><span class="nav-number">2.</span> <span class="nav-text">创建并初始化C++字符串</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#字符串的操作"><span class="nav-number">3.</span> <span class="nav-text">字符串的操作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#追加、插入和连接字符串"><span class="nav-number">3.1.</span> <span class="nav-text">追加、插入和连接字符串</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#替换字符串的字符"><span class="nav-number">3.2.</span> <span class="nav-text">替换字符串的字符</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用非成员重载运算符连接"><span class="nav-number">3.3.</span> <span class="nav-text">使用非成员重载运算符连接</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#字符串的查找"><span class="nav-number">4.</span> <span class="nav-text">字符串的查找</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#字符串的删除"><span class="nav-number">5.</span> <span class="nav-text">字符串的删除</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#字符串的比较"><span class="nav-number">6.</span> <span class="nav-text">字符串的比较</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#C语言函数处理时的转换"><span class="nav-number">7.</span> <span class="nav-text">C语言函数处理时的转换</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">jonnydu</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io" target="_blank" rel="noopener">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" target="_blank" rel="noopener">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+  
+  
+<script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = NexT.utils.escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    NexT.motion.middleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+
+      if (CONFIG.sidebar.display === 'post' || CONFIG.sidebar.display === 'always') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          NexT.utils.displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"jonnydu"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+  
+
+
+
+
+
+  
+  
+  
+
+  
+
+
+</body>
+</html>

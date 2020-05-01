@@ -1,0 +1,782 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="NVMe over RDMA," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一期一会" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="在存储的那些词儿一文中已经提到了NVMe是使用PCIe通道的一种逻辑设备接口标准（是接口标准，不是接口！），本文将进一步地分析NVMe的设计及其带来的性能提升。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NVMe技术浅析">
+<meta property="og:url" content="http://blog.jonnydu.me/2017/02/17/NVMe/index.html">
+<meta property="og:site_name" content="一期一会">
+<meta property="og:description" content="在存储的那些词儿一文中已经提到了NVMe是使用PCIe通道的一种逻辑设备接口标准（是接口标准，不是接口！），本文将进一步地分析NVMe的设计及其带来的性能提升。">
+<meta property="og:image" content="http://i.imgur.com/INLzJpX.png">
+<meta property="og:image" content="http://i.imgur.com/vl7O3dS.png">
+<meta property="og:image" content="http://i.imgur.com/Z25eGGp.png">
+<meta property="og:image" content="http://i.imgur.com/bIIfhg0.png">
+<meta property="og:image" content="http://i.imgur.com/8IzJSna.png">
+<meta property="og:image" content="http://i.imgur.com/L8WPeKE.png">
+<meta property="og:image" content="http://i.imgur.com/sRJyKnc.png">
+<meta property="og:image" content="http://i.imgur.com/riHdErF.png">
+<meta property="og:image" content="http://i.imgur.com/UmkUyR6.png">
+<meta property="og:image" content="http://i.imgur.com/vd75vaC.png">
+<meta property="article:published_time" content="2017-02-17T12:09:40.000Z">
+<meta property="article:modified_time" content="2020-04-30T14:16:30.271Z">
+<meta property="article:author" content="jonnydu">
+<meta property="article:tag" content="NVMe over RDMA">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://i.imgur.com/INLzJpX.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '一期一会'
+    }
+  };
+</script>
+
+  <title> NVMe技术浅析 | 一期一会 </title>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">一期一会</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CFymCPjb2LHwhFXVjxQk','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                NVMe技术浅析
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-02-17T20:09:40+08:00" content="2017-02-17">
+              2017-02-17
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/02/17/NVMe/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/17/NVMe/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在<a href="http://blog.dujiong.net/2017/02/13/storage/" target="_blank" rel="noopener">存储的那些词儿</a>一文中已经提到了NVMe是使用PCIe通道的一种逻辑设备接口标准（是接口标准，不是接口！），本文将进一步地分析NVMe的设计及其带来的性能提升。</p>
+<a id="more"></a>
+<h3 id="NVMe设计"><a href="#NVMe设计" class="headerlink" title="NVMe设计"></a>NVMe设计</h3><p>NVMe指定了Host与SSD之间通信的命令，以及命令执行的流程。NVMe由两种命令组成，一种是Admin Command，用于Host管理和控制SSD；另外一种是I/O Command，用于Host和SSD之间数据的传输。<br>同ATA中定义的命令相比，NVMe的命令个数少了很多，完全就是为SSD量身定制的。这里放一张NVMe1.2支持的IO Command列表。<br><img src="http://i.imgur.com/INLzJpX.png" alt=""><br>除了指定Host与SSD之间的通信命令以外，NVMe还定义了命令的执行流程。NVMe中定义了三个关键组件用于命令和数据的处理：Submission Queue（SQ）、Completion Queue（CQ）和Doorbell Register（DB）。SQ和CQ位于Host的内存中，DB位于SSD的控制器内部。在详细说明NVMe命令的处理流程之前，先上一张图宏观感受下PCIe系统和NVMe的结合。图中的NVMe Subsystem一般就是SSD，作为一个PCIe Endpoint通过PCIe连接着Root Complex（RC），然后RC连接着CPU和内存。<br><img src="http://i.imgur.com/vl7O3dS.png" alt=""><br>下面通过SQ、CQ和DB这三个关键组件来总体认识NVMe是如何处理命令的。SQ位于内存中，Host要发送命令时，先把准备好的命令放在SQ中（每个命令条目大小是64字节），然后通知SSD来取；在通知中发挥作用的就是DB寄存器，Host通过写SSD端的DB寄存器来告知SSD执行命令；此外，CQ也是位于Host内存中，一个命令执行完成，成功或失败，SSD总会往CQ中写入命令完成状态（每个条目是16字节）。<br>下图展示了NVMe一次完整处理指令的流程，共八步：<br>（1）Host将指令写到SQ；<br>（2）Host写DB，通知SSD取指令；<br>（3）SSD收到通知，从SQ中取走指令；<br>（4）SSD执行指令；<br>（5）指令执行完成，SSD往CQ写入指令执行结果；<br>（6）SSD通知Host指令执行完成；<br>（7）Host收到通知，处理CQ，查看指令完成状态；<br>（8）Host处理完CQ中的指令执行结果，通过DB回复SSD。<br><img src="http://i.imgur.com/Z25eGGp.png" alt="">   </p>
+<h4 id="SQ-CQ-DB详细分析"><a href="#SQ-CQ-DB详细分析" class="headerlink" title="SQ/CQ/DB详细分析"></a>SQ/CQ/DB详细分析</h4><p>如前文所述，SQ/CQ/DB是NVMe处理命令的关键。Host往SQ中写入命令，SSD往CQ中写入命令完成结果。NVMe中有两种SQ和CQ，一种是Admin SQ，用于放Admin命令；一种是I/O SQ，放I/O命令。如下图所示，系统中只有一对Admin SQ/CQ，它们是一一对应的关系；I/O SQ/CQ却可以有很多，最大值65535（64K-1）。此外，Host端每个Core可以有一个或多个SQ，但只有一个CQ，即SQ与CQ可以是一对一或多对一的关系。这样设计的原因有二：一是性能需求，一个Core中有多线程，可以做到一个线程独享一个SQ；二是QoS需求，可以对多个SQ设置不同的优先级。<br><img src="http://i.imgur.com/bIIfhg0.png" alt=""><br>此外，作为队列，每个SQ和CQ都有一定的深度，对Admin SQ/CQ来说，其深度可以是2-4096（4K），对I/O SQ/CQ，队列深度可以是2-65536（64K）。<br>综上，NVMe中SQ/CQ的个数可以配置，每个SQ/CQ的深度也可以配置，即NVMe的性能是可以通过配置队列个数和队列深度来灵活调节的。这一点和AHCI相比是巨大的提升，因为我们知道，AHCI只有一个命令队列，且队列深度是固定的32。<br>说了这么多SQ和CQ，DB呢？我们知道，SQ和CQ都是队列（且是环形队列），队列的头尾很重要，头决定谁会最先被服务，尾决定新到来命令的位置。所以，我们需要记录SQ和CQ的头尾位置，这就是DB的作用之一。DB是在SSD端的寄存器，记录SQ和CQ的头尾位置。每个SQ或CQ，都有两个对应的DB：Head DB和Tail DB。<br><img src="http://i.imgur.com/8IzJSna.png" alt=""><br>从上图可以看出，这是一个生产者/消费者模型。对一个SQ来说，它的生产者是Host，因为它往SQ的Tail位置写入命令，消费者是SSD，它从SQ的Head取出指令执行。CQ则刚好相反，生产者是SSD，消费者是Host。<br>DB的另一个作用是通知，Host更新SQ Tail DB的同时，也是在告知SSD有新的命令需要处理；Host更新CQ Head DB的同时，也是在告知SSD返回的命令完成状态信息已经被处理。<br>下面以一个实例来说明SQ/CQ/DB三者配合的详细过程。<br>（1）开始时假设SQ1和CQ1是空的，Head=Tail=0；<br><img src="http://i.imgur.com/L8WPeKE.png" alt=""><br>（2）Host往SQ1中写入三个命令，SQ1的Tail变为3。Host在往SQ1写入三个命令后，同时去更新SSD Controller的SQ1 Tail DB寄存器，值为3。Host更新这个寄存器的同时，也是在告诉SSD Controller，有新命令了。<br><img src="http://i.imgur.com/sRJyKnc.png" alt=""><br>（3）SSD Controller收到通知后，于是派人去SQ1把3个命令都取回来执行。SSD把SQ1的三个命令都消费了，SQ1的Head从而也调整为3，SSD Controller会把这个Head值写入到本地的SQ1 Head DB寄存器。<br><img src="http://i.imgur.com/riHdErF.png" alt=""><br>（4）SSD执行完了两个命令，于是往CQ1中写入两个命令完成信息，同时更新CQ1对应的Tail DB寄存器，值为2。同时，SSD发消息给Host告知有命令完成。<br><img src="http://i.imgur.com/UmkUyR6.png" alt=""><br>（5）Host收到SSD的通知后，从CQ1中取出那两条完成信息处理。待处理完毕，Host往CQ1 Head DB寄存器中写入CQ1的head，值为2。<br><img src="http://i.imgur.com/vd75vaC.png" alt=""><br>这样，就完成了一次完整的命令处理。    </p>
+<h3 id="NVMe总结"><a href="#NVMe总结" class="headerlink" title="NVMe总结"></a>NVMe总结</h3><p>NVMe所带来的重大改进主要包含以下几方面：一是低延迟，低延时和良好的并行性可以让SSD的随机性能大幅提升；其次是支持多队列和更高的队列深度，多队列让CPU的性能得到更好的释放，而队列深度从32提升到最大64K，则大幅提升了SSD的IOPS能力；然后是NVMe的低功耗，其加入了自动功耗状态切换和动态能耗管理功能；最后是其驱动的适用性广，解决了不同PCIe SSD之间的驱动适用性问题。支持NVMe标准的PCIe SSD可适用于多个不同平台，也不需要厂商独立提供驱动支持。目前Windows、Linux、Solaris、Unix、VMware、UEFI等都加入了对NVMe SSD的支持。</p>
+<h3 id="附"><a href="#附" class="headerlink" title="附"></a>附</h3><p>特别鸣谢：<br><a href="http://www.ssdfans.com/" target="_blank" rel="noopener">ssdfans</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/NVMe-over-RDMA/" rel="tag">#NVMe over RDMA</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/13/storage/" rel="next" title="存储的那些词儿">
+                <i class="fa fa-chevron-left"></i> 存储的那些词儿
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/27/RDMA/" rel="prev" title="RDMA技术浅析">
+                RDMA技术浅析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/02/17/NVMe/"
+           data-title="NVMe技术浅析" data-url="http://blog.jonnydu.me/2017/02/17/NVMe/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="jonnydu" />
+          <p class="site-author-name" itemprop="name">jonnydu</p>
+          <p class="site-description motion-element" itemprop="description">jonnydu.uestc@gmail.com</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">71</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jiongdu" target="_blank">
+                  
+                    <i class="fa fa-https://github.com/jiongdu"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/3309795495" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 微博
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#NVMe设计"><span class="nav-number">1.</span> <span class="nav-text">NVMe设计</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#SQ-CQ-DB详细分析"><span class="nav-number">1.1.</span> <span class="nav-text">SQ&#x2F;CQ&#x2F;DB详细分析</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NVMe总结"><span class="nav-number">2.</span> <span class="nav-text">NVMe总结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#附"><span class="nav-number">3.</span> <span class="nav-text">附</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">jonnydu</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io" target="_blank" rel="noopener">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" target="_blank" rel="noopener">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+  
+  
+<script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = NexT.utils.escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    NexT.motion.middleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+
+      if (CONFIG.sidebar.display === 'post' || CONFIG.sidebar.display === 'always') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          NexT.utils.displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"jonnydu"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+  
+
+
+
+
+
+  
+  
+  
+
+  
+
+
+</body>
+</html>

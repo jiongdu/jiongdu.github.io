@@ -1,0 +1,842 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="进程/线程/并发," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一期一会" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="协程，顾名思义，是“协作的例程”。跟具有操作系统概念的线程不一样，协程是在用户空间利用程序语言的语法语义就能实现逻辑上类似多任务的编程技巧。协程可以在运行期间的某个点上暂停执行，并在恢复运行时从暂停的点上继续执行。协程已经被证明是一种非常有用的程序组件，不仅被Python、lua、ruby等脚本语言广泛语言，还被新一代面多核的编程语言如golang等作为并发的基本单位。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="协程">
+<meta property="og:url" content="http://blog.jonnydu.me/2016/12/23/Coroutine/index.html">
+<meta property="og:site_name" content="一期一会">
+<meta property="og:description" content="协程，顾名思义，是“协作的例程”。跟具有操作系统概念的线程不一样，协程是在用户空间利用程序语言的语法语义就能实现逻辑上类似多任务的编程技巧。协程可以在运行期间的某个点上暂停执行，并在恢复运行时从暂停的点上继续执行。协程已经被证明是一种非常有用的程序组件，不仅被Python、lua、ruby等脚本语言广泛语言，还被新一代面多核的编程语言如golang等作为并发的基本单位。">
+<meta property="og:image" content="http://i.imgur.com/SvtkRI7.png">
+<meta property="og:image" content="http://i.imgur.com/FbFrKKW.png">
+<meta property="article:published_time" content="2016-12-23T10:41:42.000Z">
+<meta property="article:modified_time" content="2020-04-30T14:16:30.277Z">
+<meta property="article:author" content="jonnydu">
+<meta property="article:tag" content="进程&#x2F;线程&#x2F;并发">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://i.imgur.com/SvtkRI7.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '一期一会'
+    }
+  };
+</script>
+
+  <title> 协程 | 一期一会 </title>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">一期一会</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CFymCPjb2LHwhFXVjxQk','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                协程
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-12-23T18:41:42+08:00" content="2016-12-23">
+              2016-12-23
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/12/23/Coroutine/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/12/23/Coroutine/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>协程，顾名思义，是“协作的例程”。跟具有操作系统概念的线程不一样，协程是在用户空间利用程序语言的语法语义就能实现逻辑上类似多任务的编程技巧。协程可以在运行期间的某个点上暂停执行，并在恢复运行时从暂停的点上继续执行。协程已经被证明是一种非常有用的程序组件，不仅被Python、lua、ruby等脚本语言广泛语言，还被新一代面多核的编程语言如golang等作为并发的基本单位。  </p>
+<a id="more"></a>   
+<h3 id="协程的特点"><a href="#协程的特点" class="headerlink" title="协程的特点"></a>协程的特点</h3><p>协程的调度完全由用户控制，一个线程可以有多个协程，每个协程都是循环按照指定的任务清单顺序完成不同的任务，当任务被阻塞的时候执行下一个任务，当恢复的时候再回来执行这个任务，任务之间的切换只需要保存每个任务的上下文内容，就像直接操作栈一样，这样就完全没有内核切换的开销，可以不加锁的访问全局变量，所以上下文的切换非常快。<br>因此，与传统的抢占式线程相比，协程主要具有以下两个优点：<br>（1）与线程不同，线程是自己主动让出CPU，并交付它期望的下一个协程运行，而不是在任何时候都有可能被系统调度打断。因此协程的使用更加清晰易懂，并且大多数情况下不需要锁机制。<br>（2）与线程相比，协程的切换由程序控制，发生在用户空间而非内核空间，因此切换的代价非常小。    </p>
+<h3 id="进程与线程"><a href="#进程与线程" class="headerlink" title="进程与线程"></a>进程与线程</h3><p>下面简单回顾下进程与线程的概念。   </p>
+<h4 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h4><p>进程是具有一定独立功能的程序关于某个数据集合上的一次活动，进程是系统进行资源分配和调度的单位。<br>进程之间不共享任何状态，进程的调度由操作系统完成，每个进程都有自己的独立的内存空间，而进程间的通信主要是通过信号传递的方式来实现的，实现的方式有多种，如信号量、管道等，但是任何一种方式的通信都需要通过内核，因此效率比较低。同时，由于进程拥有的是独立的内存空间，所以在进行上下文切换的时候需要先保存调用栈的信息，CPU各寄存器的信息，虚拟内存以及打开的句柄等信息，所以导致进程间切换开销很大。</p>
+<h4 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h4><p>线程是进程的一个实体，是CPU调度的基本单位，它是比进程更小的能独立运行的基本单位。线程自己基本上不拥有系统资源，只拥有一点再运行中比不可少的资源（如程序计数器、一些寄存器和栈），它与同一个进程的其他线程共享所拥有的全部资源。<br>线程之间共享变量，解决了通信麻烦的问题，但同时，多个线程对变量的访问需要进行同步与互斥操作。线程的调度也主要由操作系统完成，一个进程可以拥有多个线程，每个线程会共享父进程向操作系统申请的资源，包括虚拟内存，文件等，因此创建线程所需的资源要比进程小很多，相应的可创建的线程数量也变得多很多。线程之间的通信除了可以使用进程之间通信的方式之外还可以通过共享内存的方式，此外，在线程调度方面，由于线程间共享进程的资源，所以上下文切换的时候需要保存的东西相对少些，上下文也因此高效一些。     </p>
+<h3 id="构建C协程"><a href="#构建C协程" class="headerlink" title="构建C协程"></a>构建C协程</h3><p>C/C++不直接支持协程语义，但目前已有不少开源的协程库，本文以其中最常用的使用glibc的ucontext组件的实现方式进行说明。</p>
+<h4 id="ucontext组件"><a href="#ucontext组件" class="headerlink" title="ucontext组件"></a>ucontext组件</h4><p>ucontext组件是GNU C库提供的一组用于创建、保存、切换用户态执行”上下文”的API。主要包括以下两个结构体和四个函数：</p>
+<pre><code>//mcontest_t类型与机器相关，并且不透明
+typedef struct ucontext {
+    struct ucontext* uc_link;    //链接下一个执行的上下文
+    sigset_t uc_sigmask;    //阻塞信号集合
+    stack_t uc_stack;        //该上下文中使用的栈
+    mcontext_t uc_mcontest;
+    ...
+} ucontext_t;
+
+//初始化一个ucontext_t类型的结构，即用户执行上下文。
+//函数指针func指明了该context的入口函数，argc指入口参数个数    
+void makecontext(ucontext_t *ucp, void (*func)(), int argc, ...);
+//&quot;原子&quot;地完成旧状态的保存和切换到新状态的工作
+int swapcontext(ucontext_t *oucp, ucontext_t *ucp);
+//将当前执行上下文保存到ucp中，若后续调用setcontext或swapcontext恢复状态，
+//则程序会沿着getcontext调用点之后继续执行，看起来好像刚从getcontext函数返回一样。
+int getcontext(ucontext_t *ucp);
+//将当前程序执行线索切换到ucp所指向的上下文状态，
+//在执行正确的情况下，该函数直接切入到新的执行状态，不再回返回
+int setcontext(const ucontext_t *ucp);</code></pre><p>来看一个简单的实例：</p>
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;ucontext.h&gt;
+#include &lt;unistd.h&gt;
+
+int main()
+{
+    ucontext_t context;
+
+    getcontext(&amp;context);    
+    puts(&quot;hello world&quot;);
+    sleep(1);
+    setcontext(&amp;context);
+    return 0;
+}         </code></pre><p>运行结果如下：<br><img src="http://i.imgur.com/SvtkRI7.png" alt="">               </p>
+<p>程序通过getcontext保存了一个上下文，然后输出”hello world”，睡一秒后执行到setcontext，恢复上下文到getcontext之后，重新执行代码，所以程序不断输出“hello world”。   </p>
+<h4 id="使用ucontext实现线程切换"><a href="#使用ucontext实现线程切换" class="headerlink" title="使用ucontext实现线程切换"></a>使用ucontext实现线程切换</h4><p>虽然我们称协程是一个用户态的轻量级线程，但实际上多个协程同属于一个线程。任意一个时刻，同一个线程不可能同时运行两个协程。<br>接下来通过一个实例说明协程与主函数的切换，即实现协程的调度。 </p>
+<pre><code>#include &lt;ucontext.h&gt;
+#include &lt;stdio.h&gt;
+
+void func1(void *arg)
+{
+    puts(&quot;1&quot;);
+    puts(&quot;11&quot;);
+    puts(&quot;111&quot;);
+    puts(&quot;1111&quot;);
+}
+
+void context_test()
+{
+    char stack[1024*128];
+    ucontext_t child, main;
+    getcontext(&amp;child);
+    child.uc_stack.ss_sp = stack;
+    child.uc_stack.ss_size = sizeof(stack);
+    child.uc_link = &amp;main;
+    makecontext(&amp;child, (void (*)(void))func1, 0);
+    swapcontext(&amp;main, &amp;child);
+    puts(&quot;main&quot;);
+}
+
+int main()
+{
+    context_test();
+    return 0;
+}</code></pre><p>运行结果如下图所示。<br><img src="http://i.imgur.com/FbFrKKW.png" alt=""><br>在context_test中，创建了一个用户线程（协程）child，其运行的函数为func1，指定后继上下文为main，当func1返回后激活后继上下文，继续执行main函数。</p>
+<h3 id="开源C-C-协程库"><a href="#开源C-C-协程库" class="headerlink" title="开源C/C++协程库"></a>开源C/C++协程库</h3><p>最后，罗列几个比较出名的开源C/C++协程库，后面争取再深入学习下。<br>libco： <a href="http://code.tencent.com/libco.html" target="_blank" rel="noopener">腾讯的开源协程库</a><br>coroutine: <a href="https://github.com/cloudwu/coroutine/" target="_blank" rel="noopener">云风大牛的作品</a><br>Protothreads: <a href="http://coolshell.cn/articles/10975.html" target="_blank" rel="noopener">一个”蝇量级”C语言协程库</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E8%BF%9B%E7%A8%8B-%E7%BA%BF%E7%A8%8B-%E5%B9%B6%E5%8F%91/" rel="tag">#进程/线程/并发</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/19/Effective-STL-2/" rel="next" title="使用STL算法时需注意的问题">
+                <i class="fa fa-chevron-left"></i> 使用STL算法时需注意的问题
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/30/Effective-STL-3/" rel="prev" title="更好地使用STL关联容器">
+                更好地使用STL关联容器 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/12/23/Coroutine/"
+           data-title="协程" data-url="http://blog.jonnydu.me/2016/12/23/Coroutine/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="jonnydu" />
+          <p class="site-author-name" itemprop="name">jonnydu</p>
+          <p class="site-description motion-element" itemprop="description">jonnydu.uestc@gmail.com</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">71</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jiongdu" target="_blank">
+                  
+                    <i class="fa fa-https://github.com/jiongdu"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/3309795495" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 微博
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#协程的特点"><span class="nav-number">1.</span> <span class="nav-text">协程的特点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#进程与线程"><span class="nav-number">2.</span> <span class="nav-text">进程与线程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#进程"><span class="nav-number">2.1.</span> <span class="nav-text">进程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#线程"><span class="nav-number">2.2.</span> <span class="nav-text">线程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#构建C协程"><span class="nav-number">3.</span> <span class="nav-text">构建C协程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ucontext组件"><span class="nav-number">3.1.</span> <span class="nav-text">ucontext组件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用ucontext实现线程切换"><span class="nav-number">3.2.</span> <span class="nav-text">使用ucontext实现线程切换</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#开源C-C-协程库"><span class="nav-number">4.</span> <span class="nav-text">开源C&#x2F;C++协程库</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">jonnydu</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io" target="_blank" rel="noopener">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" target="_blank" rel="noopener">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+  
+  
+<script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = NexT.utils.escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    NexT.motion.middleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+
+      if (CONFIG.sidebar.display === 'post' || CONFIG.sidebar.display === 'always') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          NexT.utils.displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"jonnydu"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+  
+
+
+
+
+
+  
+  
+  
+
+  
+
+
+</body>
+</html>

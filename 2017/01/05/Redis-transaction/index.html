@@ -1,0 +1,781 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Redis," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一期一会" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="在关系数据库的事务中，用户首先向数据库服务器发送BEGIN，然后执行各个相互一致的写操作和读操作，最后，用户可以选择发送COMMIT来确认之前所做的修改，或者发送ROLLBACK来放弃那些修改。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis事务">
+<meta property="og:url" content="http://blog.jonnydu.me/2017/01/05/Redis-transaction/index.html">
+<meta property="og:site_name" content="一期一会">
+<meta property="og:description" content="在关系数据库的事务中，用户首先向数据库服务器发送BEGIN，然后执行各个相互一致的写操作和读操作，最后，用户可以选择发送COMMIT来确认之前所做的修改，或者发送ROLLBACK来放弃那些修改。">
+<meta property="og:image" content="http://i.imgur.com/6PQWySj.png">
+<meta property="og:image" content="http://i.imgur.com/PMcavUU.png">
+<meta property="og:image" content="http://i.imgur.com/TnIfK7G.png">
+<meta property="og:image" content="http://i.imgur.com/igmOQqS.png">
+<meta property="article:published_time" content="2017-01-05T12:25:52.000Z">
+<meta property="article:modified_time" content="2020-04-30T14:16:30.251Z">
+<meta property="article:author" content="jonnydu">
+<meta property="article:tag" content="Redis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://i.imgur.com/6PQWySj.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '一期一会'
+    }
+  };
+</script>
+
+  <title> Redis事务 | 一期一会 </title>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">一期一会</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CFymCPjb2LHwhFXVjxQk','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Redis事务
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-01-05T20:25:52+08:00" content="2017-01-05">
+              2017-01-05
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/01/05/Redis-transaction/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/01/05/Redis-transaction/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在关系数据库的事务中，用户首先向数据库服务器发送BEGIN，然后执行各个相互一致的写操作和读操作，最后，用户可以选择发送COMMIT来确认之前所做的修改，或者发送ROLLBACK来放弃那些修改。</p>
+<a id="more"></a>
+<h3 id="Redis事务处理流程"><a href="#Redis事务处理流程" class="headerlink" title="Redis事务处理流程"></a>Redis事务处理流程</h3><p>Redis通过MULTI、EXEC、WATCH等命令来实现事务功能。事务提供了一种将多个命令请求打包，然后一次性、按顺序地执行多个命令的机制，并且在事务执行期间，服务器不会中断事务而该去执行其他客户端的命令请求，它会将事务中的所有命令都执行完毕，然后才去处理其他客户端的命令请求。<br>一个事务从开始到结束会经历如下三个阶段：<br>（1）事务开始<br>MULTI命令标志着事务的开始，其将执行该命令的客户端从非事务状态切换至事务状态。<br>（2）命令入队<br>当一个客户端处于非事务状态时，这个客户端发送的命令会立即被服务器执行，而当其切换到事务状态时，服务器会根据客户端发来的不同命令来执行不同的操作：如果是MULTI、EXEC、DISCARD、WATCH四个命令中的一个，那么服务器立即执行；如果不是，那么服务器不立即执行命令，而是将其放入一个服务队列里面，然后向客户端返回QUEUED回复。<br>这些命令保存在每个客户端所持有的一个事务队列中，该队列以FIFO的方式保存入队的命令。<br>（3）执行事务<br>当处于事务状态的客户端向服务器发送EXEC命令时，EXEC命令将立即被服务器执行。服务器会遍历这个客户端的事务队列，执行队列中保持的所有命令，最后将执行结果全部返回给客户端。<br>但是，MULTI和EXEC只能保证它们中间的那些入队的命令不会被其他客户端掺杂在一起，却没有锁的逻辑，即不能解决干扰。比如，现有一个key为1的数字，客户端1需要在事务中连续做两次自增操作，但在EXEC之前，客户端2对key进行了修改<code>set key 100</code>。<br><img src="http://i.imgur.com/6PQWySj.png" alt=""><br>可以看出，在事务执行的过程中，读到了脏数据，为了保障不被干扰，需要对数据加锁。        </p>
+<h3 id="乐观锁WATCH"><a href="#乐观锁WATCH" class="headerlink" title="乐观锁WATCH"></a>乐观锁WATCH</h3><p>在访问以写入为目的数据的时候，关系数据库会对被访问的数据加锁，直到事务被提交或者被回滚为止。如果有其他客户端试图对被加锁的数据行进行写入，那么该客户端将被阻塞，直到第一个事务执行完毕为止。这种做法称为悲观锁。<br>而Redis为了减少客户端的等待时间，并不会在执行WATCH命令时对数据加锁。相反地，Redis只会在数据已经被其他客户端抢先修改了的情况下，通知执行了WATCH的客户端，这种做法称为乐观锁。当被监视的键至少有一个已经被修改过了，服务器将拒绝执行事务，并向客户端返回代表事务执行失败的空回复。<br>对于上面的例子，使用WATCH监视key。<br><img src="http://i.imgur.com/PMcavUU.png" alt=""><br>当客户端执行EXEC时，服务器发现WATCH监视的键“name”已经被修改，因此服务器拒绝执行客户端A的事务，并向客户端A返回空回复。<br>但是，需要注意的是，WATCH命令的作用只是当被监控的键值被修改后阻止之后一个事务的执行，而不能保证其他客户端不修改这一键值，所以，通常情况下在EXEC执行失败后会重新执行整个函数。   </p>
+<h4 id="利用WATCH实现原子自增"><a href="#利用WATCH实现原子自增" class="headerlink" title="利用WATCH实现原子自增"></a>利用WATCH实现原子自增</h4><p>使用伪代码表示为：</p>
+<pre><code>WATCH key
+val = GET key
+val = val + 1
+MULTI
+SET key $val
+EXEC</code></pre><h3 id="事务的ACID性质"><a href="#事务的ACID性质" class="headerlink" title="事务的ACID性质"></a>事务的ACID性质</h3><p>（1）原子性<br>对于Redis的事务功能来说，事务队列中的命令要么就全部都执行，要么就一个都不执行，因此，从这一点来看，Redis的事务是具有原子性的。<br>下图是事务因为命令入队出错而被服务器拒绝执行，事务中的所有命令都不会被执行。<br><img src="http://i.imgur.com/TnIfK7G.png" alt=""><br>但是，Redis事务不支持关系数据库的事务回滚机制，即事务队列中的某个命令在执行期间（非语法错误，执行错误）出现了错误，事务的后续命令也会继续执行下去，并且之前执行的命令没有影响。因此，在这方面是不符合原子性的。<br><img src="http://i.imgur.com/igmOQqS.png" alt=""><br>（2）一致性<br>事务的一致性是指，如果数据库在执行事务之前是一致的，那么在事务执行之后，无论事务是否执行成功，数据库也应该是一致的。<br>如前所述，当出现入队错误或是执行错误的情况，Redis分别通过拒绝执行和进行错误处理的方式来保证事务的一致性。<br>当Redis服务器在执行事务的过程中停机，那么根据服务器使用的持久化方式，分以下几种情况讨论：<br>a. 如果当前Redis采用的是内存模式，那么重启后Redis数据库是空的，满足一致性条件；<br>b. 如果当前Redis采用RDB模式存储，在执行事务时，Redis不会中断事务去执行保存RDB的工作，只有在事务执行之后，保存RDB的工作才有可能开始。所以当RDB模式下的Redis服务器进程在事务中途被杀死时，事务内执行的命令，不管成功了多少，都不会被保存到RDB文件里。恢复数据库需要使用现有的RDB文件，而这个RDB文件的数据保存的是最近一次的数据库快照，所以它的数据可能不是最新的，但只要RDB文件本身没有因为其他问题而出错，那么还原后的数据库就是一致的；<br>c. 如果当前Redis采用的AOF模式存储，那么可能事务的内容还未写入到AOF文件，那么此时肯定是满足一致性的，如果事务的内容有部分写入到AOF文件中，那么需要用工具把AOF中事务执行部分成功的指令移除，这时，移除之后的AOF文件也是满足一致性的。<br>（3）隔离性<br>事务的隔离性是指，即使数据库有多个事务并发地执行，各个事务之间也不会互相影响，并发状态下执行的事务和串行执行的事务产生的结果完全相同。<br>因为Redis采用单线程的方式来执行事务，并且服务器保证，在执行事务期间不会对事务进行中断，因此，Redis的事务总是以串行的方式运行的，且事务总是具有隔离性。<br>（4）持久性<br>事务的持久性是指，当一个事务执行完毕时，执行这个事务所得的结果已经被保存到永久性存储介质里面了，即使服务器在事务执行完毕之后停机，执行事务所得的结果也不会丢失。<br>Redis事务只有当服务器运行在AOF持久化模式下，并且appendfsync选项为always时，才是具有持久性的。因为程序总会在执行命令之后调用同步函数，将命令数据真正地保存到硬盘里。<br>当然，不论Redis以什么模式运行，在一个事务的最后加上SAVE命令总可以保证持久性，但这种做法效率太低。<br>所以，Redis只满足ACID中的一致性和隔离性。 </p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Redis/" rel="tag">#Redis</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/30/Effective-STL-3/" rel="next" title="更好地使用STL关联容器">
+                <i class="fa fa-chevron-left"></i> 更好地使用STL关联容器
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/01/11/Redis-sentinel/" rel="prev" title="Redis Sentinel原理及实践">
+                Redis Sentinel原理及实践 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/01/05/Redis-transaction/"
+           data-title="Redis事务" data-url="http://blog.jonnydu.me/2017/01/05/Redis-transaction/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="jonnydu" />
+          <p class="site-author-name" itemprop="name">jonnydu</p>
+          <p class="site-description motion-element" itemprop="description">jonnydu.uestc@gmail.com</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">71</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jiongdu" target="_blank">
+                  
+                    <i class="fa fa-https://github.com/jiongdu"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/3309795495" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 微博
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis事务处理流程"><span class="nav-number">1.</span> <span class="nav-text">Redis事务处理流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#乐观锁WATCH"><span class="nav-number">2.</span> <span class="nav-text">乐观锁WATCH</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#利用WATCH实现原子自增"><span class="nav-number">2.1.</span> <span class="nav-text">利用WATCH实现原子自增</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#事务的ACID性质"><span class="nav-number">3.</span> <span class="nav-text">事务的ACID性质</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">jonnydu</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io" target="_blank" rel="noopener">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" target="_blank" rel="noopener">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+  
+  
+<script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = NexT.utils.escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    NexT.motion.middleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+
+      if (CONFIG.sidebar.display === 'post' || CONFIG.sidebar.display === 'always') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          NexT.utils.displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"jonnydu"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+  
+
+
+
+
+
+  
+  
+  
+
+  
+
+
+</body>
+</html>

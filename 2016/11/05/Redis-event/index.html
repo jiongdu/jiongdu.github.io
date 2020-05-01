@@ -1,0 +1,873 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Redis," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一期一会" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="事件处理是Redis的核心机制之一，通过在文件、网络和时间等类型的事件上进行多路复用，为Redis的高性能提供保证。事件驱动在Redis源码中主要涉及ae.h&#x2F;ae.c，Ae_evport&#x2F;epoll&#x2F;kqueue&#x2F;select.c等文件。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis之事件驱动">
+<meta property="og:url" content="http://blog.jonnydu.me/2016/11/05/Redis-event/index.html">
+<meta property="og:site_name" content="一期一会">
+<meta property="og:description" content="事件处理是Redis的核心机制之一，通过在文件、网络和时间等类型的事件上进行多路复用，为Redis的高性能提供保证。事件驱动在Redis源码中主要涉及ae.h&#x2F;ae.c，Ae_evport&#x2F;epoll&#x2F;kqueue&#x2F;select.c等文件。">
+<meta property="og:image" content="http://i.imgur.com/5bUY0j1.png">
+<meta property="article:published_time" content="2016-11-05T04:03:53.000Z">
+<meta property="article:modified_time" content="2020-04-30T14:16:30.268Z">
+<meta property="article:author" content="jonnydu">
+<meta property="article:tag" content="Redis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://i.imgur.com/5bUY0j1.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '一期一会'
+    }
+  };
+</script>
+
+  <title> Redis之事件驱动 | 一期一会 </title>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">一期一会</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CFymCPjb2LHwhFXVjxQk','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Redis之事件驱动
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-11-05T12:03:53+08:00" content="2016-11-05">
+              2016-11-05
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/11/05/Redis-event/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/11/05/Redis-event/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>事件处理是Redis的核心机制之一，通过在文件、网络和时间等类型的事件上进行多路复用，为Redis的高性能提供保证。事件驱动在Redis源码中主要涉及ae.h/ae.c，Ae_evport/epoll/kqueue/select.c等文件。</p>
+<a id="more"></a>
+<h3 id="Redis事件驱动相关数据结构"><a href="#Redis事件驱动相关数据结构" class="headerlink" title="Redis事件驱动相关数据结构"></a>Redis事件驱动相关数据结构</h3><p>Redis事件驱动内部包含四个主要的数据结构(定义在ae.h中)，分别是：文件事件结构体、时间事件结构体、就绪事件结构体和循环结构体。</p>
+<h4 id="文件事件"><a href="#文件事件" class="headerlink" title="文件事件"></a>文件事件</h4><p>文件事件定义在ae.h/aeFileEvent结构体中。</p>
+<pre><code>typedef struct aeFileEvent {
+    int mask;            //状态
+
+    aeFileProc* rfileProc;        
+    aeFileProc* wfileProc;
+    void* clientData;    //多路复用库的私有数据
+} aeFileEvent;</code></pre><p>其中，rfileProc和wfileProc为aeFileProc类型函数指针，分别对应于读、写事件处理函数。其声明为：    </p>
+<pre><code>typedef void aeFileProc(struct aeEventLoop *eventLoop, int fd, void *clientData, int mask);</code></pre><p>clientData保存执行命令时所需要的数据，每次处理事件时，它会作为参数被传入事件处理器。</p>
+<h4 id="就绪事件"><a href="#就绪事件" class="headerlink" title="就绪事件"></a>就绪事件</h4><p>就绪事件定义在ae.h/aeFiredEvent结构体中。</p>
+<pre><code>typedef struct aeFiredEvent {
+    int fd;                //就绪文件描述符
+
+    int mask;            //事件类型掩码
+} aeFiredEvent;</code></pre><p>就绪事件结构体将在IO多路复用（aeApiPoll函数）返回时设置。</p>
+<h4 id="时间事件"><a href="#时间事件" class="headerlink" title="时间事件"></a>时间事件</h4><p>时间事件定义在ae.h/aeTimeEvent结构体中。</p>
+<pre><code>typedef struct aeTimeEvent {
+    long long id;        //时间事件的唯一标识
+
+    long when_sec;
+    long when_ms;
+
+    aeTimeProc* timeProc;
+    aeEventFinalizerProc* finalizerProc;     
+    void* clientData;
+    struct aeTimeEvent* next;        //指向下个时间事件结构，形成链表
+}</code></pre><p>其中，id为时间事件的全局唯一标识号，其值按从小到大的顺序递增，新事件的id号比旧事件的id大。when为毫秒级的UNIX时间戳，记录时间事件的到达时间。next为指向下个时间事件结构的指针，Redis服务器将所有时间事件都放在一个无序（到达时间）链表中，每当时间事件执行器运行时，就遍历链表，查找所有已到达的时间事件，并调用相应的事件处理器。注意，Redis的时间事件链表是按id排序的链表，对于到达时间，它是无序的。<br>timeProc和finalizerProc分别为时间事件处理器和事件释放函数的函数指针。其声明为：</p>
+<pre><code>typedef int aeTimeProc(struct aeEventLoop *eventLoop, long long id, void *clientData);
+typedef void aeEventFinalizerProc(struct aeEventLoop *eventLoop, void *clientData);</code></pre><p>此外，Redis的时间事件可以分为以下两类：<br>（1）定时事件：让一段程序在指定的时间之后执行一次；<br>（2）周期性事件：让一段程序每隔指定的时间就执行一次。<br>一个时间事件是定时事件还是周期性事件取决于时间事件处理器的返回值(ae.c/processTimeEvents/retval = te-&gt;timeProc(eventLoop, id, te-&gt;clientData))：<br>（1）如果事件处理器返回返回ae.h/AE_NOMORE,那么这个事件为定时事件，该事件在到达一次之后就会被删除。<br>（2）如果事件处理器返回一个非AE_NOMORE的整数值，那么这个事件为周期性事件，此时，服务器会对时间事件的when属性进行更新，让该事件在一段时间之后再次到达，并以这种方式更新、运行。   </p>
+<h4 id="事件循环结构体"><a href="#事件循环结构体" class="headerlink" title="事件循环结构体"></a>事件循环结构体</h4><p>在事件驱动的实现中，需要有一个事件循环结构来监控调度所有的事件。在Redis中的事件驱动库中，事件循环结构结构定义在ae.h/aeEventLoop中。</p>
+<pre><code>typedef struct aeEventLoop {
+    int maxfd;                    //注册的最大的文件描述符
+    int setsize;                //监听的文件描述符的最大个数
+
+    long long timeEventNextId;    //生成时间事件id
+    time_t lastTime;            //最后一次执行时间事件的时间
+
+    aeFileEvent* events;        //注册的文件事件
+    aeFilEvent* fired;            //就绪的文件事件
+    aeTimeEvent* timeEventHead;    //时间事件
+    int stop;
+    void* apindata;                //多路复用库的私有数据
+    aeBeforeSleepProc* beforesleep;
+} aeEventLoop;</code></pre><p>其中，events是aeFileEvent结构的数组，每个aeFileEvent结构表示一个注册的文件事件。setsize表示能处理的文件描述符的最大个数。beforesleep函数指针表示在监控事件触发之前，需要调用的函数。apindata表示底层多路复用的私有数据，比如对于select来说，该结构保存了读写描述符数组；对于epoll来说，该结构中保存了epoll描述符和epoll_event数组。       </p>
+<h3 id="Redis事件的调度与执行"><a href="#Redis事件的调度与执行" class="headerlink" title="Redis事件的调度与执行"></a>Redis事件的调度与执行</h3><p>Redis的事件处理主循环在aeMain函数中进行：</p>
+<pre><code>void aeMain(aeEventLoop* eventLoop){
+    eventLoop-&gt;stop = 0;
+    while(!eventLoop-&gt;stop){
+        if(eventLoop-&gt;beforesleep != NULL){
+            eventLoop-&gt;beforesleep(eventLoop);
+        }
+        aeProessEvents(eventLoop, AE_ALL_EVENTS);
+    }
+}</code></pre><p>该事件循环的流程图如下：<br><img src="http://i.imgur.com/5bUY0j1.png" alt=""><br>aeProcessEvents函数进行具体的事件处理，定义在ae.c文件下，其关键代码如下：</p>
+<pre><code>int aeProcessEvents(aeEventLoop* eventLoop, int flags) {
+    ...
+    if(eventLoop-&gt;maxfd!=-1 || ((flags &amp; AE_TIME_EVENTS) &amp;&amp; !(flags &amp; AE_DONT_WAIT))) {
+        shortest = aeSearchNearestTimer(eventLoop);  //获取最近的时间事件
+        if(shortest){
+            aeGetTime(&amp;now_sec, &amp;now_ms);
+            //计算最近的时间事件距离到达还有多少毫秒
+            tvp-&gt;tv_usec = ((shortest-&gt;when_ms+1000) - now_ms)*1000;
+            tvp-&gt;tv_sec --;
+            ...
+        }else{        //没有时间事件，根据AE_DONT_WAIT来设置是否阻塞，以及阻塞的事件长度
+            if(flags &amp; AE_DONT_WAIT) {        
+                tv.tv_sec = tv.tv_usec = 0;
+                tvp = &amp;tv;
+            }else{
+                tvp = NULL;
+            }
+        }
+        numevents = aeApiPoll(eventLoop, tvp);            //select,epoll...
+        for(j=0; j&lt;numevents;j++){
+            aeFileEvent *fe = &amp;eventLoop-&gt;events[eventLoop-&gt;fired[j].fd];
+            int mask = eventLoop-&gt;fired[j].mask;
+            int fd = eventLoop-&gt;fired[j].fd;
+            int rfired = 0;
+            if(fe-&gt;mask &amp; mask &amp; AE_READABLE){
+                rfired = 1;
+                fe-&gt;rfileProc(eventLoop, fd, fe-&gt;clientData, mask);        //处理读事件
+            }
+        ...
+        }
+    }
+    if(flags &amp; AE_TIME_EVENTS)
+        processed += processTimeEvents(eventLoop);        //处理时间事件
+    return processed;
+}</code></pre><p>可以看出，aeApiPoll函数的最大阻塞时间(tvp结构)由到达时间最接近当前时间的时间事件(shortest)决定，这样既可以避免服务器对时间事件进行频繁的轮询（忙等待），也可以确保aeApiPoll函数不会阻塞过长时间。<br>因为文件事件是随机出现的，如果等待并处理完一次文件事件之后，仍未有任何时间事件到来，那么服务器将再次等待并处理文件事件。随着文件事件的不断执行，时间逐渐向时间事件所设置的到达时间逼近，并最终来到到达时间，这时服务器就可以开始处理到达的时间事件了。<br>对文件事件和时间事件的处理都是同步、有序、原子地执行的，服务器不会中途中断事件处理，也不会对事件进行抢占，因此，不管是文件事件的处理器，还是时间事件的处理器，它们都会尽可能地减少程序的阻塞时间，并在需要时让出执行权，从而降低造成事件饥饿的可能性。比如说，在命令回复处理器将一个命令回复写入到客户端套接字，如果写入的字节数超过了一个预设常量的话，命令回复处理器就会主动用break跳出写入循环，将余下的数据留到下次再写，另外，时间事件也会将非常耗时的持久化操作放到子线程或子进程中执行。<br>此外，由于时间事件放在文件事件之后执行，并且事件之间不会出现抢占，所以时间事件的实际处理时间，通常会比时间事件设定的到达时间稍晚一些。   </p>
+<h3 id="Redis-IO复用函数选择"><a href="#Redis-IO复用函数选择" class="headerlink" title="Redis IO复用函数选择"></a>Redis IO复用函数选择</h3><p>最后提到的一点是，Redis提供了在多个IO库之间选择最佳的策略。</p>
+<pre><code>#ifdef HAVE_EVPORT
+#include &quot;ae_evport.c&quot;
+#else
+    #ifdef HAVE_EPOLL
+    #include &quot;ae_epoll.c&quot;
+    #else
+        #ifdef HAVE_KQUEUE
+        #include &quot;ae_kqueue.c&quot;
+        #else
+        #include &quot;ae_select.c&quot;
+        #endif
+    #endif
+#endif</code></pre><p>这样，在编译时，Redis可以根据平台自上而下选择最快的IO多路复用函数。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Redis/" rel="tag">#Redis</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/31/STL-deque/" rel="next" title="C++ STL之deque">
+                <i class="fa fa-chevron-left"></i> C++ STL之deque
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/11/10/Redis-start/" rel="prev" title="Redis之启动过程分析">
+                Redis之启动过程分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/11/05/Redis-event/"
+           data-title="Redis之事件驱动" data-url="http://blog.jonnydu.me/2016/11/05/Redis-event/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="jonnydu" />
+          <p class="site-author-name" itemprop="name">jonnydu</p>
+          <p class="site-description motion-element" itemprop="description">jonnydu.uestc@gmail.com</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">71</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jiongdu" target="_blank">
+                  
+                    <i class="fa fa-https://github.com/jiongdu"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/3309795495" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 微博
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis事件驱动相关数据结构"><span class="nav-number">1.</span> <span class="nav-text">Redis事件驱动相关数据结构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#文件事件"><span class="nav-number">1.1.</span> <span class="nav-text">文件事件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#就绪事件"><span class="nav-number">1.2.</span> <span class="nav-text">就绪事件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#时间事件"><span class="nav-number">1.3.</span> <span class="nav-text">时间事件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#事件循环结构体"><span class="nav-number">1.4.</span> <span class="nav-text">事件循环结构体</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis事件的调度与执行"><span class="nav-number">2.</span> <span class="nav-text">Redis事件的调度与执行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis-IO复用函数选择"><span class="nav-number">3.</span> <span class="nav-text">Redis IO复用函数选择</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">jonnydu</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io" target="_blank" rel="noopener">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" target="_blank" rel="noopener">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+  
+  
+<script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = NexT.utils.escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    NexT.motion.middleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+
+      if (CONFIG.sidebar.display === 'post' || CONFIG.sidebar.display === 'always') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          NexT.utils.displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"jonnydu"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+  
+
+
+
+
+
+  
+  
+  
+
+  
+
+
+</body>
+</html>
