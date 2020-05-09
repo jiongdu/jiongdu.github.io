@@ -1,0 +1,903 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="markdown," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一期一会" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="本文对markdown常用的一些语法做简单汇总。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="markdown常用语法汇总">
+<meta property="og:url" content="http://blog.jonnydu.me/2019/12/06/docskill/index.html">
+<meta property="og:site_name" content="一期一会">
+<meta property="og:description" content="本文对markdown常用的一些语法做简单汇总。">
+<meta property="og:image" content="http://blog.jonnydu.me/images/title.png">
+<meta property="og:image" content="http://blog.jonnydu.me/images/server_team.jpeg">
+<meta property="article:published_time" content="2019-12-06T14:10:53.000Z">
+<meta property="article:modified_time" content="2020-05-09T15:04:11.510Z">
+<meta property="article:author" content="jonnydu">
+<meta property="article:tag" content="markdown">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://blog.jonnydu.me/images/title.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '一期一会'
+    }
+  };
+</script>
+
+  <title> markdown常用语法汇总 | 一期一会 </title>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">一期一会</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'CFymCPjb2LHwhFXVjxQk','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                markdown常用语法汇总
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2019-12-06T22:10:53+08:00" content="2019-12-06">
+              2019-12-06
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2019/12/06/docskill/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2019/12/06/docskill/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文对markdown常用的一些语法做简单汇总。</p>
+<a id="more"></a>
+
+<p>[[TOC]]</p>
+<h1 id="使用标准的Markdown语法"><a href="#使用标准的Markdown语法" class="headerlink" title="使用标准的Markdown语法"></a>使用标准的Markdown语法</h1><h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><p><strong>输入</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[[toc]]</span><br></pre></td></tr></table></figure>
+<p><strong>输出</strong></p>
+<blockquote>
+<p>见文档头部</p>
+</blockquote>
+<h2 id="标题"><a href="#标题" class="headerlink" title="标题"></a>标题</h2><p><strong>输入</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 一级标题</span><br><span class="line">## 二级标题</span><br><span class="line">### 三级标题</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出</strong></p>
+<p><img src="/images/title.png" alt="title"></p>
+<h2 id="文本颜色"><a href="#文本颜色" class="headerlink" title="文本颜色"></a>文本颜色</h2><p><strong>输入</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$\color&#123;red&#125;&#123;这是有颜色的文本&#125;$</span><br></pre></td></tr></table></figure>
+<p><strong>输出</strong></p>
+<p>$\color{red}{这是有颜色的文本}$</p>
+<h2 id="文本粗体和斜体"><a href="#文本粗体和斜体" class="headerlink" title="文本粗体和斜体"></a>文本粗体和斜体</h2><p><strong>输入</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">我是正常体</span><br><span class="line">*我是斜体*</span><br><span class="line">**我是粗体**</span><br><span class="line">***我是粗体 + 斜体***</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出</strong></p>
+<p>我是正常体<br><br><em>我是斜体</em><br><br><strong>我是粗体</strong><br><br><strong><em>我是粗体 + 斜体</em></strong><br></p>
+<h2 id="代码块"><a href="#代码块" class="headerlink" title="代码块"></a>代码块</h2><p><strong>输入</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">​&#96;&#96;&#96;go</span><br><span class="line">package main</span><br><span class="line"></span><br><span class="line">import &quot;fmt&quot;</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line"> fmt.Println(&quot;hello world!&quot;)</span><br><span class="line">&#125;</span><br><span class="line">&#96;&#96;&#96;</span><br></pre></td></tr></table></figure>
+<p><strong>输出</strong></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"fmt"</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line"> fmt.Println(<span class="string">"hello world!"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="行内代码"><a href="#行内代码" class="headerlink" title="行内代码"></a>行内代码</h2><p><strong>输入</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">这是行内代码&#96;func handler(ctx Context)&#96;的例子</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出</strong></p>
+<p>这是行内代码<code>func handler(ctx Context)</code>的例子</p>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><p><strong>输入</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt; 读一本好书，就是在和高尚的人谈话。 ---歌德</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出</strong></p>
+<blockquote>
+<p>读一本好书，就是在和高尚的人谈话。 —歌德</p>
+</blockquote>
+<h2 id="分割线"><a href="#分割线" class="headerlink" title="分割线"></a>分割线</h2><p><strong>输入</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">分割线1</span><br><span class="line">------</span><br><span class="line">分割线2</span><br><span class="line">------</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出</strong></p>
+<h5 id="分割线1"><a href="#分割线1" class="headerlink" title="分割线1"></a>分割线1</h5><hr>
+<h5 id="分割线2"><a href="#分割线2" class="headerlink" title="分割线2"></a>分割线2</h5><hr>
+<h2 id="图片"><a href="#图片" class="headerlink" title="图片"></a>图片</h2><p><strong>输入</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">![描述](路径)</span><br><span class="line">![server_team](&#x2F;images&#x2F;server_team.jpeg)</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出</strong></p>
+<p><img src="/images/server_team.jpeg" alt="server_team"></p>
+<h2 id="列表"><a href="#列表" class="headerlink" title="列表"></a>列表</h2><p><strong>输入</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">- this is the first line</span><br><span class="line">- this is the second line</span><br><span class="line"></span><br><span class="line">1. this is the first line</span><br><span class="line">2. this is the second line</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出</strong></p>
+<ul>
+<li>this is the first line</li>
+<li>this is the second line</li>
+</ul>
+<ol>
+<li>this is the first line</li>
+<li>this is the second line</li>
+</ol>
+<h2 id="超链接"><a href="#超链接" class="headerlink" title="超链接"></a>超链接</h2><p><strong>输入</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">这是[课堂首页](http:&#x2F;&#x2F;ke.qq.com)的地址</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出</strong></p>
+<p>这是<a href="http://ke.qq.com" target="_blank" rel="noopener">课堂首页</a>的地址</p>
+<h2 id="换行符"><a href="#换行符" class="headerlink" title="换行符"></a>换行符</h2><p><strong>输入</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">这是第一行&lt;br&gt;这是第二行</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出</strong></p>
+<p>这是第一行<br><br>这是第二行</p>
+<h2 id="特别提示"><a href="#特别提示" class="headerlink" title="特别提示"></a>特别提示</h2><p><strong>输入</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">::: tip 提示</span><br><span class="line">This is a tip</span><br><span class="line">:::</span><br><span class="line"></span><br><span class="line">::: warning 警告</span><br><span class="line">This is a warning</span><br><span class="line">:::</span><br><span class="line"></span><br><span class="line">::: danger 危险</span><br><span class="line">This is a dangerous warning</span><br><span class="line">:::</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出</strong></p>
+<p>::: tip 提示<br>This is a tip<br>:::</p>
+<p>::: warning 警告<br>This is a warning<br>:::</p>
+<p>::: danger 危险<br>This is a dangerous thing<br>:::</p>
+<h2 id="删除线"><a href="#删除线" class="headerlink" title="删除线"></a>删除线</h2><p><strong>输入</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">后面三个字打上~~删除线~~</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出</strong></p>
+<p>后面三个字打上<del>删除线</del></p>
+<h2 id="下划线"><a href="#下划线" class="headerlink" title="下划线"></a>下划线</h2><p><strong>输入</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;u&gt;这是下划线文本&lt;&#x2F;u&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出</strong></p>
+<p><u>这是下划线文本</u></p>
+<h2 id="表格"><a href="#表格" class="headerlink" title="表格"></a>表格</h2><p><strong>输入</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">| Tables        | Are           | Cool  |</span><br><span class="line">| ------------- |-------------  | ----- |</span><br><span class="line">| col 3 is      | right-aligned | $1600 |</span><br><span class="line">| col 2 is      | centered      |   $12 |</span><br><span class="line">| zebra stripes | are neat &lt;br&gt;are neat?|    $1 |</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出</strong></p>
+<table>
+<thead>
+<tr>
+<th>Tables</th>
+<th>Are</th>
+<th>Cool</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>col 3 is</td>
+<td>right-aligned</td>
+<td>$1600</td>
+</tr>
+<tr>
+<td>col 2 is</td>
+<td>centered</td>
+<td>$12</td>
+</tr>
+<tr>
+<td>zebra stripes</td>
+<td>are neat <br>are neat?</td>
+<td>$1 <br>$5</td>
+</tr>
+</tbody></table>
+<h2 id="兼容HTML"><a href="#兼容HTML" class="headerlink" title="兼容HTML"></a>兼容HTML</h2><p><strong>输入</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;div style&#x3D;&quot;text-align: left&quot;&gt;我会左对齐&lt;&#x2F;div&gt;</span><br><span class="line">&lt;center&gt;我会居中呢&lt;&#x2F;center&gt;</span><br><span class="line">&lt;div style&#x3D;&quot;text-align: right&quot;&gt;我会右对齐&lt;&#x2F;div&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出</strong></p>
+<div style="text-align: left">我会左对齐</div>
+<center>我会居中呢</center>
+<div style="text-align: right">我会右对齐</div>
+
+<h2 id="Emoji"><a href="#Emoji" class="headerlink" title="Emoji"></a>Emoji</h2><p><strong>输入</strong>  <a href="https://www.webfx.com/tools/emoji-cheat-sheet/" target="_blank" rel="noopener">Emoji大全</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">:tada: :100:</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出</strong></p>
+<p>:tada: :100:</p>
+<h2 id="数学公式"><a href="#数学公式" class="headerlink" title="数学公式"></a>数学公式</h2><p><strong>输入</strong>  <a href="https://www.zybuluo.com/codeep/note/163962" target="_blank" rel="noopener">公式大全</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$$\frac &#123;\partial^r&#125; &#123;\partial \omega^r&#125; \left(\frac &#123;y^&#123;\omega&#125;&#125; &#123;\omega&#125;\right) </span><br><span class="line">&#x3D; \left(\frac &#123;y^&#123;\omega&#125;&#125; &#123;\omega&#125;\right) \left\&#123;(\log y)^r + \sum_&#123;i&#x3D;1&#125;^r \frac &#123;(-1)^i r \cdots (r-i+1) (\log y)^&#123;r-i&#125;&#125; &#123;\omega^i&#125; \right\&#125;$$</span><br></pre></td></tr></table></figure>
+<p><strong>输出</strong><br>$$\frac {\partial^r} {\partial \omega^r} \left(\frac {y^{\omega}} {\omega}\right)<br>= \left(\frac {y^{\omega}} {\omega}\right) \left{(\log y)^r + \sum_{i=1}^r \frac {(-1)^i r \cdots (r-i+1) (\log y)^{r-i}} {\omega^i} \right}$$</p>
+<h2 id="流程图"><a href="#流程图" class="headerlink" title="流程图"></a>流程图</h2><p><strong>输入</strong>   <a href="https://flowchart.vuepress.ulivz.com/#syntax" target="_blank" rel="noopener">官方文档</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">@flowstart</span><br><span class="line">st&#x3D;&gt;start: Start|past:&gt;http:&#x2F;&#x2F;www.google.com[blank]</span><br><span class="line">e&#x3D;&gt;end: End|future:&gt;http:&#x2F;&#x2F;www.google.com</span><br><span class="line">op1&#x3D;&gt;operation: My Operation|past</span><br><span class="line">op2&#x3D;&gt;operation: Stuff|current</span><br><span class="line">sub1&#x3D;&gt;subroutine: My Subroutine|invalid</span><br><span class="line">cond&#x3D;&gt;condition: Yes</span><br><span class="line">or No?|approved:&gt;http:&#x2F;&#x2F;www.google.com</span><br><span class="line">c2&#x3D;&gt;condition: Good idea|rejected</span><br><span class="line">io&#x3D;&gt;inputoutput: catch something...|future</span><br><span class="line"></span><br><span class="line">st-&gt;op1(right)-&gt;cond</span><br><span class="line">cond(yes, right)-&gt;c2</span><br><span class="line">cond(no)-&gt;sub1(left)-&gt;op1</span><br><span class="line">c2(yes)-&gt;io-&gt;e</span><br><span class="line">c2(no)-&gt;op2-&gt;e</span><br><span class="line">@flowend</span><br></pre></td></tr></table></figure>
+<p><strong>输出</strong><br>@flowstart<br>st=&gt;start: Start|past:&gt;<a href="http://www.google.com[blank]">http://www.google.com[blank]</a><br>e=&gt;end: End|future:&gt;<a href="http://www.google.com" target="_blank" rel="noopener">http://www.google.com</a><br>op1=&gt;operation: My Operation|past<br>op2=&gt;operation: Stuff|current<br>sub1=&gt;subroutine: My Subroutine|invalid<br>cond=&gt;condition: Yes<br>or No?|approved:&gt;<a href="http://www.google.com" target="_blank" rel="noopener">http://www.google.com</a><br>c2=&gt;condition: Good idea|rejected<br>io=&gt;inputoutput: catch something…|future</p>
+<p>st-&gt;op1(right)-&gt;cond<br>cond(yes, right)-&gt;c2<br>cond(no)-&gt;sub1(left)-&gt;op1<br>c2(yes)-&gt;io-&gt;e<br>c2(no)-&gt;op2-&gt;e<br>@flowend</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/markdown/" rel="tag">#markdown</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/10/07/hexo-move-to-new-pc/" rel="next" title="hexo博客迁移新电脑">
+                <i class="fa fa-chevron-left"></i> hexo博客迁移新电脑
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2019/12/06/docskill/"
+           data-title="markdown常用语法汇总" data-url="http://blog.jonnydu.me/2019/12/06/docskill/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="jonnydu" />
+          <p class="site-author-name" itemprop="name">jonnydu</p>
+          <p class="site-description motion-element" itemprop="description">jonnydu.uestc@gmail.com</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">72</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jiongdu" target="_blank">
+                  
+                    <i class="fa fa-https://github.com/jiongdu"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/3309795495" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 微博
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#使用标准的Markdown语法"><span class="nav-number">1.</span> <span class="nav-text">使用标准的Markdown语法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#目录"><span class="nav-number">1.1.</span> <span class="nav-text">目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#标题"><span class="nav-number">1.2.</span> <span class="nav-text">标题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文本颜色"><span class="nav-number">1.3.</span> <span class="nav-text">文本颜色</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文本粗体和斜体"><span class="nav-number">1.4.</span> <span class="nav-text">文本粗体和斜体</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码块"><span class="nav-number">1.5.</span> <span class="nav-text">代码块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#行内代码"><span class="nav-number">1.6.</span> <span class="nav-text">行内代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#引用"><span class="nav-number">1.7.</span> <span class="nav-text">引用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分割线"><span class="nav-number">1.8.</span> <span class="nav-text">分割线</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#分割线1"><span class="nav-number">1.8.0.0.1.</span> <span class="nav-text">分割线1</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#分割线2"><span class="nav-number">1.8.0.0.2.</span> <span class="nav-text">分割线2</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#图片"><span class="nav-number">1.9.</span> <span class="nav-text">图片</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#列表"><span class="nav-number">1.10.</span> <span class="nav-text">列表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#超链接"><span class="nav-number">1.11.</span> <span class="nav-text">超链接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#换行符"><span class="nav-number">1.12.</span> <span class="nav-text">换行符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#特别提示"><span class="nav-number">1.13.</span> <span class="nav-text">特别提示</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#删除线"><span class="nav-number">1.14.</span> <span class="nav-text">删除线</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#下划线"><span class="nav-number">1.15.</span> <span class="nav-text">下划线</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#表格"><span class="nav-number">1.16.</span> <span class="nav-text">表格</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#兼容HTML"><span class="nav-number">1.17.</span> <span class="nav-text">兼容HTML</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Emoji"><span class="nav-number">1.18.</span> <span class="nav-text">Emoji</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数学公式"><span class="nav-number">1.19.</span> <span class="nav-text">数学公式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#流程图"><span class="nav-number">1.20.</span> <span class="nav-text">流程图</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">jonnydu</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io" target="_blank" rel="noopener">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" target="_blank" rel="noopener">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+  
+  
+<script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = NexT.utils.escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    NexT.motion.middleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+
+      if (CONFIG.sidebar.display === 'post' || CONFIG.sidebar.display === 'always') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          NexT.utils.displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"jonnydu"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+  
+
+
+
+
+
+  
+  
+  
+
+  
+
+
+</body>
+</html>
