@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://blog.jonnydu.me/"/>
-  <updated>2020-05-10T08:24:53.452Z</updated>
+  <updated>2020-05-18T09:50:22.166Z</updated>
   <id>http://blog.jonnydu.me/</id>
   
   <author>
@@ -15,6 +15,27 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>nsq初探</title>
+    <link href="http://blog.jonnydu.me/2020/03/29/nsqd-first-look/"/>
+    <id>http://blog.jonnydu.me/2020/03/29/nsqd-first-look/</id>
+    <published>2020-03-29T14:10:53.000Z</published>
+    <updated>2020-05-18T09:50:22.166Z</updated>
+    
+    <content type="html"><![CDATA[<p>分布式实时消息平台nsq入门。</p><a id="more"></a><h3 id="nsq"><a href="#nsq" class="headerlink" title="nsq"></a>nsq</h3><h4 id="初探"><a href="#初探" class="headerlink" title="初探"></a>初探</h4><p><strong>1. 整体架构</strong><br><img src="http://ww1.sinaimg.cn/large/c54778a7gy1gewqzehkb9j21400t7whu.jpg" alt="nsq架构.jpg"></p><p><strong>2. 和kafka对比：</strong></p><ul><li><strong>多消费者实例</strong>：kafka中的consumer group，在nsq中对应的术语是channel。</li><li><strong>服务发现</strong>：需要一个类似注册中心的中间件来让生产者、消费者和mq自动发现对方，kafka使用的是zk，而nsq用的nsqlookup。</li><li><strong>消息存储和持久化</strong>：nsq把消息放到了内存，只有当队列消息的数量超过<code>--mem-queue-size</code>配置的限制时，才会对消息进行持久化。而kafka是直接把消息存储到磁盘中</li><li><strong>数据备份</strong>：nsq把消息存储到一台机器中，不做任何备份，一旦机器崩溃，磁盘损坏，消息就永久丢失了。kafka则通过partition的机制，对消息做了备份，增强了消息的安全性。</li><li><strong>消息有序</strong>：nsq不支持顺序消费，kafka支持顺序消费，须满足几个条件：(1)要被顺序消息的消息必须都放到一个partition中;(2)partition只能被消费者组里的一个消费者实例消费。</li><li><strong>消息投递语义</strong>：nsq只支持at least once，也就是说消息有可能被多次投递，消费者必须自己保证消息处理的幂等性。kafka则支持exactly once。</li></ul><h4 id="深入架构和原理"><a href="#深入架构和原理" class="headerlink" title="深入架构和原理"></a>深入架构和原理</h4><p><strong>1. producer</strong></p><ul><li>producer通过HTTP API将消息发布到nsqd的指定topic。</li><li>producer也可以通过nsqd客户端的TCP接口将消息发布给nsqd的指定topic。</li></ul><p><strong>2. channel</strong><br><img src="http://ww1.sinaimg.cn/large/c54778a7gy1gewr0nrq6zg20bo07t3zq.gif" alt="nsq-channel.gif"></p><ul><li>channel与consumer有关，是消费者之间的负载均衡，消费者通过这个特殊的channel读取消息。</li><li>当生产者每次发布消息的时候，消息会采用多播的方式被拷贝到各个channel中。</li><li>一个channel一般会有多个consumer连接。假设所有已连接的consumer处于准备接收消息的状态，每个消息将被传递到一个随机的consumer。</li><li>在consumer想单独获取某个topic的消息时，可以subscribe一个自己单独命名的nsqd中还不存在的channel，nsqd会为这个consumer创建其命名的channel。</li><li>channel起到队列的作用，多个producer产生的topic消息在每一个连接topic的channel上进行排队。</li><li>topic和channel一旦建立，将会一直存在，要及时在管理台或者用代码清除无效的topic和channel，避免资源的浪费。</li></ul><p><strong>3. consumer</strong></p><ul><li>consumer通过TCP subscribe自己需要的channel。</li><li>多个consumer subscribe一个channel，假设所有已连接的客户端处于准备接收消息的状态，每个消息将被传递到一个随机的consumer。</li></ul><p><strong>4. nslookupd</strong></p><ul><li>nslookupd是守护进程负责管理拓扑信息。客户端通过查询nsqlookupd来发现指定topic的生产者，并且nsqd节点广播topic和channel信息。</li><li>nslookupd是中心管理服务，它使用tcp管理nsqd服务，使用http管理nsqadmin服务，同时为客户端提供查询功能。</li></ul><p><strong>5. nsqadmin</strong></p><ul><li>一套WEB UI，用来汇集集群的实时统计，并执行不同的管理任务。</li><li>nsqadmin的所有功能都必须依赖于nslookupd，nsqadmin只是向nsqlookup传递用户操作并展示来自nslookupd的数据。</li></ul><p><strong>6. nsqd</strong></p><ul><li>nsqd是一个守护进程，负责接收、排队、投递消息给客户端。也就是真正干活的服务。</li></ul><h4 id="show-me-code"><a href="#show-me-code" class="headerlink" title="show me code"></a>show me code</h4><p><strong>1. nsqd源码架构</strong><br><img src="http://ww1.sinaimg.cn/large/c54778a7gy1gewr08a3kaj20mg0ivgmw.jpg" alt="nsq源码架构.jpg"></p><p><strong>2. 源码库</strong><br><a href="https://github.com/nsqio/nsq" target="_blank" rel="noopener">nsq源码地址</a><br><a href="https://github.com/nsqio/go-nsq" target="_blank" rel="noopener">nsq-go客户端</a></p><p><strong>3. example</strong><br><a href="https://github.com/jiongdu/golang-snippets/tree/master/nsq-example" target="_blank" rel="noopener">nsq-example</a></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;分布式实时消息平台nsq入门。&lt;/p&gt;
+    
+    </summary>
+    
+    
+    
+      <category term="消息队列" scheme="http://blog.jonnydu.me/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/"/>
+    
+  </entry>
   
   <entry>
     <title>markdown常用语法汇总</title>
@@ -414,27 +435,6 @@
     
     
       <category term="NVMe over RDMA" scheme="http://blog.jonnydu.me/tags/NVMe-over-RDMA/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>分配排序（桶排序和基数排序）总结</title>
-    <link href="http://blog.jonnydu.me/2017/01/20/Distribute-Sort/"/>
-    <id>http://blog.jonnydu.me/2017/01/20/Distribute-Sort/</id>
-    <published>2017-01-20T11:51:47.000Z</published>
-    <updated>2020-04-30T14:16:30.271Z</updated>
-    
-    <content type="html"><![CDATA[<p>分配排序，是指不需要进行两两之间的比较，而根据记录自己的关键码的分配来进行排序的一类方法，因此，在进行分配排序时，我们通常需要知道记录序列的一些具体情况，比如关键码的分布。分配排序主要包括桶排序和基数排序。   </p><a id="more"></a><h3 id="桶排序"><a href="#桶排序" class="headerlink" title="桶排序"></a>桶排序</h3><p>首先来介绍桶排序。如果我们知道序列中的记录都位于一个比较小的区间范围之内，那我们可以把相同值的记录分配到同一个桶里面，然后依次收集这些桶就能得到一个有序的序列。<br>例如，下图中，我们知道待排序数组的记录值在0~9的范围之内，因此，我们可以设定10个桶，然后就把这些记录值分配到各个桶里面。<br><img src="http://i.imgur.com/SVkuDWp.png" alt=""><br>此外，我们还维护了前若干桶的一个累加值，并且，在进行排序的时候，我们从数组记录值的最右边开始遍历，这样来保持排序的稳定性。<br><img src="http://i.imgur.com/yGcdDMb.png" alt=""></p><h4 id="桶排序的实现"><a href="#桶排序的实现" class="headerlink" title="桶排序的实现"></a>桶排序的实现</h4><p>在弄清楚了原理之后，桶排序的实现就很简单了。</p><pre><code> void BucketSort(vector&lt;int&gt;&amp; nums, int max){     int n=nums.size();     vector&lt;int&gt; temp(begin(nums), end(nums));     vector&lt;int&gt; count(max);     for(int i=0;i&lt;max;i++){         count[i]=0;     }     for(int i=0;i&lt;n;i++){         count[nums[i]]++;     }     for(int i=0;i&lt;max;i++){         count[i]=count[i-1]+count[i];     }     for(int i=n-1;i&gt;=0;i--){             nums[--count[temp[i]]]=temp[i];     }}</code></pre><h4 id="桶排序性能分析"><a href="#桶排序性能分析" class="headerlink" title="桶排序性能分析"></a>桶排序性能分析</h4><p>由前面的分析可知，桶排序使用的场景是：待排序的数组长度为n，所有数组记录值位于[0,m)上，且m相对于n很小。<br>因为排序过程需要遍历原数组和count数组，所以总的时间复杂度为O（n+m）。空间代价为O（n+m），包括临时数组和计数器。桶排序是稳定的。   </p><h3 id="静态基数排序"><a href="#静态基数排序" class="headerlink" title="静态基数排序"></a>静态基数排序</h3><p>我们已经知道，桶排序只适合m很小的情况，那如果出现m很大，甚至大于n的情况，应该怎么办呢？不难想象，我们可以把这些记录的关键码认为地拆成几个部分，然后再运用几次桶排序，从而完成整个排序过程，这就是基数排序的思想，基数排序又可以分为静态基数排序和链式基数排序。<br>比如，我们需要对0到9999之间的整数进行排序，这时直接使用桶排序显然是代价较高的。我们可以将四位数看做是由四个排序码决定，个位为最低排序码。基数等于10。然后，按照千，百，十，个位数字依次进行4次桶排序。<br>下面以一个记录值都是两位数的数组的排序过程来说明静态基数排序两趟桶排的具体过程，这里和后面的代码都采用的是低位优先法。<br><img src="http://i.imgur.com/gPF11Hv.png" alt=""><br><img src="http://i.imgur.com/hr8v9TV.png" alt=""></p><h4 id="静态基数排序的实现"><a href="#静态基数排序的实现" class="headerlink" title="静态基数排序的实现"></a>静态基数排序的实现</h4><p>同样，给出静态基数排序的实现。</p><pre><code>void RadixSort(vector&lt;int&gt;&amp; nums, int d, int r){    int n=nums.size();    vector&lt;int&gt; temp(n,0);    vector&lt;int&gt; count(r,0);        //r:radix,10    int radix=1;    int i,j,k;    for(i=1;i&lt;=d;i++){        //d:排序码的个数        for(j=0;j&lt;r;j++){            count[j]=0;        }        for(j=0;j&lt;n;j++){            k=(nums[j]/radix)%r;            count[k]++;        }        for(j=1;j&lt;r;j++){            count[j]=count[j]+count[j-1];        }        for(j=n-1;j&gt;=0;j--){            k=(nums[j]/radix)%r;            count[k]--;            temp[count[k]]=nums[j];        }        for(j=0;j&lt;n;j++){            nums[j]=temp[j];        }        radix*=r;    }}</code></pre><h4 id="静态基数排序性能分析"><a href="#静态基数排序性能分析" class="headerlink" title="静态基数排序性能分析"></a>静态基数排序性能分析</h4><p>同样的，静态基数排序也需要一个临时数组和r个计数器，所以总的空间代价为O（n+r）。时间代价则为O（d*(n+r)），因为它相当于进行了d次桶式排序。此外，静态基数排序也是稳定的。</p><h3 id="链式基数排序"><a href="#链式基数排序" class="headerlink" title="链式基数排序"></a>链式基数排序</h3><p>基于静态链的基数排序相对于静态基数排序的差别在于将分配出来的子序列存放在r个静态链组织的队列中。<br>下面，同样以一个例子来说明链式基数排序的过程。<br>假设有待排序数组[97, 53, 88, 59, 26, 41, 88, 31, 22]，首先按照个位进行第一趟分配，分配完元素后的队列如下图所示。<br><img src="http://i.imgur.com/D5ZCnQk.png" alt=""><br>然后进行第一趟收集，即个位有序：[41, 31, 22, 53, 26, 97, 88, 88]。<br>接下来，再按照十位进行第二趟分配。<br><img src="http://i.imgur.com/BUeHB5r.png" alt=""><br>最后进行第二趟收集，即完成最终的排序。</p><h4 id="链式基数排序的实现"><a href="#链式基数排序的实现" class="headerlink" title="链式基数排序的实现"></a>链式基数排序的实现</h4><p>下面给出链式基数排序的实现。</p><pre><code>typedef struct Node{    int key;    int next;    //下一个节点在数组中的下标}Node;typedef struct StaticQueue{    int head;    int tail;}StaticQueue;void Distribute(vector&lt;Node&gt;&amp; node, int first, int i, int r, StaticQueue* queue);void Collect(vector&lt;Node&gt;&amp; node, int&amp; first, int r, StaticQueue* queue);void RadixSort(vector&lt;int&gt;&amp; nums, int d, int r){    int i, first=0;    int n=nums.size();    vector&lt;Node&gt; node(n);    StaticQueue* queue = new StaticQueue[r];    for(i=0;i&lt;n-1;i++){        node[i].key=nums[i];        node[i].next=i+1;    }    node[n-1].key=nums[n-1];    node[n-1].next=-1;    for(i=0;i&lt;d;i++){            //d趟的分配和收集        Distribute(node, first, i, r, queue);            //分配到不同队列        Collect(node, first, r, queue);                    //聚合    }    for(i=0;i&lt;r;i++){        if(queue[i].head==-1) continue;        else break;    }    int j=queue[i].head;    while(node[j].next!=-1){        //排序结果        cout &lt;&lt; node[j].key &lt;&lt; endl;        j = node[j].next;    }    cout &lt;&lt; node[j].key &lt;&lt; endl;    delete[] queue;}void Distribute(vector&lt;Node&gt;&amp; node, int first, int i, int r, StaticQueue* queue){    int current=first;    for(int j=0;j&lt;r;j++){        queue[j].head=-1;    }    while(current!=-1){        int k = node[current].key;        for(int a=0;a&lt;i;a++){            k=k/r;        }        k=k%r;        if(queue[k].head==-1){            queue[k].head=current;        }else{            node[queue[k].tail].next=current;        }        queue[k].tail=current;        current=node[current].next;    }}void Collect(vector&lt;Node&gt;&amp; node, int&amp; first, int r, StaticQueue* queue){    int last,k=0;    while(queue[k].head==-1) k++;    first=queue[k].head;    last=queue[k].tail;    while(k&lt;r-1){        k++;        while(k&lt;r-1 &amp;&amp; queue[k].head==-1){            k++;        }        if(queue[k].head!=-1){            node[last].next=queue[k].head;            last=queue[k].tail;        }    }    node[last].next=-1;}</code></pre><h4 id="链式基数排序性能分析"><a href="#链式基数排序性能分析" class="headerlink" title="链式基数排序性能分析"></a>链式基数排序性能分析</h4><p>由前面的分析和代码可知，链式基数排序在分配和收集的过程中，不需要移动记录本身，只是在做记录next指针的修改。因此，它的时间代价和空间代价与静态基数排序一致，分别为O（d*(n+r)）和O（n+r）。并且，根据队列的先入先出的特点，链式基数排序也是稳定的。</p><h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>本文总结了分配排序中最常见的桶排序和基数排序，并给出了具体的实现和相关分析。可以看出，分配排序不会对记录值进行两两比较，因此不受O（nlgn）时间复杂度的限制。从另外一个角度看，分配排序也可以看做是以空间换时间的典型方法。</p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;分配排序，是指不需要进行两两之间的比较，而根据记录自己的关键码的分配来进行排序的一类方法，因此，在进行分配排序时，我们通常需要知道记录序列的一些具体情况，比如关键码的分布。分配排序主要包括桶排序和基数排序。   &lt;/p&gt;
-    
-    </summary>
-    
-    
-    
-      <category term="数据结构与算法" scheme="http://blog.jonnydu.me/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/"/>
     
   </entry>
   
